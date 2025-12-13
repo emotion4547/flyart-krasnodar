@@ -30,6 +30,7 @@ import {
   LogOut,
   Upload,
   ChevronRight,
+  UserCog,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -45,6 +46,7 @@ const menuItems = [
   { title: 'Маркетинг / SEO', url: '/admin4547/marketing', icon: BarChart3 },
   { title: 'Контент', url: '/admin4547/content', icon: FileText },
   { title: 'Импорт Excel', url: '/admin4547/import', icon: Upload },
+  { title: 'Пользователи', url: '/admin4547/users', icon: UserCog },
   { title: 'Настройки', url: '/admin4547/settings', icon: Settings },
 ];
 

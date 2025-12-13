@@ -32,6 +32,7 @@ import Marketing from "./pages/admin/Marketing";
 import Content from "./pages/admin/Content";
 import Import from "./pages/admin/Import";
 import Settings from "./pages/admin/Settings";
+import UsersManagement from "./pages/admin/UsersManagement";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ const App = () => (
               <Route path="/admin4547/marketing" element={<AdminLayout><Marketing /></AdminLayout>} />
               <Route path="/admin4547/content" element={<AdminLayout><Content /></AdminLayout>} />
               <Route path="/admin4547/import" element={<AdminLayout><Import /></AdminLayout>} />
+              <Route path="/admin4547/users" element={<AdminLayout><UsersManagement /></AdminLayout>} />
               <Route path="/admin4547/settings" element={<AdminLayout><Settings /></AdminLayout>} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

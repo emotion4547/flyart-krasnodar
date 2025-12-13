@@ -1,55 +1,112 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
-import { toast } from 'sonner';
-import { Save, Store, Truck, CreditCard, Users } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Save, Store, Truck, CreditCard, Plus, Trash2 } from 'lucide-react';
+import { useSettings } from '@/hooks/useSettings';
+
+interface GeneralSettings {
+  siteName: string;
+  siteDescription: string;
+  phone: string;
+  email: string;
+  address: string;
+  workingHours: string;
+}
+
+interface DeliveryZone {
+  name: string;
+  price: string;
+}
+
+interface DeliverySettings {
+  freeDeliveryThreshold: string;
+  deliveryZones: DeliveryZone[];
+  selfPickup: boolean;
+  selfPickupAddress: string;
+}
+
+interface PaymentSettings {
+  cardPayment: boolean;
+  cashPayment: boolean;
+  onlinePayment: boolean;
+}
+
+const defaultGeneral: GeneralSettings = {
+  siteName: 'FlyArt',
+  siteDescription: 'Воздушные шары и оформление праздников',
+  phone: '+7 (900) 123-45-67',
+  email: 'info@flyart.ru',
+  address: 'Красноярск',
+  workingHours: 'Пн-Вс: 9:00 - 21:00',
+};
+
+const defaultDelivery: DeliverySettings = {
+  freeDeliveryThreshold: '3000',
+  deliveryZones: [{ name: 'По городу', price: '350' }],
+  selfPickup: true,
+  selfPickupAddress: 'Красноярск',
+};
+
+const defaultPayment: PaymentSettings = {
+  cardPayment: true,
+  cashPayment: true,
+  onlinePayment: false,
+};
 
 export default function Settings() {
-  const [generalSettings, setGeneralSettings] = useState({
-    siteName: 'FlyArt',
-    siteDescription: 'Воздушные шары и оформление праздников',
-    phone: '+7 (495) 000-00-00',
-    email: 'info@flyart.ru',
-    address: 'Москва, ул. Примерная, д. 1',
-    workingHours: 'Ежедневно с 9:00 до 21:00',
-  });
+  const { data: generalData, isLoading: generalLoading, save: saveGeneral, isSaving: savingGeneral } = 
+    useSettings<GeneralSettings>('general', defaultGeneral);
+  const { data: deliveryData, isLoading: deliveryLoading, save: saveDelivery, isSaving: savingDelivery } = 
+    useSettings<DeliverySettings>('delivery', defaultDelivery);
+  const { data: paymentData, isLoading: paymentLoading, save: savePayment, isSaving: savingPayment } = 
+    useSettings<PaymentSettings>('payment', defaultPayment);
 
-  const [deliverySettings, setDeliverySettings] = useState({
-    freeDeliveryThreshold: '3000',
-    deliveryZones: [
-      { name: 'Внутри МКАД', price: '350' },
-      { name: 'До 10 км от МКАД', price: '600' },
-      { name: 'До 20 км от МКАД', price: '950' },
-    ],
-    selfPickup: true,
-    selfPickupAddress: 'Москва, ул. Примерная, д. 1',
-  });
+  const [generalSettings, setGeneralSettings] = useState<GeneralSettings>(defaultGeneral);
+  const [deliverySettings, setDeliverySettings] = useState<DeliverySettings>(defaultDelivery);
+  const [paymentSettings, setPaymentSettings] = useState<PaymentSettings>(defaultPayment);
 
-  const [paymentSettings, setPaymentSettings] = useState({
-    cardPayment: true,
-    cashPayment: true,
-    onlinePayment: false,
-  });
+  useEffect(() => {
+    if (generalData) setGeneralSettings(generalData);
+  }, [generalData]);
 
-  const handleSaveGeneral = () => {
-    localStorage.setItem('general-settings', JSON.stringify(generalSettings));
-    toast.success('Общие настройки сохранены');
+  useEffect(() => {
+    if (deliveryData) setDeliverySettings(deliveryData);
+  }, [deliveryData]);
+
+  useEffect(() => {
+    if (paymentData) setPaymentSettings(paymentData);
+  }, [paymentData]);
+
+  const addDeliveryZone = () => {
+    setDeliverySettings({
+      ...deliverySettings,
+      deliveryZones: [...deliverySettings.deliveryZones, { name: '', price: '' }],
+    });
   };
 
-  const handleSaveDelivery = () => {
-    localStorage.setItem('delivery-settings', JSON.stringify(deliverySettings));
-    toast.success('Настройки доставки сохранены');
+  const removeDeliveryZone = (index: number) => {
+    const zones = [...deliverySettings.deliveryZones];
+    zones.splice(index, 1);
+    setDeliverySettings({ ...deliverySettings, deliveryZones: zones });
   };
 
-  const handleSavePayment = () => {
-    localStorage.setItem('payment-settings', JSON.stringify(paymentSettings));
-    toast.success('Настройки оплаты сохранены');
-  };
+  if (generalLoading || deliveryLoading || paymentLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Настройки</h1>
+          <p className="text-muted-foreground">Общие настройки магазина</p>
+        </div>
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -126,9 +183,9 @@ export default function Settings() {
                 />
               </div>
 
-              <Button onClick={handleSaveGeneral}>
+              <Button onClick={() => saveGeneral(generalSettings)} disabled={savingGeneral}>
                 <Save className="h-4 w-4 mr-2" />
-                Сохранить
+                {savingGeneral ? 'Сохранение...' : 'Сохранить'}
               </Button>
             </CardContent>
           </Card>
@@ -153,28 +210,46 @@ export default function Settings() {
               </div>
 
               <div className="space-y-4">
-                <Label>Зоны доставки</Label>
+                <div className="flex items-center justify-between">
+                  <Label>Зоны доставки</Label>
+                  <Button variant="outline" size="sm" onClick={addDeliveryZone}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Добавить
+                  </Button>
+                </div>
                 {deliverySettings.deliveryZones.map((zone, index) => (
-                  <div key={index} className="grid gap-4 md:grid-cols-2">
-                    <Input
-                      value={zone.name}
-                      onChange={(e) => {
-                        const zones = [...deliverySettings.deliveryZones];
-                        zones[index].name = e.target.value;
-                        setDeliverySettings({ ...deliverySettings, deliveryZones: zones });
-                      }}
-                      placeholder="Название зоны"
-                    />
-                    <Input
-                      type="number"
-                      value={zone.price}
-                      onChange={(e) => {
-                        const zones = [...deliverySettings.deliveryZones];
-                        zones[index].price = e.target.value;
-                        setDeliverySettings({ ...deliverySettings, deliveryZones: zones });
-                      }}
-                      placeholder="Цена"
-                    />
+                  <div key={index} className="grid gap-4 md:grid-cols-3 items-end">
+                    <div className="md:col-span-2">
+                      <Input
+                        value={zone.name}
+                        onChange={(e) => {
+                          const zones = [...deliverySettings.deliveryZones];
+                          zones[index].name = e.target.value;
+                          setDeliverySettings({ ...deliverySettings, deliveryZones: zones });
+                        }}
+                        placeholder="Название зоны"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        value={zone.price}
+                        onChange={(e) => {
+                          const zones = [...deliverySettings.deliveryZones];
+                          zones[index].price = e.target.value;
+                          setDeliverySettings({ ...deliverySettings, deliveryZones: zones });
+                        }}
+                        placeholder="Цена"
+                      />
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => removeDeliveryZone(index)}
+                        disabled={deliverySettings.deliveryZones.length === 1}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -200,9 +275,9 @@ export default function Settings() {
                 </div>
               )}
 
-              <Button onClick={handleSaveDelivery}>
+              <Button onClick={() => saveDelivery(deliverySettings)} disabled={savingDelivery}>
                 <Save className="h-4 w-4 mr-2" />
-                Сохранить
+                {savingDelivery ? 'Сохранение...' : 'Сохранить'}
               </Button>
             </CardContent>
           </Card>
@@ -250,9 +325,9 @@ export default function Settings() {
                 />
               </div>
 
-              <Button onClick={handleSavePayment}>
+              <Button onClick={() => savePayment(paymentSettings)} disabled={savingPayment}>
                 <Save className="h-4 w-4 mr-2" />
-                Сохранить
+                {savingPayment ? 'Сохранение...' : 'Сохранить'}
               </Button>
             </CardContent>
           </Card>

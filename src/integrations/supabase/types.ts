@@ -214,6 +214,45 @@ export type Database = {
         }
         Relationships: []
       }
+      pages_seo: {
+        Row: {
+          created_at: string
+          description: string | null
+          h1: string | null
+          id: string
+          keywords: string | null
+          og_description: string | null
+          og_title: string | null
+          page_id: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          h1?: string | null
+          id?: string
+          keywords?: string | null
+          og_description?: string | null
+          og_title?: string | null
+          page_id: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          h1?: string | null
+          id?: string
+          keywords?: string | null
+          og_description?: string | null
+          og_title?: string | null
+          page_id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_categories: {
         Row: {
           category_id: string
@@ -399,6 +438,30 @@ export type Database = {
           id?: string
           role?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      settings: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json
         }
         Relationships: []
       }

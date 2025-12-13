@@ -1,50 +1,89 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Save, Code, FileText, Globe } from 'lucide-react';
+import { useSettings } from '@/hooks/useSettings';
 
-export default function Marketing() {
-  const [seoTemplates, setSeoTemplates] = useState({
-    productTitle: '{{title}} - Купить в FlyArt',
-    productDescription: '{{title}} по цене {{price}} руб. {{description}}',
-    categoryTitle: '{{name}} - Каталог FlyArt',
-    categoryDescription: 'Купить {{name}} в FlyArt. {{description}}',
-  });
+interface SeoTemplates {
+  productTitle: string;
+  productDescription: string;
+  categoryTitle: string;
+  categoryDescription: string;
+}
 
-  const [robotsTxt, setRobotsTxt] = useState(`User-agent: *
+interface RobotsTxt {
+  content: string;
+}
+
+interface AnalyticsCode {
+  yandexMetrika: string;
+  googleAnalytics: string;
+  facebookPixel: string;
+}
+
+const defaultSeoTemplates: SeoTemplates = {
+  productTitle: '{{title}} - Купить в FlyArt',
+  productDescription: '{{title}} по цене {{price}} руб. {{description}}',
+  categoryTitle: '{{name}} - Каталог FlyArt',
+  categoryDescription: 'Купить {{name}} в FlyArt. {{description}}',
+};
+
+const defaultRobotsTxt: RobotsTxt = {
+  content: `User-agent: *
 Allow: /
-Disallow: /admin/
+Disallow: /admin4547/
 Disallow: /cart
 Disallow: /checkout
 
-Sitemap: https://flyart.ru/sitemap.xml`);
+Sitemap: https://flyart.ru/sitemap.xml`,
+};
 
-  const [analyticsCode, setAnalyticsCode] = useState({
-    yandexMetrika: '',
-    googleAnalytics: '',
-    facebookPixel: '',
-  });
+const defaultAnalytics: AnalyticsCode = {
+  yandexMetrika: '',
+  googleAnalytics: '',
+  facebookPixel: '',
+};
 
-  const handleSaveTemplates = () => {
-    // Save to localStorage or backend
-    localStorage.setItem('seo-templates', JSON.stringify(seoTemplates));
-    toast.success('Шаблоны SEO сохранены');
-  };
+export default function Marketing() {
+  const { data: seoData, isLoading: seoLoading, save: saveSeo, isSaving: savingSeo } = 
+    useSettings<SeoTemplates>('seo_templates', defaultSeoTemplates);
+  const { data: robotsData, isLoading: robotsLoading, save: saveRobots, isSaving: savingRobots } = 
+    useSettings<RobotsTxt>('robots_txt', defaultRobotsTxt);
+  const { data: analyticsData, isLoading: analyticsLoading, save: saveAnalytics, isSaving: savingAnalytics } = 
+    useSettings<AnalyticsCode>('analytics', defaultAnalytics);
 
-  const handleSaveRobots = () => {
-    localStorage.setItem('robots-txt', robotsTxt);
-    toast.success('robots.txt сохранён');
-  };
+  const [seoTemplates, setSeoTemplates] = useState<SeoTemplates>(defaultSeoTemplates);
+  const [robotsTxt, setRobotsTxt] = useState<string>(defaultRobotsTxt.content);
+  const [analyticsCode, setAnalyticsCode] = useState<AnalyticsCode>(defaultAnalytics);
 
-  const handleSaveAnalytics = () => {
-    localStorage.setItem('analytics-code', JSON.stringify(analyticsCode));
-    toast.success('Коды аналитики сохранены');
-  };
+  useEffect(() => {
+    if (seoData) setSeoTemplates(seoData);
+  }, [seoData]);
+
+  useEffect(() => {
+    if (robotsData) setRobotsTxt(robotsData.content);
+  }, [robotsData]);
+
+  useEffect(() => {
+    if (analyticsData) setAnalyticsCode(analyticsData);
+  }, [analyticsData]);
+
+  if (seoLoading || robotsLoading || analyticsLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Маркетинг / SEO</h1>
+          <p className="text-muted-foreground">Глобальные настройки SEO и интеграции</p>
+        </div>
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -114,9 +153,9 @@ Sitemap: https://flyart.ru/sitemap.xml`);
                 </div>
               </div>
 
-              <Button onClick={handleSaveTemplates}>
+              <Button onClick={() => saveSeo(seoTemplates)} disabled={savingSeo}>
                 <Save className="h-4 w-4 mr-2" />
-                Сохранить шаблоны
+                {savingSeo ? 'Сохранение...' : 'Сохранить шаблоны'}
               </Button>
             </CardContent>
           </Card>
@@ -140,9 +179,9 @@ Sitemap: https://flyart.ru/sitemap.xml`);
                 rows={12}
                 className="font-mono text-sm"
               />
-              <Button onClick={handleSaveRobots}>
+              <Button onClick={() => saveRobots({ content: robotsTxt })} disabled={savingRobots}>
                 <Save className="h-4 w-4 mr-2" />
-                Сохранить robots.txt
+                {savingRobots ? 'Сохранение...' : 'Сохранить robots.txt'}
               </Button>
             </CardContent>
           </Card>
@@ -187,9 +226,9 @@ Sitemap: https://flyart.ru/sitemap.xml`);
                 />
               </div>
 
-              <Button onClick={handleSaveAnalytics}>
+              <Button onClick={() => saveAnalytics(analyticsCode)} disabled={savingAnalytics}>
                 <Save className="h-4 w-4 mr-2" />
-                Сохранить коды аналитики
+                {savingAnalytics ? 'Сохранение...' : 'Сохранить коды аналитики'}
               </Button>
             </CardContent>
           </Card>
