@@ -103,11 +103,11 @@ export function SearchDialog({ variant = "icon" }: SearchDialogProps) {
       ) : variant === "header" ? (
         <button
           onClick={() => setOpen(true)}
-          className="flex-1 flex items-center gap-3 px-4 py-2.5 rounded-full border border-border bg-muted/50 text-muted-foreground text-left hover:border-tiffany hover:bg-background transition-all group"
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-full border border-border bg-muted/50 text-muted-foreground text-left hover:border-tiffany hover:bg-background transition-all group"
         >
-          <Search className="h-5 w-5 text-muted-foreground group-hover:text-tiffany transition-colors" />
-          <span className="text-sm">Искать воздушные шары...</span>
-          <kbd className="ml-auto hidden md:inline-flex h-6 items-center gap-1 rounded border border-border bg-background px-2 font-mono text-xs text-muted-foreground">
+          <Search className="h-5 w-5 flex-shrink-0 text-muted-foreground group-hover:text-tiffany transition-colors" />
+          <span className="text-sm whitespace-nowrap">Искать воздушные шары...</span>
+          <kbd className="ml-auto hidden lg:inline-flex h-6 items-center gap-1 rounded border border-border bg-background px-2 font-mono text-xs text-muted-foreground flex-shrink-0">
             <span className="text-xs">⌘</span>K
           </kbd>
         </button>
