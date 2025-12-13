@@ -94,8 +94,10 @@ export function Header() {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-2 ml-auto">
-            <SearchDialog />
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="md:hidden">
+              <SearchDialog />
+            </div>
             
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">
@@ -106,7 +108,7 @@ export function Header() {
               </Button>
             </Link>
 
-            <Button variant="cta" className="hidden md:flex">
+            <Button variant="cta" className="hidden md:flex whitespace-nowrap">
               Заказать
             </Button>
 
