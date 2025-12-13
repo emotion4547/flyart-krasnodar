@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/CartContext";
 import { SearchDialog } from "./SearchDialog";
+import { CallbackDialog } from "@/components/CallbackDialog";
 
 const navigation = [
   { name: "Каталог", href: "/catalog" },
@@ -39,9 +40,7 @@ export function Header() {
                 <Phone className="h-4 w-4 text-tiffany" />
                 +7 (900) 123-45-67
               </a>
-              <Button variant="tiffanyOutline" size="sm">
-                Заказать звонок
-              </Button>
+              <CallbackDialog />
             </div>
           </div>
         </div>
