@@ -1,66 +1,99 @@
 import { Link } from "react-router-dom";
-import { Baby, User, Heart, Crown, Stethoscope, HelpCircle, Package, Sparkles } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const categories = [
-  {
-    name: "Для девочки",
-    slug: "girl",
-    icon: Baby,
-    color: "from-pink-200 to-peach",
-    iconColor: "text-pink-500",
-  },
-  {
-    name: "Для мальчика",
-    slug: "boy",
-    icon: Baby,
-    color: "from-blue-200 to-tiffany-light",
-    iconColor: "text-blue-500",
-  },
-  {
-    name: "Для девушки",
-    slug: "woman",
-    icon: Heart,
-    color: "from-peach to-pink-100",
-    iconColor: "text-cta",
-  },
-  {
-    name: "Для мужчины",
-    slug: "man",
-    icon: Crown,
-    color: "from-slate-200 to-tiffany-light",
-    iconColor: "text-tiffany-dark",
-  },
-  {
-    name: "Выписка",
-    slug: "discharge",
-    icon: Stethoscope,
-    color: "from-tiffany-light to-blue-100",
-    iconColor: "text-tiffany",
-  },
-  {
-    name: "Гендер пати",
-    slug: "gender-party",
-    icon: HelpCircle,
-    color: "from-pink-100 via-purple-100 to-blue-100",
-    iconColor: "text-purple-500",
-  },
-  {
-    name: "Коробки",
-    slug: "boxes",
-    icon: Package,
-    color: "from-gold-light to-peach",
-    iconColor: "text-accent-foreground",
-  },
-  {
-    name: "Под потолок",
-    slug: "ceiling",
-    icon: Sparkles,
-    color: "from-tiffany-light to-gold-light",
-    iconColor: "text-tiffany-dark",
-  },
+// Color palette for categories
+const categoryColors = [
+  "from-pink-200 to-peach",
+  "from-blue-200 to-tiffany-light",
+  "from-peach to-pink-100",
+  "from-slate-200 to-tiffany-light",
+  "from-tiffany-light to-blue-100",
+  "from-pink-100 via-purple-100 to-blue-100",
+  "from-gold-light to-peach",
+  "from-tiffany-light to-gold-light",
 ];
 
 export function CategoriesSection() {
+  // Fetch categories with product images
+  const { data: categories, isLoading } = useQuery({
+    queryKey: ["home-categories"],
+    queryFn: async () => {
+      // Get categories with product count > 0
+      const { data: cats, error } = await supabase
+        .from("categories")
+        .select("id, name, slug")
+        .order("sort_order", { ascending: true });
+
+      if (error) throw error;
+
+      // Get a random product image for each category
+      const categoriesWithImages = await Promise.all(
+        cats.map(async (cat) => {
+          // Get products in this category with images
+          const { data: products } = await supabase
+            .from("product_categories")
+            .select(`
+              product_id,
+              products!inner (
+                id,
+                is_active,
+                product_images (url, is_main)
+              )
+            `)
+            .eq("category_id", cat.id)
+            .limit(10);
+
+          // Find a product with an image
+          let imageUrl: string | null = null;
+          if (products) {
+            for (const pc of products) {
+              const product = pc.products as any;
+              if (product?.is_active && product?.product_images?.length > 0) {
+                const mainImg = product.product_images.find((img: any) => img.is_main);
+                imageUrl = mainImg?.url || product.product_images[0]?.url;
+                break;
+              }
+            }
+          }
+
+          return {
+            ...cat,
+            imageUrl,
+            productCount: products?.length || 0,
+          };
+        })
+      );
+
+      // Filter to show only categories with at least one product with image
+      // and limit to 8 most populated
+      return categoriesWithImages
+        .filter((c) => c.productCount > 0 && c.imageUrl)
+        .slice(0, 8);
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <section className="section-padding bg-background">
+        <div className="container-custom">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Популярные разделы
+            </h2>
+            <div className="gold-line max-w-xs mx-auto mb-4" />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="aspect-square rounded-2xl" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="section-padding bg-background">
       <div className="container-custom">
@@ -77,33 +110,43 @@ export function CategoriesSection() {
 
         {/* Categories grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {categories.map((category, index) => {
-            const Icon = category.icon;
-            return (
-              <Link
-                key={category.slug}
-                to={`/catalog/${category.slug}`}
-                className="group relative overflow-hidden rounded-2xl aspect-square transition-all duration-300 hover:-translate-y-1"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                {/* Background gradient */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${category.color} transition-transform duration-300 group-hover:scale-105`} />
-                
-                {/* Content */}
-                <div className="relative h-full flex flex-col items-center justify-center p-4 text-center">
-                  <div className="h-14 w-14 md:h-16 md:w-16 rounded-2xl bg-background/80 backdrop-blur-sm flex items-center justify-center mb-4 shadow-soft group-hover:shadow-card transition-shadow">
-                    <Icon className={`h-7 w-7 md:h-8 md:w-8 ${category.iconColor}`} />
-                  </div>
-                  <h3 className="font-semibold text-foreground text-sm md:text-base">
-                    {category.name}
-                  </h3>
-                </div>
+          {categories?.map((category, index) => (
+            <Link
+              key={category.id}
+              to={`/catalog?category=${category.id}`}
+              className="group relative overflow-hidden rounded-2xl aspect-square transition-all duration-300 hover:-translate-y-1 hover:shadow-card"
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
+              {/* Background gradient */}
+              <div
+                className={`absolute inset-0 bg-gradient-to-br ${categoryColors[index % categoryColors.length]} transition-transform duration-300 group-hover:scale-105`}
+              />
 
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-tiffany/0 group-hover:bg-tiffany/5 transition-colors duration-300" />
-              </Link>
-            );
-          })}
+              {/* Product image */}
+              {category.imageUrl && (
+                <div className="absolute inset-0 flex items-center justify-center p-4">
+                  <img
+                    src={category.imageUrl}
+                    alt={category.name}
+                    className="w-3/4 h-3/4 object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
+                  />
+                </div>
+              )}
+
+              {/* Gradient overlay for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+
+              {/* Category name */}
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <h3 className="font-semibold text-white text-sm md:text-base text-center drop-shadow-md">
+                  {category.name}
+                </h3>
+              </div>
+
+              {/* Hover overlay */}
+              <div className="absolute inset-0 bg-tiffany/0 group-hover:bg-tiffany/10 transition-colors duration-300" />
+            </Link>
+          ))}
         </div>
       </div>
     </section>

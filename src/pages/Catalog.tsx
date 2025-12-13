@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ProductCard } from "@/components/home/ProductCard";
@@ -21,12 +22,35 @@ import { Label } from "@/components/ui/label";
 const PRODUCTS_PER_PAGE = 24;
 
 const Catalog = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    searchParams.get("category")
+  );
   const [sortBy, setSortBy] = useState<string>("sort_order");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [priceMin, setPriceMin] = useState<string>("");
   const [priceMax, setPriceMax] = useState<string>("");
+
+  // Sync URL params with state
+  useEffect(() => {
+    const categoryFromUrl = searchParams.get("category");
+    if (categoryFromUrl !== selectedCategory) {
+      setSelectedCategory(categoryFromUrl);
+      setCurrentPage(1);
+    }
+  }, [searchParams]);
+
+  // Update URL when category changes
+  const handleCategoryChange = (categoryId: string | null) => {
+    setSelectedCategory(categoryId);
+    setCurrentPage(1);
+    if (categoryId) {
+      setSearchParams({ category: categoryId });
+    } else {
+      setSearchParams({});
+    }
+  };
 
   // Fetch categories
   const { data: categories } = useQuery({
@@ -153,10 +177,7 @@ const Catalog = () => {
       <Button
         variant={selectedCategory === null ? "tiffany" : "ghost"}
         className="w-full justify-start text-left whitespace-normal h-auto py-2"
-        onClick={() => {
-          setSelectedCategory(null);
-          setCurrentPage(1);
-        }}
+        onClick={() => handleCategoryChange(null)}
       >
         Все товары
       </Button>
@@ -165,10 +186,7 @@ const Catalog = () => {
           key={category.id}
           variant={selectedCategory === category.id ? "tiffany" : "ghost"}
           className="w-full justify-start text-left whitespace-normal h-auto py-2"
-          onClick={() => {
-            setSelectedCategory(category.id);
-            setCurrentPage(1);
-          }}
+          onClick={() => handleCategoryChange(category.id)}
         >
           {category.name}
         </Button>
@@ -250,7 +268,7 @@ const Catalog = () => {
                     variant="secondary"
                     size="sm"
                     className="h-8 gap-1"
-                    onClick={() => setSelectedCategory(null)}
+                    onClick={() => handleCategoryChange(null)}
                   >
                     {categories?.find((c) => c.id === selectedCategory)?.name}
                     <X className="h-3 w-3" />
@@ -382,7 +400,7 @@ const Catalog = () => {
                   {selectedCategory && (
                     <Button
                       variant="tiffanyOutline"
-                      onClick={() => setSelectedCategory(null)}
+                      onClick={() => handleCategoryChange(null)}
                     >
                       Сбросить фильтр
                     </Button>
