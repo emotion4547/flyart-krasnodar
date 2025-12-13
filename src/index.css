@@ -224,4 +224,20 @@
       transform: scale(1);
     }
   }
+
+  .animate-pulse-ring {
+    animation: pulseRing 2s ease-out infinite;
+  }
+
+  @keyframes pulseRing {
+    0% {
+      box-shadow: 0 0 0 0 hsl(var(--tiffany) / 0.6);
+    }
+    70% {
+      box-shadow: 0 0 0 15px hsl(var(--tiffany) / 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 hsl(var(--tiffany) / 0);
+    }
+  }
 }
