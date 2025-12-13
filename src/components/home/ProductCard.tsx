@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 
 interface ProductCardProps {
   id: string;
+  slug: string;
   title: string;
   sku: string;
   price: number;
@@ -16,6 +17,7 @@ interface ProductCardProps {
 
 export function ProductCard({
   id,
+  slug,
   title,
   sku,
   price,
@@ -67,7 +69,7 @@ export function ProductCard({
         <p className="text-xs text-muted-foreground mb-1">Арт. {sku}</p>
         
         {/* Title */}
-        <Link to={`/product/${id}`}>
+        <Link to={`/product/${slug}`}>
           <h3 className="font-medium text-foreground text-sm md:text-base line-clamp-2 mb-3 hover:text-tiffany transition-colors min-h-[2.5rem]">
             {title}
           </h3>
