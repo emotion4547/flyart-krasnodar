@@ -103,6 +103,10 @@ export function Header() {
               </SheetTrigger>
               <SheetContent side="right" className="w-80 bg-background">
                 <div className="flex flex-col gap-6 mt-8">
+                  <div className="px-4">
+                    <SearchDialog variant="full" />
+                  </div>
+                  
                   <div className="flex flex-col gap-2">
                     {navigation.map((item) => (
                       <Link

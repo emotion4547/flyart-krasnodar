@@ -20,7 +20,11 @@ interface Product {
   images: { url: string; is_main: boolean }[];
 }
 
-export function SearchDialog() {
+interface SearchDialogProps {
+  variant?: "icon" | "full";
+}
+
+export function SearchDialog({ variant = "icon" }: SearchDialogProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
@@ -87,14 +91,24 @@ export function SearchDialog() {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setOpen(true)}
-        className="relative"
-      >
-        <Search className="h-5 w-5" />
-      </Button>
+      {variant === "icon" ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setOpen(true)}
+          className="relative"
+        >
+          <Search className="h-5 w-5" />
+        </Button>
+      ) : (
+        <button
+          onClick={() => setOpen(true)}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-border bg-background text-muted-foreground text-left hover:border-tiffany transition-colors"
+        >
+          <Search className="h-5 w-5" />
+          <span>Поиск товаров...</span>
+        </button>
+      )}
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput
