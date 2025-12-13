@@ -107,9 +107,6 @@ export function SearchDialog({ variant = "icon" }: SearchDialogProps) {
         >
           <Search className="h-5 w-5 flex-shrink-0 text-muted-foreground group-hover:text-tiffany transition-colors" />
           <span className="text-sm whitespace-nowrap">Искать воздушные шары...</span>
-          <kbd className="ml-auto hidden lg:inline-flex h-6 items-center gap-1 rounded border border-border bg-background px-2 font-mono text-xs text-muted-foreground flex-shrink-0">
-            <span className="text-xs">⌘</span>K
-          </kbd>
         </button>
       ) : (
         <button
