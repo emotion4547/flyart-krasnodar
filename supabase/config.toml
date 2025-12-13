@@ -2,3 +2,6 @@ project_id = "gsnqucupjpdlfeqpbjup"
 
 [functions.sitemap]
 verify_jwt = false
+
+[functions.product-advisor]
+verify_jwt = false
