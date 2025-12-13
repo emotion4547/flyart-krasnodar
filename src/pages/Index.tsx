@@ -7,10 +7,12 @@ import { ContactForm } from "@/components/home/ContactForm";
 import { AdvantagesSection } from "@/components/home/AdvantagesSection";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
 import { AboutSection } from "@/components/home/AboutSection";
+import { SEO } from "@/components/SEO";
 
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO />
       <Header />
       <main className="flex-1">
         <HeroSection />

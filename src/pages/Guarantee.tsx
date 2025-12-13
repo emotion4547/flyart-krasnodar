@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Shield, AlertTriangle, Clock, MessageCircle, CheckCircle, XCircle } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const guaranteeRules = [
   {
@@ -26,6 +27,11 @@ const guaranteeRules = [
 const Guarantee = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO 
+        title="Гарантия"
+        description="Гарантия качества воздушных шаров FlyArt. Условия возврата и замены при обнаружении брака."
+        keywords="гарантия воздушные шары, возврат шаров"
+      />
       <Header />
       
       <main className="flex-1">
