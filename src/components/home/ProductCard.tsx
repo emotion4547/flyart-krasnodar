@@ -50,7 +50,7 @@ export function ProductCard({
   };
 
   return (
-    <article className="card-product group">
+    <article className="card-product group h-full flex flex-col">
       {/* Image container */}
       <div className="relative aspect-square overflow-hidden bg-warm-cream">
         <img
@@ -86,12 +86,12 @@ export function ProductCard({
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-1">
         {/* SKU */}
         <p className="text-xs text-muted-foreground mb-1">Арт. {sku}</p>
         
         {/* Title */}
-        <Link to={`/product/${slug}`}>
+        <Link to={`/product/${slug}`} className="flex-1">
           <h3 className="font-medium text-foreground text-sm md:text-base line-clamp-2 mb-3 hover:text-tiffany transition-colors min-h-[2.5rem]">
             {title}
           </h3>
@@ -110,7 +110,7 @@ export function ProductCard({
         </div>
 
         {/* Add to cart */}
-        <Button variant="cta" className="w-full" size="sm" onClick={handleAddToCart}>
+        <Button variant="cta" className="w-full mt-auto" size="sm" onClick={handleAddToCart}>
           <ShoppingCart className="h-4 w-4 mr-2" />
           В корзину
         </Button>

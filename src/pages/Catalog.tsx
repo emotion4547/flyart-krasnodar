@@ -92,7 +92,7 @@ const Catalog = () => {
     <div className="space-y-2">
       <Button
         variant={selectedCategory === null ? "tiffany" : "ghost"}
-        className="w-full justify-start"
+        className="w-full justify-start text-left whitespace-normal h-auto py-2"
         onClick={() => setSelectedCategory(null)}
       >
         Все товары
@@ -101,7 +101,7 @@ const Catalog = () => {
         <Button
           key={category.id}
           variant={selectedCategory === category.id ? "tiffany" : "ghost"}
-          className="w-full justify-start"
+          className="w-full justify-start text-left whitespace-normal h-auto py-2"
           onClick={() => setSelectedCategory(category.id)}
         >
           {category.name}
