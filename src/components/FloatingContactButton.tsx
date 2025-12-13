@@ -59,7 +59,7 @@ export function FloatingContactButton() {
           className={`h-16 w-16 rounded-full shadow-xl transition-all duration-300 p-0 ${
             isOpen
               ? "bg-muted text-foreground hover:bg-muted/80"
-              : "bg-tiffany hover:bg-tiffany-dark"
+              : "bg-tiffany hover:bg-tiffany-dark animate-pulse-ring"
           }`}
           size="icon"
         >
