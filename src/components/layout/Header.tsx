@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, Phone, Clock, ShoppingCart } from "lucide-react";
+import { Menu, Phone, Clock, ShoppingCart, LayoutGrid, Truck, Shield, Star, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/CartContext";
@@ -8,12 +8,11 @@ import { SearchDialog } from "./SearchDialog";
 import { CallbackDialog } from "@/components/CallbackDialog";
 
 const navigation = [
-  { name: "Каталог", href: "/catalog" },
-  { name: "Популярные подборки", href: "/popular" },
-  { name: "Доставка и оплата", href: "/delivery" },
-  { name: "Гарантия", href: "/guarantee" },
-  { name: "Отзывы", href: "/reviews" },
-  { name: "Контакты", href: "/contacts" },
+  { name: "Каталог", href: "/catalog", icon: LayoutGrid, highlight: true },
+  { name: "Доставка и оплата", href: "/delivery", icon: Truck },
+  { name: "Гарантия", href: "/guarantee", icon: Shield },
+  { name: "Отзывы", href: "/reviews", icon: Star },
+  { name: "Контакты", href: "/contacts", icon: MapPin },
 ];
 
 export function Header() {
@@ -64,16 +63,24 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="px-4 py-2 text-sm font-medium text-foreground/80 hover:text-tiffany transition-colors rounded-lg hover:bg-tiffany-light/50"
-              >
-                {item.name}
-              </Link>
-            ))}
+          <nav className="hidden lg:flex items-center bg-muted/50 rounded-full px-2 py-1.5 border border-border/50">
+            {navigation.map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-full ${
+                    item.highlight
+                      ? "bg-tiffany text-white hover:bg-tiffany-dark"
+                      : "text-foreground/80 hover:text-tiffany hover:bg-background"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Actions */}
@@ -107,16 +114,20 @@ export function Header() {
                   </div>
                   
                   <div className="flex flex-col gap-2">
-                    {navigation.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        onClick={() => setIsOpen(false)}
-                        className="px-4 py-3 text-base font-medium text-foreground hover:text-tiffany hover:bg-tiffany-light/50 rounded-lg transition-colors"
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
+                    {navigation.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 text-base font-medium text-foreground hover:text-tiffany hover:bg-tiffany-light/50 rounded-lg transition-colors"
+                        >
+                          <Icon className="h-5 w-5" />
+                          {item.name}
+                        </Link>
+                      );
+                    })}
                   </div>
                   
                   <div className="gold-line" />
