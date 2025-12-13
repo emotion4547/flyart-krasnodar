@@ -47,7 +47,7 @@ export function Header() {
 
       {/* Main header */}
       <div className="container-custom">
-        <div className="flex h-16 md:h-20 items-center justify-between gap-4">
+        <div className="flex h-16 md:h-20 items-center gap-4">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="relative">
@@ -62,19 +62,29 @@ export function Header() {
             </div>
           </Link>
 
-          {/* Desktop Navigation - centered */}
-          <nav className="hidden lg:inline-flex items-center bg-muted/50 rounded-full px-1 py-1 border border-border/50 shadow-sm">
-            {navigation.map((item) => {
+          {/* Catalog button */}
+          <Link
+            to="/catalog"
+            className="hidden lg:flex items-center gap-2 px-4 py-2.5 bg-tiffany text-white rounded-full font-medium text-sm hover:bg-tiffany-dark transition-colors shadow-sm"
+          >
+            <LayoutGrid className="h-4 w-4" />
+            <span>Каталог</span>
+          </Link>
+
+          {/* Desktop Search - center */}
+          <div className="hidden md:flex flex-1 max-w-xl">
+            <SearchDialog variant="header" />
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden xl:inline-flex items-center gap-1">
+            {navigation.filter(item => !item.highlight).map((item) => {
               const Icon = item.icon;
               return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-all rounded-full whitespace-nowrap ${
-                    item.highlight
-                      ? "bg-tiffany text-white hover:bg-tiffany-dark shadow-sm"
-                      : "text-foreground/70 hover:text-tiffany hover:bg-background"
-                  }`}
+                  className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-foreground/70 hover:text-tiffany transition-colors whitespace-nowrap"
                 >
                   <Icon className="h-4 w-4" />
                   <span>{item.name}</span>
@@ -84,7 +94,7 @@ export function Header() {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 ml-auto">
             <SearchDialog />
             
             <Link to="/cart">
@@ -97,7 +107,7 @@ export function Header() {
             </Link>
 
             <Button variant="cta" className="hidden md:flex">
-              Заказать шары
+              Заказать
             </Button>
 
             {/* Mobile menu */}
