@@ -110,7 +110,7 @@ export default function Products() {
           <h1 className="text-2xl font-bold">Товары</h1>
           <p className="text-muted-foreground">Управление каталогом товаров</p>
         </div>
-        <Link to="/admin/products/new">
+        <Link to="/admin4547/products/new">
           <Button>
             <Plus className="h-4 w-4 mr-2" />
             Добавить товар
@@ -217,7 +217,7 @@ export default function Products() {
                         >
                           {product.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
-                        <Link to={`/admin/products/${product.id}`}>
+                        <Link to={`/admin4547/products/${product.id}`}>
                           <Button variant="ghost" size="icon">
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -244,7 +244,7 @@ export default function Products() {
             <div className="text-center py-12">
               <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground">Товары не найдены</p>
-              <Link to="/admin/products/new">
+              <Link to="/admin4547/products/new">
                 <Button className="mt-4">
                   <Plus className="h-4 w-4 mr-2" />
                   Добавить первый товар

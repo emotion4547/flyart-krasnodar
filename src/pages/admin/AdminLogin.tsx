@@ -44,7 +44,7 @@ export default function AdminLogin() {
           }
         } else {
           toast.success('Регистрация успешна! Первый пользователь автоматически получает права администратора.');
-          navigate('/admin');
+          navigate('/admin4547');
         }
       } else {
         const { error } = await signIn(email, password);
@@ -52,7 +52,7 @@ export default function AdminLogin() {
           toast.error('Неверный email или пароль');
         } else {
           toast.success('Вход выполнен');
-          navigate('/admin');
+          navigate('/admin4547');
         }
       }
     } finally {
