@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Save, FileText } from 'lucide-react';
+import { usePageSeo } from '@/hooks/useSettings';
 
 const pages = [
   { id: 'delivery', name: 'Доставка и оплата', path: '/delivery' },
@@ -16,45 +17,124 @@ const pages = [
   { id: 'offer', name: 'Публичная оферта', path: '/offer' },
 ];
 
-interface PageSeo {
+interface PageSeoForm {
   title: string;
   description: string;
   keywords: string;
   h1: string;
-  ogTitle: string;
-  ogDescription: string;
+  og_title: string;
+  og_description: string;
 }
 
-export default function Content() {
-  const [selectedPage, setSelectedPage] = useState(pages[0].id);
-  const [pageSeo, setPageSeo] = useState<Record<string, PageSeo>>(() => {
-    const saved = localStorage.getItem('pages-seo');
-    return saved ? JSON.parse(saved) : {};
-  });
-
-  const currentSeo = pageSeo[selectedPage] || {
+function PageSeoEditor({ pageId }: { pageId: string }) {
+  const { data, isLoading, save, isSaving } = usePageSeo(pageId);
+  const [form, setForm] = useState<PageSeoForm>({
     title: '',
     description: '',
     keywords: '',
     h1: '',
-    ogTitle: '',
-    ogDescription: '',
-  };
+    og_title: '',
+    og_description: '',
+  });
 
-  const updateSeo = (field: keyof PageSeo, value: string) => {
-    setPageSeo({
-      ...pageSeo,
-      [selectedPage]: {
-        ...currentSeo,
-        [field]: value,
-      },
-    });
-  };
+  useEffect(() => {
+    if (data) {
+      setForm({
+        title: data.title || '',
+        description: data.description || '',
+        keywords: data.keywords || '',
+        h1: data.h1 || '',
+        og_title: data.og_title || '',
+        og_description: data.og_description || '',
+      });
+    }
+  }, [data]);
 
-  const handleSave = () => {
-    localStorage.setItem('pages-seo', JSON.stringify(pageSeo));
-    toast.success('Настройки страницы сохранены');
-  };
+  if (isLoading) {
+    return <Skeleton className="h-96 w-full" />;
+  }
+
+  return (
+    <div className="space-y-6">
+      <Tabs defaultValue="seo">
+        <TabsList>
+          <TabsTrigger value="seo">SEO</TabsTrigger>
+          <TabsTrigger value="og">Open Graph</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="seo" className="space-y-4 mt-4">
+          <div className="space-y-2">
+            <Label>H1 заголовок</Label>
+            <Input
+              value={form.h1}
+              onChange={(e) => setForm({ ...form, h1: e.target.value })}
+              placeholder="Заголовок страницы"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Meta Title</Label>
+            <Input
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              maxLength={60}
+            />
+            <p className="text-xs text-muted-foreground">{form.title.length}/60 символов</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Meta Description</Label>
+            <Textarea
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              maxLength={160}
+              rows={3}
+            />
+            <p className="text-xs text-muted-foreground">{form.description.length}/160 символов</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Keywords</Label>
+            <Input
+              value={form.keywords}
+              onChange={(e) => setForm({ ...form, keywords: e.target.value })}
+              placeholder="ключевые, слова, через, запятую"
+            />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="og" className="space-y-4 mt-4">
+          <div className="space-y-2">
+            <Label>OG Title</Label>
+            <Input
+              value={form.og_title}
+              onChange={(e) => setForm({ ...form, og_title: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>OG Description</Label>
+            <Textarea
+              value={form.og_description}
+              onChange={(e) => setForm({ ...form, og_description: e.target.value })}
+              rows={3}
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      <div className="flex justify-end pt-4 border-t">
+        <Button onClick={() => save(form)} disabled={isSaving}>
+          <Save className="h-4 w-4 mr-2" />
+          {isSaving ? 'Сохранение...' : 'Сохранить'}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export default function Content() {
+  const [selectedPage, setSelectedPage] = useState(pages[0].id);
 
   return (
     <div className="space-y-6">
@@ -97,80 +177,8 @@ export default function Content() {
               {pages.find((p) => p.id === selectedPage)?.name}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <Tabs defaultValue="seo">
-              <TabsList>
-                <TabsTrigger value="seo">SEO</TabsTrigger>
-                <TabsTrigger value="og">Open Graph</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="seo" className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <Label>H1 заголовок</Label>
-                  <Input
-                    value={currentSeo.h1}
-                    onChange={(e) => updateSeo('h1', e.target.value)}
-                    placeholder="Заголовок страницы"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Meta Title</Label>
-                  <Input
-                    value={currentSeo.title}
-                    onChange={(e) => updateSeo('title', e.target.value)}
-                    maxLength={60}
-                  />
-                  <p className="text-xs text-muted-foreground">{currentSeo.title.length}/60 символов</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Meta Description</Label>
-                  <Textarea
-                    value={currentSeo.description}
-                    onChange={(e) => updateSeo('description', e.target.value)}
-                    maxLength={160}
-                    rows={3}
-                  />
-                  <p className="text-xs text-muted-foreground">{currentSeo.description.length}/160 символов</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Keywords</Label>
-                  <Input
-                    value={currentSeo.keywords}
-                    onChange={(e) => updateSeo('keywords', e.target.value)}
-                    placeholder="ключевые, слова, через, запятую"
-                  />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="og" className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <Label>OG Title</Label>
-                  <Input
-                    value={currentSeo.ogTitle}
-                    onChange={(e) => updateSeo('ogTitle', e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>OG Description</Label>
-                  <Textarea
-                    value={currentSeo.ogDescription}
-                    onChange={(e) => updateSeo('ogDescription', e.target.value)}
-                    rows={3}
-                  />
-                </div>
-              </TabsContent>
-            </Tabs>
-
-            <div className="flex justify-end pt-4 border-t">
-              <Button onClick={handleSave}>
-                <Save className="h-4 w-4 mr-2" />
-                Сохранить
-              </Button>
-            </div>
+          <CardContent>
+            <PageSeoEditor key={selectedPage} pageId={selectedPage} />
           </CardContent>
         </Card>
       </div>
