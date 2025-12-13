@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronDown, Filter, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Filter, X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -15,11 +15,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+const PRODUCTS_PER_PAGE = 24;
 
 const Catalog = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>("sort_order");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [priceMin, setPriceMin] = useState<string>("");
+  const [priceMax, setPriceMax] = useState<string>("");
 
   // Fetch categories
   const { data: categories } = useQuery({
@@ -76,24 +83,80 @@ const Catalog = () => {
       if (error) throw error;
 
       // Filter by category on client side (simpler for MVP)
+      let filtered = data;
       if (selectedCategory) {
-        return data.filter((product) =>
+        filtered = filtered.filter((product) =>
           product.product_categories?.some(
             (pc) => pc.category_id === selectedCategory
           )
         );
       }
 
-      return data;
+      return filtered;
     },
   });
+
+  // Apply price filter on filtered products
+  const filteredProducts = products?.filter((product) => {
+    const min = priceMin ? parseFloat(priceMin) : null;
+    const max = priceMax ? parseFloat(priceMax) : null;
+    if (min !== null && product.price < min) return false;
+    if (max !== null && product.price > max) return false;
+    return true;
+  });
+
+  const PriceFilter = () => (
+    <div className="space-y-3 mt-6 pt-6 border-t border-border/50">
+      <Label className="text-sm font-medium">Цена, ₽</Label>
+      <div className="flex gap-2">
+        <Input
+          type="number"
+          placeholder="от"
+          value={priceMin}
+          onChange={(e) => {
+            setPriceMin(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="w-full"
+        />
+        <Input
+          type="number"
+          placeholder="до"
+          value={priceMax}
+          onChange={(e) => {
+            setPriceMax(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="w-full"
+        />
+      </div>
+      {(priceMin || priceMax) && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full text-xs"
+          onClick={() => {
+            setPriceMin("");
+            setPriceMax("");
+            setCurrentPage(1);
+          }}
+        >
+          <X className="h-3 w-3 mr-1" />
+          Сбросить цену
+        </Button>
+      )}
+    </div>
+  );
 
   const CategoryFilters = () => (
     <div className="space-y-2">
       <Button
         variant={selectedCategory === null ? "tiffany" : "ghost"}
         className="w-full justify-start text-left whitespace-normal h-auto py-2"
-        onClick={() => setSelectedCategory(null)}
+        onClick={() => {
+          setSelectedCategory(null);
+          setCurrentPage(1);
+        }}
       >
         Все товары
       </Button>
@@ -102,11 +165,15 @@ const Catalog = () => {
           key={category.id}
           variant={selectedCategory === category.id ? "tiffany" : "ghost"}
           className="w-full justify-start text-left whitespace-normal h-auto py-2"
-          onClick={() => setSelectedCategory(category.id)}
+          onClick={() => {
+            setSelectedCategory(category.id);
+            setCurrentPage(1);
+          }}
         >
           {category.name}
         </Button>
       ))}
+      <PriceFilter />
     </div>
   );
 
@@ -123,7 +190,12 @@ const Catalog = () => {
               </h1>
               <div className="gold-line max-w-xs mb-4" />
               <p className="text-muted-foreground">
-                {products?.length || 0} товаров
+                {filteredProducts?.length || 0} товаров
+                {filteredProducts && filteredProducts.length > PRODUCTS_PER_PAGE && (
+                  <span className="ml-2">
+                    (страница {currentPage} из {Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)})
+                  </span>
+                )}
               </p>
             </div>
 
@@ -145,7 +217,7 @@ const Catalog = () => {
               </Sheet>
 
               {/* Sort */}
-              <Select value={sortBy} onValueChange={setSortBy}>
+              <Select value={sortBy} onValueChange={(value) => { setSortBy(value); setCurrentPage(1); }}>
                 <SelectTrigger className="w-48 bg-card">
                   <SelectValue placeholder="Сортировка" />
                 </SelectTrigger>
@@ -200,34 +272,108 @@ const Catalog = () => {
                     </div>
                   ))}
                 </div>
-              ) : products && products.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                  {products.map((product, index) => {
-                    const mainImage =
-                      product.product_images?.find((img) => img.is_main) ||
-                      product.product_images?.[0];
-                    return (
-                      <div
-                        key={product.id}
-                        className="animate-fade-up"
-                        style={{ animationDelay: `${index * 0.03}s` }}
+              ) : filteredProducts && filteredProducts.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                    {filteredProducts
+                      .slice((currentPage - 1) * PRODUCTS_PER_PAGE, currentPage * PRODUCTS_PER_PAGE)
+                      .map((product, index) => {
+                        const mainImage =
+                          product.product_images?.find((img) => img.is_main) ||
+                          product.product_images?.[0];
+                        return (
+                          <div
+                            key={product.id}
+                            className="animate-fade-up"
+                            style={{ animationDelay: `${index * 0.03}s` }}
+                          >
+                            <ProductCard
+                              id={product.id}
+                              slug={product.slug}
+                              title={product.title}
+                              sku={product.sku}
+                              price={product.price}
+                              priceOld={product.price_old ?? undefined}
+                              image={mainImage?.url || "/placeholder.svg"}
+                              isHit={product.is_hit ?? false}
+                              isNew={product.is_new ?? false}
+                              isSale={product.is_sale ?? false}
+                            />
+                          </div>
+                        );
+                      })}
+                  </div>
+
+                  {/* Pagination */}
+                  {filteredProducts.length > PRODUCTS_PER_PAGE && (
+                    <div className="flex items-center justify-center gap-2 mt-8">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                          setCurrentPage((p) => Math.max(1, p - 1));
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        disabled={currentPage === 1}
                       >
-                        <ProductCard
-                          id={product.id}
-                          slug={product.slug}
-                          title={product.title}
-                          sku={product.sku}
-                          price={product.price}
-                          priceOld={product.price_old ?? undefined}
-                          image={mainImage?.url || "/placeholder.svg"}
-                          isHit={product.is_hit ?? false}
-                          isNew={product.is_new ?? false}
-                          isSale={product.is_sale ?? false}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+
+                      {Array.from({ length: Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE) }).map(
+                        (_, i) => {
+                          const page = i + 1;
+                          const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+                          
+                          // Show first, last, current, and adjacent pages
+                          if (
+                            page === 1 ||
+                            page === totalPages ||
+                            (page >= currentPage - 1 && page <= currentPage + 1)
+                          ) {
+                            return (
+                              <Button
+                                key={page}
+                                variant={currentPage === page ? "tiffany" : "outline"}
+                                size="icon"
+                                onClick={() => {
+                                  setCurrentPage(page);
+                                  window.scrollTo({ top: 0, behavior: "smooth" });
+                                }}
+                              >
+                                {page}
+                              </Button>
+                            );
+                          }
+
+                          // Show ellipsis
+                          if (page === currentPage - 2 || page === currentPage + 2) {
+                            return (
+                              <span key={page} className="px-2 text-muted-foreground">
+                                ...
+                              </span>
+                            );
+                          }
+
+                          return null;
+                        }
+                      )}
+
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                          setCurrentPage((p) =>
+                            Math.min(Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE), p + 1)
+                          );
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        disabled={currentPage === Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="text-center py-16">
                   <p className="text-muted-foreground text-lg mb-4">
