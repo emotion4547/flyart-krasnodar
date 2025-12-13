@@ -2,49 +2,27 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Truck, Gift } from "lucide-react";
 import { Link } from "react-router-dom";
 
-// Import balloon images
-import balloonRed from "@/assets/balloon-red.png";
-import balloonTiffany from "@/assets/balloon-tiffany.png";
-import balloonPink from "@/assets/balloon-pink.png";
-import balloonGold from "@/assets/balloon-gold.png";
-
-const balloons = [
-  { src: balloonRed, side: 'left', delay: 0, duration: 12, left: '5%', size: 60 },
-  { src: balloonTiffany, side: 'left', delay: 2, duration: 14, left: '12%', size: 50 },
-  { src: balloonPink, side: 'left', delay: 4, duration: 11, left: '3%', size: 45 },
-  { src: balloonGold, side: 'left', delay: 6, duration: 13, left: '8%', size: 55 },
-  { src: balloonRed, side: 'right', delay: 1, duration: 13, right: '6%', size: 55 },
-  { src: balloonTiffany, side: 'right', delay: 3, duration: 12, right: '10%', size: 50 },
-  { src: balloonPink, side: 'right', delay: 5, duration: 14, right: '4%', size: 60 },
-  { src: balloonGold, side: 'right', delay: 7, duration: 11, right: '12%', size: 45 },
-];
-
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-tiffany-light/20 via-background to-background min-h-[600px] md:min-h-[700px]">
-      {/* Floating balloons animation */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {balloons.map((balloon, index) => (
-          <img
-            key={index}
-            src={balloon.src}
-            alt=""
-            className="absolute animate-balloon-float opacity-80"
-            style={{
-              width: balloon.size,
-              height: 'auto',
-              left: balloon.side === 'left' ? balloon.left : 'auto',
-              right: balloon.side === 'right' ? balloon.right : 'auto',
-              animationDelay: `${balloon.delay}s`,
-              animationDuration: `${balloon.duration}s`,
-            }}
-          />
-        ))}
+    <section className="relative overflow-hidden min-h-[600px] md:min-h-[700px]">
+      {/* Video background */}
+      <div className="absolute inset-0 z-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+        >
+          <source src="/videos/hero-balloons.mp4" type="video/mp4" />
+        </video>
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-background/30" />
       </div>
 
-      <div className="container-custom relative py-8 md:py-12">
-        {/* Rounded banner */}
-        <div className="relative bg-white/80 dark:bg-card/80 backdrop-blur-sm rounded-3xl shadow-xl border border-border/50 px-6 py-12 md:px-12 md:py-16 lg:px-16 lg:py-20">
+      <div className="container-custom relative z-10 py-8 md:py-12">
+        {/* Rounded banner - more transparent to see balloons underneath */}
+        <div className="relative bg-white/60 dark:bg-card/60 backdrop-blur-md rounded-3xl shadow-xl border border-border/30 px-6 py-12 md:px-12 md:py-16 lg:px-16 lg:py-20">
           {/* Decorative gradient orbs inside banner */}
           <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
             <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-tiffany-light/30 blur-3xl" />
