@@ -91,7 +91,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <div className="min-h-screen flex w-full bg-muted/30">
         <Sidebar className="border-r border-border">
           <SidebarHeader className="p-4 border-b border-border">
-            <Link to="/admin" className="flex items-center gap-2">
+            <Link to="/admin4547" className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-sm">FA</span>
               </div>
@@ -105,7 +105,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <SidebarMenu>
                   {menuItems.map((item) => {
                     const isActive = location.pathname === item.url || 
-                      (item.url !== '/admin' && location.pathname.startsWith(item.url));
+                      (item.url !== '/admin4547' && location.pathname.startsWith(item.url));
                     
                     return (
                       <SidebarMenuItem key={item.title}>

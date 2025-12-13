@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Package, ShoppingCart, FolderTree, Users, TrendingUp, Clock } from 'lucide-react';
+import { Package, ShoppingCart, FolderTree, Users, TrendingUp, Clock, Plus, Upload, ArrowRight } from 'lucide-react';
 
 export default function Dashboard() {
   const { data: productsCount, isLoading: loadingProducts } = useQuery({
@@ -94,9 +96,25 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Дашборд</h1>
-        <p className="text-muted-foreground">Обзор статистики магазина</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Дашборд</h1>
+          <p className="text-muted-foreground">Обзор статистики магазина</p>
+        </div>
+        <div className="flex gap-2">
+          <Link to="/admin4547/products/new">
+            <Button size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Добавить товар
+            </Button>
+          </Link>
+          <Link to="/admin4547/import">
+            <Button size="sm" variant="outline">
+              <Upload className="h-4 w-4 mr-2" />
+              Импорт
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -121,11 +139,17 @@ export default function Dashboard() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-muted-foreground" />
               Последние заказы
             </CardTitle>
+            <Link to="/admin4547/orders">
+              <Button variant="ghost" size="sm">
+                Все заказы
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
           </CardHeader>
           <CardContent>
             {loadingRecentOrders ? (
@@ -137,7 +161,11 @@ export default function Dashboard() {
             ) : recentOrders && recentOrders.length > 0 ? (
               <div className="space-y-3">
                 {recentOrders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <Link 
+                    key={order.id} 
+                    to="/admin4547/orders"
+                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+                  >
                     <div>
                       <p className="font-medium">{order.order_number}</p>
                       <p className="text-sm text-muted-foreground">{order.customer_name}</p>
@@ -146,7 +174,7 @@ export default function Dashboard() {
                       {getStatusBadge(order.status)}
                       <p className="text-sm font-medium mt-1">{order.total} ₽</p>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             ) : (
@@ -156,11 +184,17 @@ export default function Dashboard() {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5 text-muted-foreground" />
               Новые заявки
             </CardTitle>
+            <Link to="/admin4547/clients">
+              <Button variant="ghost" size="sm">
+                Все заявки
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
           </CardHeader>
           <CardContent>
             {loadingContacts ? (
