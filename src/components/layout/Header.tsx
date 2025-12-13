@@ -4,6 +4,7 @@ import { Menu, Phone, Clock, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/CartContext";
+import { SearchDialog } from "./SearchDialog";
 
 const navigation = [
   { name: "Каталог", href: "/catalog" },
@@ -78,6 +79,8 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
+            <SearchDialog />
+            
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
