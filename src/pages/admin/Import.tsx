@@ -19,6 +19,7 @@ interface ProductRow {
   'External ID'?: string;
   'Brand'?: string;
   'SKU'?: string;
+  'Mark'?: string;
   'Category'?: string;
   'Title'?: string;
   'Description'?: string;
@@ -81,32 +82,43 @@ export default function Import() {
         setProgress(Math.round(((i + 1) / jsonData.length) * 100));
 
         try {
-          if (!row['Title'] || !row['SKU']) {
-            errors.push(`Строка ${i + 2}: отсутствует название или артикул`);
+          // Get SKU from SKU column, Mark column, or generate from Tilda UID
+          const sku = row['SKU'] || row['Mark'] || row['Tilda UID']?.toString() || '';
+          
+          if (!row['Title']) {
+            errors.push(`Строка ${i + 2}: отсутствует название`);
+            continue;
+          }
+          
+          if (!sku) {
+            errors.push(`Строка ${i + 2}: отсутствует артикул для "${row['Title']}"`);
             continue;
           }
 
-          const externalId = row['External ID'] || row['Tilda UID'] || '';
-          const price = parseFloat(String(row['Price'] || 0));
+          const externalId = row['External ID'] || row['Tilda UID']?.toString() || '';
+          const price = parseFloat(String(row['Price'] || 0).replace(',', '.'));
 
           if (isNaN(price) || price <= 0) {
             errors.push(`Строка ${i + 2}: некорректная цена для "${row['Title']}"`);
             continue;
           }
 
+          // Fix photo URL - remove backslashes that Tilda sometimes adds
+          const photoUrl = row['Photo']?.replace(/\\:/g, ':') || null;
+
           const productData = {
             title: row['Title'],
-            sku: row['SKU'],
-            slug: row['Title'].toLowerCase().replace(/[^a-zа-яё0-9]/gi, '-').replace(/-+/g, '-'),
+            sku: sku,
+            slug: row['Title'].toLowerCase().replace(/[^a-zа-яё0-9]/gi, '-').replace(/-+/g, '-').substring(0, 100),
             description: row['Description'] || null,
             full_text: row['Text'] || null,
             price: price,
-            price_old: row['Price Old'] ? parseFloat(String(row['Price Old'])) : null,
+            price_old: row['Price Old'] ? parseFloat(String(row['Price Old']).replace(',', '.')) : null,
             quantity: row['Quantity'] ? parseInt(String(row['Quantity'])) : null,
-            weight: row['Weight'] ? parseFloat(String(row['Weight'])) : null,
-            length: row['Length'] ? parseFloat(String(row['Length'])) : null,
-            width: row['Width'] ? parseFloat(String(row['Width'])) : null,
-            height: row['Height'] ? parseFloat(String(row['Height'])) : null,
+            weight: row['Weight'] ? parseFloat(String(row['Weight']).replace(',', '.')) : null,
+            length: row['Length'] ? parseFloat(String(row['Length']).replace(',', '.')) : null,
+            width: row['Width'] ? parseFloat(String(row['Width']).replace(',', '.')) : null,
+            height: row['Height'] ? parseFloat(String(row['Height']).replace(',', '.')) : null,
             seo_title: row['SEO title'] || null,
             seo_description: row['SEO descr'] || null,
             seo_keywords: row['SEO keywords'] || null,
@@ -161,11 +173,11 @@ export default function Import() {
           }
 
           // Handle image
-          if (row['Photo']) {
+          if (photoUrl) {
             await supabase.from('product_images').delete().eq('product_id', productId);
             await supabase.from('product_images').insert({
               product_id: productId,
-              url: row['Photo'],
+              url: photoUrl,
               is_main: true,
             });
           }
