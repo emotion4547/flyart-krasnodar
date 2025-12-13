@@ -19,6 +19,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SEO } from "@/components/SEO";
+import { ProductAdvisor } from "@/components/ProductAdvisor";
 
 const PRODUCTS_PER_PAGE = 24;
 
@@ -418,6 +419,7 @@ const Catalog = () => {
         </div>
       </main>
       <Footer />
+      <ProductAdvisor />
     </div>
   );
 };
