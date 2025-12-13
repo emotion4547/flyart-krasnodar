@@ -128,6 +128,8 @@ export function CategoriesSection() {
                   <img
                     src={category.imageUrl}
                     alt={category.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-3/4 h-3/4 object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
                   />
                 </div>

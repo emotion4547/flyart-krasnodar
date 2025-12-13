@@ -137,6 +137,8 @@ export function SearchDialog({ variant = "icon" }: SearchDialogProps) {
                   <img
                     src={getMainImage(product.images)}
                     alt={product.title}
+                    loading="lazy"
+                    decoding="async"
                     className="h-10 w-10 rounded-md object-cover"
                   />
                   <div className="flex-1 min-w-0">
