@@ -2,10 +2,16 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Phone, Mail, MapPin, Clock, MessageCircle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SEO } from "@/components/SEO";
 
 const Contacts = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO 
+        title="Контакты"
+        description="Контакты FlyArt в Красноярске. Телефон +7 (923) 771-40-04, адрес: ул. Александра Матросова 30ст57."
+        keywords="контакты FlyArt, воздушные шары Красноярск телефон"
+      />
       <Header />
       
       <main className="flex-1">

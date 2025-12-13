@@ -1,10 +1,16 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FileText } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const Offer = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO 
+        title="Публичная оферта"
+        description="Публичная оферта интернет-магазина FlyArt. Условия договора купли-продажи."
+        noindex
+      />
       <Header />
       
       <main className="flex-1">

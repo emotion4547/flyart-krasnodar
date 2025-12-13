@@ -10,6 +10,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, Minus, Plus, ChevronLeft, Check, Truck, Shield, Gift } from "lucide-react";
 import { useState } from "react";
+import { SEO } from "@/components/SEO";
 
 const Product = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -144,8 +145,17 @@ const Product = () => {
   const mainImage = images[selectedImage] || images[0];
   const discount = product.price_old ? Math.round((1 - product.price / product.price_old) * 100) : 0;
 
+  const mainImageUrl = mainImage?.url || "/placeholder.svg";
+
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO 
+        title={product.seo_title || product.title}
+        description={product.seo_description || product.description || `Купить ${product.title} с доставкой в Красноярске`}
+        keywords={product.seo_keywords || `${product.title}, воздушные шары, купить`}
+        image={mainImageUrl}
+        type="product"
+      />
       <Header />
       <main className="flex-1 bg-warm-cream">
         {/* Breadcrumb */}

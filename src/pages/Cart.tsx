@@ -4,6 +4,7 @@ import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const Cart = () => {
   const { items, removeItem, updateQuantity, totalPrice, clearCart } = useCart();
@@ -11,6 +12,7 @@ const Cart = () => {
   if (items.length === 0) {
     return (
       <div className="min-h-screen flex flex-col">
+        <SEO title="Корзина" noindex />
         <Header />
         <main className="flex-1 section-padding bg-warm-cream">
           <div className="container-custom">
@@ -40,6 +42,7 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO title="Корзина" noindex />
       <Header />
       <main className="flex-1 section-padding bg-warm-cream">
         <div className="container-custom">

@@ -18,6 +18,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SEO } from "@/components/SEO";
 
 const PRODUCTS_PER_PAGE = 24;
 
@@ -197,6 +198,11 @@ const Catalog = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO 
+        title="Каталог воздушных шаров"
+        description="Каталог воздушных шаров с доставкой в Красноярске. Гелиевые шары, фольгированные фигуры, композиции на любой праздник."
+        keywords="каталог шаров, воздушные шары Красноярск, гелиевые шары купить"
+      />
       <Header />
       <main className="flex-1 section-padding bg-warm-cream">
         <div className="container-custom">

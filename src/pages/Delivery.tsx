@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Truck, CreditCard, MapPin, Clock, Banknote, QrCode } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const deliveryZones = [
   { zone: "Центр города", price: "200 руб." },
@@ -12,6 +13,11 @@ const deliveryZones = [
 const Delivery = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO 
+        title="Доставка и оплата"
+        description="Доставка воздушных шаров по Красноярску с 09:00 до 22:00. Оплата наличными, картой или по QR-коду."
+        keywords="доставка шаров Красноярск, оплата воздушных шаров"
+      />
       <Header />
       
       <main className="flex-1">

@@ -1,10 +1,16 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Shield } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const Privacy = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO 
+        title="Политика конфиденциальности"
+        description="Политика конфиденциальности интернет-магазина FlyArt. Обработка персональных данных."
+        noindex
+      />
       <Header />
       
       <main className="flex-1">

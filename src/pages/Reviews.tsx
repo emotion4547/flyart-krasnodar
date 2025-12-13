@@ -3,10 +3,16 @@ import { Footer } from "@/components/layout/Footer";
 import { Star, MessageSquarePlus, StarHalf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ContactForm } from "@/components/home/ContactForm";
+import { SEO } from "@/components/SEO";
 
 const Reviews = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO 
+        title="Отзывы"
+        description="Отзывы клиентов о FlyArt. Читайте мнения о качестве воздушных шаров и доставке в Красноярске."
+        keywords="отзывы FlyArt, отзывы воздушные шары Красноярск"
+      />
       <Header />
       
       <main className="flex-1">
