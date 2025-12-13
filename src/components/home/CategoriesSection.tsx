@@ -117,22 +117,20 @@ export function CategoriesSection() {
               className="group relative overflow-hidden rounded-2xl aspect-square transition-all duration-300 hover:-translate-y-1 hover:shadow-card"
               style={{ animationDelay: `${index * 0.05}s` }}
             >
-              {/* Background gradient */}
+              {/* Background gradient fallback */}
               <div
-                className={`absolute inset-0 bg-gradient-to-br ${categoryColors[index % categoryColors.length]} transition-transform duration-300 group-hover:scale-105`}
+                className={`absolute inset-0 bg-gradient-to-br ${categoryColors[index % categoryColors.length]}`}
               />
 
-              {/* Product image */}
+              {/* Product image - full size */}
               {category.imageUrl && (
-                <div className="absolute inset-0 flex items-center justify-center p-4">
-                  <img
-                    src={category.imageUrl}
-                    alt={category.name}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-3/4 h-3/4 object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
-                  />
-                </div>
+                <img
+                  src={category.imageUrl}
+                  alt={category.name}
+                  loading="lazy"
+                  decoding="async"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
               )}
 
               {/* Gradient overlay for text readability */}
