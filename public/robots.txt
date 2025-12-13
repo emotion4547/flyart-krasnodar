@@ -12,3 +12,6 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin4547/
+
+Sitemap: https://gsnqucupjpdlfeqpbjup.supabase.co/functions/v1/sitemap
