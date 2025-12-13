@@ -23,8 +23,7 @@ export function HeroSection() {
           {/* Main heading */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-6 max-w-4xl animate-fade-up" style={{ animationDelay: '0.1s' }}>
             Воздушные шары с{" "}
-            <span className="text-tiffany">гелием</span>
-            <br className="hidden sm:block" />
+            <span className="text-tiffany">гелием</span>{" "}
             в Красноярске
           </h1>
 

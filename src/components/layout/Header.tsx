@@ -23,7 +23,7 @@ export function Header() {
 
       {/* Main header */}
       <div className="container-custom">
-        <div className="flex h-16 md:h-20 items-center gap-4">
+        <div className="flex h-16 md:h-20 items-center justify-between gap-4">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="relative">
