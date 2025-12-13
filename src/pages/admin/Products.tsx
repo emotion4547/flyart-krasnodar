@@ -22,16 +22,17 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { Plus, Search, Edit, Trash2, Eye, EyeOff, Package } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Eye, EyeOff, Package, ImageOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Products() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [photoFilter, setPhotoFilter] = useState<string>('all');
   const queryClient = useQueryClient();
 
   const { data: products, isLoading } = useQuery({
-    queryKey: ['admin-products', search, statusFilter],
+    queryKey: ['admin-products', search, statusFilter, photoFilter],
     queryFn: async () => {
       let query = supabase
         .from('products')
@@ -55,6 +56,15 @@ export default function Products() {
 
       const { data, error } = await query;
       if (error) throw error;
+      
+      // Filter by photo on client side
+      if (photoFilter === 'no_photo') {
+        return data.filter(p => !p.product_images || p.product_images.length === 0);
+      }
+      if (photoFilter === 'with_photo') {
+        return data.filter(p => p.product_images && p.product_images.length > 0);
+      }
+      
       return data;
     },
   });
@@ -76,6 +86,24 @@ export default function Products() {
     },
   });
 
+  const hideAllNoPhotoMutation = useMutation({
+    mutationFn: async (productIds: string[]) => {
+      const { error } = await supabase
+        .from('products')
+        .update({ is_active: false })
+        .in('id', productIds);
+      if (error) throw error;
+      return productIds.length;
+    },
+    onSuccess: (count) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      toast.success(`Скрыто ${count} товаров без фото`);
+    },
+    onError: () => {
+      toast.error('Ошибка при скрытии товаров');
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from('products').delete().eq('id', id);
@@ -91,9 +119,9 @@ export default function Products() {
   });
 
   const getMainImage = (images: any[] | null) => {
-    if (!images || images.length === 0) return '/placeholder.svg';
+    if (!images || images.length === 0) return null;
     const main = images.find((img) => img.is_main);
-    return main?.url || images[0]?.url || '/placeholder.svg';
+    return main?.url || images[0]?.url || null;
   };
 
   const getCategories = (productCategories: any[] | null) => {
@@ -101,6 +129,20 @@ export default function Products() {
     return productCategories
       .map((pc) => pc.categories?.name)
       .filter(Boolean);
+  };
+
+  // Get products without photos for bulk action
+  const productsWithoutPhoto = products?.filter(p => !p.product_images || p.product_images.length === 0) || [];
+  const activeProductsWithoutPhoto = productsWithoutPhoto.filter(p => p.is_active);
+
+  const handleHideAllNoPhoto = () => {
+    if (activeProductsWithoutPhoto.length === 0) {
+      toast.info('Нет активных товаров без фото');
+      return;
+    }
+    if (confirm(`Скрыть ${activeProductsWithoutPhoto.length} товаров без фото?`)) {
+      hideAllNoPhotoMutation.mutate(activeProductsWithoutPhoto.map(p => p.id));
+    }
   };
 
   return (
@@ -140,7 +182,39 @@ export default function Products() {
                 <SelectItem value="inactive">Скрытые</SelectItem>
               </SelectContent>
             </Select>
+            <Select value={photoFilter} onValueChange={setPhotoFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Фото" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Все</SelectItem>
+                <SelectItem value="with_photo">С фото</SelectItem>
+                <SelectItem value="no_photo">Без фото</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
+          
+          {/* Bulk action for products without photos */}
+          {photoFilter === 'no_photo' && activeProductsWithoutPhoto.length > 0 && (
+            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between">
+              <div className="flex items-center gap-2 text-amber-800">
+                <ImageOff className="h-4 w-4" />
+                <span className="text-sm">
+                  Найдено {activeProductsWithoutPhoto.length} активных товаров без фото
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleHideAllNoPhoto}
+                disabled={hideAllNoPhotoMutation.isPending}
+                className="border-amber-300 text-amber-800 hover:bg-amber-100"
+              >
+                <EyeOff className="h-4 w-4 mr-2" />
+                Скрыть все
+              </Button>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -163,81 +237,91 @@ export default function Products() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {products.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>
-                      <img
-                        src={getMainImage(product.product_images)}
-                        alt={product.title}
-                        className="w-12 h-12 object-cover rounded-lg"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{product.title}</p>
-                        <div className="flex gap-1 mt-1">
-                          {product.is_hit && <Badge variant="secondary" className="text-xs">Хит</Badge>}
-                          {product.is_new && <Badge variant="secondary" className="text-xs bg-tiffany-light text-tiffany-dark">Новинка</Badge>}
-                          {product.is_sale && <Badge variant="destructive" className="text-xs">Акция</Badge>}
+                {products.map((product) => {
+                  const mainImage = getMainImage(product.product_images);
+                  return (
+                    <TableRow key={product.id}>
+                      <TableCell>
+                        {mainImage ? (
+                          <img
+                            src={mainImage}
+                            alt={product.title}
+                            className="w-12 h-12 object-cover rounded-lg"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
+                            <ImageOff className="h-5 w-5 text-muted-foreground" />
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{product.title}</p>
+                          <div className="flex gap-1 mt-1">
+                            {product.is_hit && <Badge variant="secondary" className="text-xs">Хит</Badge>}
+                            {product.is_new && <Badge variant="secondary" className="text-xs bg-tiffany-light text-tiffany-dark">Новинка</Badge>}
+                            {product.is_sale && <Badge variant="destructive" className="text-xs">Акция</Badge>}
+                            {!mainImage && <Badge variant="outline" className="text-xs text-amber-600 border-amber-300">Без фото</Badge>}
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">{product.sku}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {getCategories(product.product_categories).slice(0, 2).map((cat, i) => (
-                          <Badge key={i} variant="outline" className="text-xs">{cat}</Badge>
-                        ))}
-                        {getCategories(product.product_categories).length > 2 && (
-                          <Badge variant="outline" className="text-xs">+{getCategories(product.product_categories).length - 2}</Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{product.sku}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {getCategories(product.product_categories).slice(0, 2).map((cat, i) => (
+                            <Badge key={i} variant="outline" className="text-xs">{cat}</Badge>
+                          ))}
+                          {getCategories(product.product_categories).length > 2 && (
+                            <Badge variant="outline" className="text-xs">+{getCategories(product.product_categories).length - 2}</Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{product.price} ₽</p>
+                          {product.price_old && (
+                            <p className="text-sm text-muted-foreground line-through">{product.price_old} ₽</p>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {product.is_active ? (
+                          <Badge className="bg-green-100 text-green-700 hover:bg-green-100">В продаже</Badge>
+                        ) : (
+                          <Badge variant="secondary">Скрыт</Badge>
                         )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{product.price} ₽</p>
-                        {product.price_old && (
-                          <p className="text-sm text-muted-foreground line-through">{product.price_old} ₽</p>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {product.is_active ? (
-                        <Badge className="bg-green-100 text-green-700 hover:bg-green-100">В продаже</Badge>
-                      ) : (
-                        <Badge variant="secondary">Скрыт</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => toggleActiveMutation.mutate({ id: product.id, is_active: !product.is_active })}
-                        >
-                          {product.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </Button>
-                        <Link to={`/admin4547/products/${product.id}`}>
-                          <Button variant="ghost" size="icon">
-                            <Edit className="h-4 w-4" />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => toggleActiveMutation.mutate({ id: product.id, is_active: !product.is_active })}
+                          >
+                            {product.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </Button>
-                        </Link>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => {
-                            if (confirm('Удалить товар?')) {
-                              deleteMutation.mutate(product.id);
-                            }
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                          <Link to={`/admin4547/products/${product.id}`}>
+                            <Button variant="ghost" size="icon">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => {
+                              if (confirm('Удалить товар?')) {
+                                deleteMutation.mutate(product.id);
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           ) : (
