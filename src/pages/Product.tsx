@@ -178,6 +178,7 @@ const Product = () => {
                 <img
                   src={mainImage?.url || "/placeholder.svg"}
                   alt={mainImage?.alt_text || product.title}
+                  loading="eager"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -198,6 +199,8 @@ const Product = () => {
                       <img
                         src={image.url}
                         alt={image.alt_text || `${product.title} - ${index + 1}`}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover"
                       />
                     </button>
