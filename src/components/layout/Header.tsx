@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Phone, Clock, ShoppingCart } from "lucide-react";
+import { Menu, Phone, Clock, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useCart } from "@/contexts/CartContext";
 
 const navigation = [
   { name: "Каталог", href: "/catalog" },
@@ -15,6 +16,7 @@ const navigation = [
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const { totalItems } = useCart();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -76,12 +78,14 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="relative">
-              <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-cta text-cta-foreground text-xs flex items-center justify-center font-medium">
-                0
-              </span>
-            </Button>
+            <Link to="/cart">
+              <Button variant="ghost" size="icon" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-cta text-cta-foreground text-xs flex items-center justify-center font-medium">
+                  {totalItems}
+                </span>
+              </Button>
+            </Link>
 
             <Button variant="cta" className="hidden md:flex">
               Заказать шары
@@ -124,6 +128,13 @@ export function Header() {
                       Пн-Вс: 9:00 - 21:00
                     </div>
                   </div>
+
+                  <Link to="/cart" onClick={() => setIsOpen(false)} className="mx-4">
+                    <Button variant="tiffanyOutline" size="lg" className="w-full">
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Корзина ({totalItems})
+                    </Button>
+                  </Link>
 
                   <Button variant="cta" size="lg" className="mx-4">
                     Заказать шары

@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { ShoppingCart, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProductCardProps {
   id: string;
@@ -28,6 +30,24 @@ export function ProductCard({
   isSale,
 }: ProductCardProps) {
   const discount = priceOld ? Math.round((1 - price / priceOld) * 100) : 0;
+  const { addItem } = useCart();
+  const { toast } = useToast();
+
+  const handleAddToCart = () => {
+    addItem({
+      id,
+      slug,
+      title,
+      sku,
+      price,
+      priceOld,
+      image,
+    });
+    toast({
+      title: "Добавлено в корзину",
+      description: title,
+    });
+  };
 
   return (
     <article className="card-product group">
@@ -50,13 +70,15 @@ export function ProductCard({
 
         {/* Quick actions */}
         <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button 
-            variant="secondary" 
-            size="icon" 
-            className="h-9 w-9 bg-background/90 backdrop-blur-sm hover:bg-tiffany hover:text-primary-foreground shadow-sm"
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
+          <Link to={`/product/${slug}`}>
+            <Button 
+              variant="secondary" 
+              size="icon" 
+              className="h-9 w-9 bg-background/90 backdrop-blur-sm hover:bg-tiffany hover:text-primary-foreground shadow-sm"
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
 
         {/* Overlay gradient */}
@@ -88,7 +110,7 @@ export function ProductCard({
         </div>
 
         {/* Add to cart */}
-        <Button variant="cta" className="w-full" size="sm">
+        <Button variant="cta" className="w-full" size="sm" onClick={handleAddToCart}>
           <ShoppingCart className="h-4 w-4 mr-2" />
           В корзину
         </Button>
