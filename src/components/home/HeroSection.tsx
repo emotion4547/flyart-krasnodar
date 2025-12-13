@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden min-h-[600px] md:min-h-[700px]">
+    <section className="relative overflow-hidden min-h-screen flex flex-col">
       {/* Video background */}
       <div className="absolute inset-0 z-0">
         <video
@@ -17,10 +17,13 @@ export function HeroSection() {
           <source src="/videos/hero-balloons.mp4" type="video/mp4" />
         </video>
         {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-background/30" />
+        <div className="absolute inset-0 bg-background/20" />
       </div>
+      
+      {/* Gradient fade to next section */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-[1]" />
 
-      <div className="container-custom relative z-10 py-8 md:py-12">
+      <div className="container-custom relative z-10 py-8 md:py-12 flex-1 flex items-center">
         {/* Rounded banner - more transparent to see balloons underneath */}
         <div className="relative bg-white/60 dark:bg-card/60 backdrop-blur-md rounded-3xl shadow-xl border border-border/30 px-6 py-12 md:px-12 md:py-16 lg:px-16 lg:py-20">
           {/* Decorative gradient orbs inside banner */}
