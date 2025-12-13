@@ -56,14 +56,23 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const location = useLocation();
 
   useEffect(() => {
+    // Only redirect to login if fully loaded and no user
     if (!isLoading && !user) {
       navigate('/admin4547/login');
     }
   }, [user, isLoading, navigate]);
 
   useEffect(() => {
-    if (!isLoading && user && !isAdmin) {
-      navigate('/');
+    // Only redirect non-admin users after isAdmin has been properly checked
+    // We need to wait for the role check to complete
+    if (!isLoading && user && isAdmin === false) {
+      // Double-check by waiting a moment for role to load
+      const timer = setTimeout(() => {
+        if (!isAdmin) {
+          navigate('/');
+        }
+      }, 500);
+      return () => clearTimeout(timer);
     }
   }, [user, isAdmin, isLoading, navigate]);
 
@@ -72,6 +81,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     navigate('/admin4547/login');
   };
 
+  // Show loading while checking auth state
   if (isLoading) {
     return (
       <div className="min-h-screen bg-muted/30 flex items-center justify-center">
@@ -84,8 +94,22 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     );
   }
 
-  if (!user || !isAdmin) {
+  // Show loading while waiting for admin role check
+  if (!user) {
     return null;
+  }
+
+  // Show loading state while isAdmin is being determined (not yet true)
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <div className="space-y-4 w-64">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      </div>
+    );
   }
 
   return (
