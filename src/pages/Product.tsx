@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, Minus, Plus, ChevronLeft, Check, Truck, Shield, Gift } from "lucide-react";
 import { useState } from "react";
 import { SEO } from "@/components/SEO";
+import { ProductSchema } from "@/components/ProductSchema";
 
 const Product = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -155,6 +156,14 @@ const Product = () => {
         keywords={product.seo_keywords || `${product.title}, воздушные шары, купить`}
         image={mainImageUrl}
         type="product"
+      />
+      <ProductSchema
+        name={product.title}
+        description={product.description || undefined}
+        image={mainImageUrl}
+        sku={product.sku}
+        price={product.price}
+        availability={product.quantity && product.quantity > 0 ? "InStock" : "OutOfStock"}
       />
       <Header />
       <main className="flex-1 bg-warm-cream">
