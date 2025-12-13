@@ -47,9 +47,9 @@ export function Header() {
 
       {/* Main header */}
       <div className="container-custom">
-        <div className="flex h-16 md:h-20 items-center justify-between">
+        <div className="flex h-16 md:h-20 items-center justify-between gap-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="relative">
               <div className="h-10 w-10 rounded-full bg-gradient-to-br from-tiffany to-tiffany-dark flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-lg">F</span>
@@ -62,18 +62,18 @@ export function Header() {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center bg-muted/50 rounded-full px-2 py-1.5 border border-border/50">
-            {navigation.map((item, index) => {
+          {/* Desktop Navigation - centered */}
+          <nav className="hidden lg:inline-flex items-center bg-muted/50 rounded-full px-1 py-1 border border-border/50 shadow-sm">
+            {navigation.map((item) => {
               const Icon = item.icon;
               return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-full ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-all rounded-full whitespace-nowrap ${
                     item.highlight
-                      ? "bg-tiffany text-white hover:bg-tiffany-dark"
-                      : "text-foreground/80 hover:text-tiffany hover:bg-background"
+                      ? "bg-tiffany text-white hover:bg-tiffany-dark shadow-sm"
+                      : "text-foreground/70 hover:text-tiffany hover:bg-background"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
