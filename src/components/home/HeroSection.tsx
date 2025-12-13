@@ -23,9 +23,9 @@ export function HeroSection() {
       {/* Gradient fade to next section */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-[1]" />
 
-      <div className="container-custom relative z-10 py-8 md:py-12 flex-1 flex items-center">
+      <div className="container-custom relative z-10 py-8 md:py-12 flex-1 flex items-center w-full">
         {/* Rounded banner - more transparent to see balloons underneath */}
-        <div className="relative bg-white/60 dark:bg-card/60 backdrop-blur-md rounded-3xl shadow-xl border border-border/30 px-6 py-12 md:px-12 md:py-16 lg:px-16 lg:py-20">
+        <div className="relative w-full bg-white/60 dark:bg-card/60 backdrop-blur-md rounded-3xl shadow-xl border border-border/30 px-6 py-12 md:px-12 md:py-16 lg:px-16 lg:py-20">
           {/* Decorative gradient orbs inside banner */}
           <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
             <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-tiffany-light/30 blur-3xl" />

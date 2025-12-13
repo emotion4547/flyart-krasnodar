@@ -76,7 +76,7 @@ export function CategoriesSection() {
 
   if (isLoading) {
     return (
-      <section className="section-padding bg-background">
+      <section className="section-padding bg-background relative z-10">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -95,7 +95,7 @@ export function CategoriesSection() {
   }
 
   return (
-    <section className="section-padding bg-background">
+    <section className="section-padding bg-background relative z-10">
       <div className="container-custom">
         {/* Section header */}
         <div className="text-center mb-12">
