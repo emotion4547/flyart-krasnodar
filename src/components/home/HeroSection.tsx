@@ -63,31 +63,31 @@ export function HeroSection() {
             </div>
 
             {/* Features */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 max-w-3xl animate-fade-up" style={{ animationDelay: '0.4s' }}>
-              <div className="flex items-center gap-3 justify-center sm:justify-start bg-background/50 rounded-xl px-4 py-3">
+            <div className="grid grid-cols-3 gap-2 md:gap-6 max-w-3xl animate-fade-up w-full" style={{ animationDelay: '0.4s' }}>
+              <div className="flex flex-col md:flex-row items-center gap-2 md:gap-3 bg-background/50 rounded-xl px-3 py-3 md:px-4">
                 <div className="h-10 w-10 rounded-xl bg-tiffany-light flex items-center justify-center flex-shrink-0">
                   <Truck className="h-5 w-5 text-tiffany-dark" />
                 </div>
-                <div className="text-left">
-                  <p className="font-medium text-foreground text-sm">Доставка</p>
+                <div className="text-center md:text-left">
+                  <p className="font-medium text-foreground text-xs md:text-sm">Доставка</p>
                   <p className="text-xs text-muted-foreground">от 2 часов</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 justify-center sm:justify-start bg-background/50 rounded-xl px-4 py-3">
+              <div className="flex flex-col md:flex-row items-center gap-2 md:gap-3 bg-background/50 rounded-xl px-3 py-3 md:px-4">
                 <div className="h-10 w-10 rounded-xl bg-peach flex items-center justify-center flex-shrink-0">
                   <Gift className="h-5 w-5 text-cta" />
                 </div>
-                <div className="text-left">
-                  <p className="font-medium text-foreground text-sm">Готовые наборы</p>
+                <div className="text-center md:text-left">
+                  <p className="font-medium text-foreground text-xs md:text-sm">Готовые наборы</p>
                   <p className="text-xs text-muted-foreground">от 990 ₽</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 justify-center sm:justify-start bg-background/50 rounded-xl px-4 py-3">
+              <div className="flex flex-col md:flex-row items-center gap-2 md:gap-3 bg-background/50 rounded-xl px-3 py-3 md:px-4">
                 <div className="h-10 w-10 rounded-xl bg-gold-light flex items-center justify-center flex-shrink-0">
                   <Sparkles className="h-5 w-5 text-accent-foreground" />
                 </div>
-                <div className="text-left">
-                  <p className="font-medium text-foreground text-sm">Индивидуальный</p>
+                <div className="text-center md:text-left">
+                  <p className="font-medium text-foreground text-xs md:text-sm">Индивидуальный</p>
                   <p className="text-xs text-muted-foreground">дизайн</p>
                 </div>
               </div>
