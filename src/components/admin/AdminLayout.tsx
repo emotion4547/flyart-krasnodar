@@ -37,15 +37,15 @@ interface AdminLayoutProps {
 }
 
 const menuItems = [
-  { title: 'Дашборд', url: '/admin', icon: LayoutDashboard },
-  { title: 'Товары', url: '/admin/products', icon: Package },
-  { title: 'Категории', url: '/admin/categories', icon: FolderTree },
-  { title: 'Заказы', url: '/admin/orders', icon: ShoppingCart },
-  { title: 'Клиенты', url: '/admin/clients', icon: Users },
-  { title: 'Маркетинг / SEO', url: '/admin/marketing', icon: BarChart3 },
-  { title: 'Контент', url: '/admin/content', icon: FileText },
-  { title: 'Импорт Excel', url: '/admin/import', icon: Upload },
-  { title: 'Настройки', url: '/admin/settings', icon: Settings },
+  { title: 'Дашборд', url: '/admin4547', icon: LayoutDashboard },
+  { title: 'Товары', url: '/admin4547/products', icon: Package },
+  { title: 'Категории', url: '/admin4547/categories', icon: FolderTree },
+  { title: 'Заказы', url: '/admin4547/orders', icon: ShoppingCart },
+  { title: 'Клиенты', url: '/admin4547/clients', icon: Users },
+  { title: 'Маркетинг / SEO', url: '/admin4547/marketing', icon: BarChart3 },
+  { title: 'Контент', url: '/admin4547/content', icon: FileText },
+  { title: 'Импорт Excel', url: '/admin4547/import', icon: Upload },
+  { title: 'Настройки', url: '/admin4547/settings', icon: Settings },
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
@@ -55,7 +55,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      navigate('/admin/login');
+      navigate('/admin4547/login');
     }
   }, [user, isLoading, navigate]);
 
@@ -67,7 +67,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/admin/login');
+    navigate('/admin4547/login');
   };
 
   if (isLoading) {

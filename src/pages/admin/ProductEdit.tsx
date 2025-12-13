@@ -193,7 +193,7 @@ export default function ProductEdit() {
       queryClient.invalidateQueries({ queryKey: ['admin-product', id] });
       toast.success(isNew ? 'Товар создан' : 'Товар сохранён');
       if (isNew) {
-        navigate(`/admin/products/${productId}`);
+        navigate(`/admin4547/products/${productId}`);
       }
     },
     onError: (error: any) => {
@@ -222,7 +222,7 @@ export default function ProductEdit() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={() => navigate('/admin/products')}>
+        <Button variant="ghost" onClick={() => navigate('/admin4547/products')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Назад
         </Button>
