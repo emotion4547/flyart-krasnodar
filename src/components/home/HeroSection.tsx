@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden min-h-screen flex flex-col">
+    <section className="relative overflow-hidden min-h-[85vh] md:min-h-screen flex flex-col">
       {/* Video background */}
       <div className="absolute inset-0 z-0">
         <video
