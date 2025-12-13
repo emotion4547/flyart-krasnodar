@@ -20,6 +20,17 @@ const callbackSchema = z.object({
   phone: z.string().trim().min(10, "Введите корректный номер телефона").max(20),
 });
 
+const formatPhone = (value: string): string => {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  
+  if (digits.length === 0) return "";
+  if (digits.length <= 1) return `+7`;
+  if (digits.length <= 4) return `+7 (${digits.slice(1)}`;
+  if (digits.length <= 7) return `+7 (${digits.slice(1, 4)}) ${digits.slice(4)}`;
+  if (digits.length <= 9) return `+7 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`;
+  return `+7 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7, 9)}-${digits.slice(9, 11)}`;
+};
+
 export function CallbackDialog() {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,9 +111,8 @@ export function CallbackDialog() {
               type="tel"
               placeholder="+7 (___) ___-__-__"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(formatPhone(e.target.value))}
               required
-              maxLength={20}
             />
           </div>
           <Button 
