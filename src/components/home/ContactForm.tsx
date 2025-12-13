@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Send, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export function ContactForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,17 +24,33 @@ export function ContactForm() {
       return;
     }
 
+    const formData = new FormData(e.target as HTMLFormElement);
+    const name = formData.get("name") as string;
+    const phone = formData.get("phone") as string;
+    const comment = formData.get("comment") as string;
+
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    
+    const { error } = await supabase
+      .from("contact_requests")
+      .insert({ name, phone, comment });
+
     setIsLoading(false);
+
+    if (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось отправить заявку. Попробуйте позже.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     toast({
       title: "Заявка отправлена!",
       description: "Мы свяжемся с вами в ближайшее время",
     });
 
-    // Reset form
     (e.target as HTMLFormElement).reset();
     setAgreed(false);
   };

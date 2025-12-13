@@ -1,80 +1,42 @@
 import { ProductCard } from "./ProductCard";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
-
-// Mock data for products
-const products = [
-  {
-    id: "1",
-    title: "Набор «Розовая мечта» — 15 шаров с конфетти",
-    sku: "FA-001",
-    price: 2490,
-    priceOld: 2990,
-    image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400&h=400&fit=crop",
-    isHit: true,
-    isSale: true,
-  },
-  {
-    id: "2",
-    title: "Фонтан из фольгированных звёзд «Космос»",
-    sku: "FA-002",
-    price: 3290,
-    image: "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=400&fit=crop",
-    isNew: true,
-  },
-  {
-    id: "3",
-    title: "Букет «Нежность» — пастельные тона",
-    sku: "FA-003",
-    price: 1890,
-    image: "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=400&h=400&fit=crop",
-    isHit: true,
-  },
-  {
-    id: "4",
-    title: "Композиция «День рождения» с цифрой",
-    sku: "FA-004",
-    price: 4590,
-    priceOld: 5200,
-    image: "https://images.unsplash.com/photo-1464349153735-7db50ed83c84?w=400&h=400&fit=crop",
-    isSale: true,
-  },
-  {
-    id: "5",
-    title: "Набор «Голубые облака» для мальчика",
-    sku: "FA-005",
-    price: 2190,
-    image: "https://images.unsplash.com/photo-1496843916299-590492c751f4?w=400&h=400&fit=crop",
-  },
-  {
-    id: "6",
-    title: "Фонтан «Золотой праздник»",
-    sku: "FA-006",
-    price: 3890,
-    image: "https://images.unsplash.com/photo-1504389896320-ac2e038a2f16?w=400&h=400&fit=crop",
-    isNew: true,
-    isHit: true,
-  },
-  {
-    id: "7",
-    title: "Коробка-сюрприз с шарами",
-    sku: "FA-007",
-    price: 5490,
-    priceOld: 6500,
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop",
-    isSale: true,
-  },
-  {
-    id: "8",
-    title: "Арка из шаров «Радуга»",
-    sku: "FA-008",
-    price: 7990,
-    image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=400&h=400&fit=crop",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function PopularProducts() {
+  const { data: products, isLoading } = useQuery({
+    queryKey: ["popular-products"],
+    queryFn: async () => {
+      const { data: productsData, error } = await supabase
+        .from("products")
+        .select(`
+          id,
+          title,
+          sku,
+          price,
+          price_old,
+          is_hit,
+          is_new,
+          is_sale,
+          slug,
+          product_images (
+            url,
+            alt_text,
+            is_main
+          )
+        `)
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .limit(8);
+
+      if (error) throw error;
+      return productsData;
+    },
+  });
+
   return (
     <section className="section-padding bg-warm-cream">
       <div className="container-custom">
@@ -98,17 +60,56 @@ export function PopularProducts() {
         </div>
 
         {/* Products grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {products.map((product, index) => (
-            <div
-              key={product.id}
-              className="animate-fade-up"
-              style={{ animationDelay: `${index * 0.05}s` }}
-            >
-              <ProductCard {...product} />
-            </div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="card-product">
+                <Skeleton className="aspect-square" />
+                <div className="p-4 space-y-3">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : products && products.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {products.map((product, index) => {
+              const mainImage = product.product_images?.find((img) => img.is_main) || product.product_images?.[0];
+              return (
+                <div
+                  key={product.id}
+                  className="animate-fade-up"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  <ProductCard
+                    id={product.id}
+                    slug={product.slug}
+                    title={product.title}
+                    sku={product.sku}
+                    price={product.price}
+                    priceOld={product.price_old ?? undefined}
+                    image={mainImage?.url || "/placeholder.svg"}
+                    isHit={product.is_hit ?? false}
+                    isNew={product.is_new ?? false}
+                    isSale={product.is_sale ?? false}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <p className="text-muted-foreground text-lg mb-4">
+              Товары скоро появятся
+            </p>
+            <p className="text-muted-foreground text-sm">
+              Следите за обновлениями каталога
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );
