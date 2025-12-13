@@ -16,62 +16,75 @@ const categoryColors = [
 ];
 
 export function CategoriesSection() {
-  // Fetch categories with product images
+  // Optimized: Fetch categories with product images in 2 queries instead of N+1
   const { data: categories, isLoading } = useQuery({
-    queryKey: ["home-categories"],
+    queryKey: ["home-categories-optimized"],
     queryFn: async () => {
-      // Get categories with product count > 0
-      const { data: cats, error } = await supabase
+      // Query 1: Get all categories
+      const { data: cats, error: catsError } = await supabase
         .from("categories")
         .select("id, name, slug")
         .order("sort_order", { ascending: true });
 
-      if (error) throw error;
+      if (catsError) throw catsError;
+      if (!cats || cats.length === 0) return [];
 
-      // Get a random product image for each category
-      const categoriesWithImages = await Promise.all(
-        cats.map(async (cat) => {
-          // Get products in this category with images
-          const { data: products } = await supabase
-            .from("product_categories")
-            .select(`
-              product_id,
-              products!inner (
-                id,
-                is_active,
-                product_images (url, is_main)
-              )
-            `)
-            .eq("category_id", cat.id)
-            .limit(10);
+      // Query 2: Get all product_categories with product images in one query
+      const { data: productCategories, error: pcError } = await supabase
+        .from("product_categories")
+        .select(`
+          category_id,
+          products!inner (
+            id,
+            is_active,
+            product_images (url, is_main)
+          )
+        `)
+        .in("category_id", cats.map(c => c.id));
 
-          // Find a product with an image
-          let imageUrl: string | null = null;
-          if (products) {
-            for (const pc of products) {
-              const product = pc.products as any;
-              if (product?.is_active && product?.product_images?.length > 0) {
-                const mainImg = product.product_images.find((img: any) => img.is_main);
-                imageUrl = mainImg?.url || product.product_images[0]?.url;
-                break;
-              }
-            }
+      if (pcError) throw pcError;
+
+      // Group by category and find first image for each
+      const categoryImageMap = new Map<string, { imageUrl: string; productCount: number }>();
+      
+      if (productCategories) {
+        for (const pc of productCategories) {
+          const product = pc.products as any;
+          if (!product?.is_active) continue;
+          
+          const existing = categoryImageMap.get(pc.category_id);
+          const currentCount = existing?.productCount || 0;
+          
+          // Only set image if we don't have one yet
+          if (!existing?.imageUrl && product?.product_images?.length > 0) {
+            const mainImg = product.product_images.find((img: any) => img.is_main);
+            const imageUrl = mainImg?.url || product.product_images[0]?.url;
+            categoryImageMap.set(pc.category_id, { 
+              imageUrl, 
+              productCount: currentCount + 1 
+            });
+          } else {
+            categoryImageMap.set(pc.category_id, { 
+              imageUrl: existing?.imageUrl || '', 
+              productCount: currentCount + 1 
+            });
           }
+        }
+      }
 
-          return {
-            ...cat,
-            imageUrl,
-            productCount: products?.length || 0,
-          };
-        })
-      );
-
-      // Filter to show only categories with at least one product with image
-      // and limit to 8 most populated
-      return categoriesWithImages
-        .filter((c) => c.productCount > 0 && c.imageUrl)
+      // Combine categories with their images
+      const categoriesWithImages = cats
+        .map(cat => ({
+          ...cat,
+          imageUrl: categoryImageMap.get(cat.id)?.imageUrl || null,
+          productCount: categoryImageMap.get(cat.id)?.productCount || 0,
+        }))
+        .filter(c => c.productCount > 0 && c.imageUrl)
         .slice(0, 8);
+
+      return categoriesWithImages;
     },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   if (isLoading) {
@@ -94,6 +107,10 @@ export function CategoriesSection() {
     );
   }
 
+  if (!categories || categories.length === 0) {
+    return null;
+  }
+
   return (
     <section className="section-padding bg-background relative z-10">
       <div className="container-custom">
@@ -110,12 +127,11 @@ export function CategoriesSection() {
 
         {/* Categories grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {categories?.map((category, index) => (
+          {categories.map((category, index) => (
             <Link
               key={category.id}
               to={`/catalog?category=${category.id}`}
               className="group relative overflow-hidden rounded-2xl aspect-square transition-all duration-300 hover:-translate-y-1 hover:shadow-card"
-              style={{ animationDelay: `${index * 0.05}s` }}
             >
               {/* Background gradient fallback */}
               <div
@@ -134,11 +150,11 @@ export function CategoriesSection() {
               )}
 
               {/* Gradient overlay for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
               {/* Category name */}
               <div className="absolute bottom-0 left-0 right-0 p-4">
-                <h3 className="font-semibold text-white text-sm md:text-base text-center drop-shadow-md">
+                <h3 className="font-semibold text-white text-sm md:text-base text-center drop-shadow-lg">
                   {category.name}
                 </h3>
               </div>
