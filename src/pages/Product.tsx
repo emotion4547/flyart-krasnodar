@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
-import { ShoppingCart, Minus, Plus, ChevronLeft, Check, Truck, Shield, Gift } from "lucide-react";
+import { ShoppingCart, Minus, Plus, ChevronLeft, Check, Truck, Shield, Gift, MapPin, CreditCard } from "lucide-react";
 import { useState } from "react";
 import { SEO } from "@/components/SEO";
 import { ProductSchema } from "@/components/ProductSchema";
@@ -289,7 +289,7 @@ const Product = () => {
               </div>
 
               {/* Features */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border/50">
                   <div className="h-10 w-10 rounded-lg bg-tiffany-light flex items-center justify-center">
                     <Truck className="h-5 w-5 text-tiffany-dark" />
@@ -316,6 +316,55 @@ const Product = () => {
                     <p className="font-medium text-foreground text-sm">Упаковка</p>
                     <p className="text-xs text-muted-foreground">в подарок</p>
                   </div>
+                </div>
+              </div>
+
+              {/* Delivery Info */}
+              <div className="bg-card rounded-2xl border border-border/50 p-5 mb-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <MapPin className="h-5 w-5 text-tiffany" />
+                  <h3 className="font-semibold text-foreground">Доставка</h3>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Свердловский р-он</span>
+                    <span className="font-medium text-foreground">200 ₽</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Центр</span>
+                    <span className="font-medium text-foreground">300 ₽</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Железнодорожный р-он</span>
+                    <span className="font-medium text-foreground">400 ₽</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Солнечный, Пашенный</span>
+                    <span className="font-medium text-foreground">500 ₽</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground pt-2 border-t border-border/50 mt-3">
+                    Время работы: с 09:00 до 22:00
+                  </p>
+                </div>
+                <div className="mt-4 pt-4 border-t border-border/50">
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">Самовывоз:</span> г. Красноярск, ул. Александра Матросова 30ст57, по предварительной договорённости.
+                  </p>
+                </div>
+              </div>
+
+              {/* Payment Info */}
+              <div className="bg-card rounded-2xl border border-border/50 p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <CreditCard className="h-5 w-5 text-tiffany" />
+                  <h3 className="font-semibold text-foreground">Оплата</h3>
+                </div>
+                <div className="space-y-3 text-sm text-muted-foreground">
+                  <p>Принимаем оплату переводом на карту в размере 30-100% от стоимости заказа.</p>
+                  <p>
+                    <span className="font-medium text-foreground">Способ оплаты:</span> Сделав заказ в нашем интернет-магазине, у оператора можно узнать номер карты для оплаты. Получатель — Татьяна Сергеевна.
+                  </p>
+                  <p className="text-xs">В комментариях к платежу ничего указывать не нужно!</p>
                 </div>
               </div>
 
