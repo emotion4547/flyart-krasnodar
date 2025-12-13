@@ -6,7 +6,6 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/CartContext";
 import { SearchDialog } from "./SearchDialog";
 import { CallbackDialog } from "@/components/CallbackDialog";
-import logoImage from "@/assets/logo.jpg";
 
 const navigation = [
   { name: "Каталог", href: "/catalog" },
@@ -51,12 +50,17 @@ export function Header() {
       <div className="container-custom">
         <div className="flex h-16 md:h-20 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            <img 
-              src={logoImage} 
-              alt="FlyArt" 
-              className="h-12 w-auto object-contain"
-            />
+          <Link to="/" className="flex items-center gap-2">
+            <div className="relative">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-tiffany to-tiffany-dark flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-lg">F</span>
+              </div>
+              <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-cta animate-pulse" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold text-foreground tracking-tight">FlyArt</span>
+              <span className="text-xs text-muted-foreground hidden sm:block">Воздушные шары</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
