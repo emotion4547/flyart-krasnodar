@@ -19,18 +19,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRoleLoading, setIsRoleLoading] = useState(false);
 
   const checkAdminRole = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId);
-    
-    if (!error && data && data.length > 0) {
-      const roles = data.map(r => r.role);
-      setIsAdmin(roles.includes('admin') || roles.includes('manager'));
-    } else {
+    setIsRoleLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId);
+      
+      if (!error && data && data.length > 0) {
+        const roles = data.map(r => r.role);
+        setIsAdmin(roles.includes('admin') || roles.includes('manager'));
+      } else {
+        setIsAdmin(false);
+      }
+    } catch (err) {
+      console.error('Error checking admin role:', err);
       setIsAdmin(false);
+    } finally {
+      setIsRoleLoading(false);
     }
   };
 
@@ -41,6 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          // Use setTimeout to avoid Supabase deadlock
           setTimeout(() => {
             checkAdminRole(session.user.id);
           }, 0);
@@ -55,9 +65,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkAdminRole(session.user.id);
+        checkAdminRole(session.user.id).then(() => {
+          setIsLoading(false);
+        });
+      } else {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
