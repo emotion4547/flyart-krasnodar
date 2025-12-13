@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/CartContext";
 import { SearchDialog } from "./SearchDialog";
-import { CallbackDialog } from "@/components/CallbackDialog";
 
 const navigation = [
   { name: "Каталог", href: "/catalog", icon: LayoutGrid, highlight: true },
@@ -21,29 +20,6 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      {/* Top bar */}
-      <div className="hidden md:block border-b border-border/30 bg-warm-cream">
-        <div className="container-custom">
-          <div className="flex h-10 items-center justify-between text-sm">
-            <div className="flex items-center gap-6 text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-tiffany" />
-                <span>Пн-Вс: 9:00 - 21:00</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <a 
-                href="tel:+79001234567" 
-                className="flex items-center gap-2 font-medium text-foreground hover:text-tiffany transition-colors"
-              >
-                <Phone className="h-4 w-4 text-tiffany" />
-                +7 (900) 123-45-67
-              </a>
-              <CallbackDialog />
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Main header */}
       <div className="container-custom">
