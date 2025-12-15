@@ -44,29 +44,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    // IMPORTANT: onAuthStateChange callback must stay synchronous to avoid deadlocks.
+    // We only update local state here, and defer any database checks with setTimeout.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
+
         if (session?.user) {
-          // Wait for role check to complete before setting isLoading to false
-          await checkAdminRole(session.user.id);
+          setIsRoleLoading(true);
+          setTimeout(() => {
+            checkAdminRole(session.user.id).finally(() => {
+              setIsRoleLoading(false);
+              setIsLoading(false);
+            });
+          }, 0);
         } else {
           setIsAdmin(false);
+          setIsRoleLoading(false);
+          setIsLoading(false);
         }
-        setIsLoading(false);
       }
     );
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+
       if (session?.user) {
-        checkAdminRole(session.user.id).then(() => {
+        setIsRoleLoading(true);
+        checkAdminRole(session.user.id).finally(() => {
+          setIsRoleLoading(false);
           setIsLoading(false);
         });
       } else {
+        setIsAdmin(false);
+        setIsRoleLoading(false);
         setIsLoading(false);
       }
     });

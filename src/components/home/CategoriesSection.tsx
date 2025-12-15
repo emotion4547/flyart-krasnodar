@@ -16,75 +16,105 @@ const categoryColors = [
 ];
 
 export function CategoriesSection() {
-  // Optimized: Fetch categories with product images in 2 queries instead of N+1
+  // Optimized: Fetch categories with preview images in 2 queries.
+  // IMPORTANT: do NOT require category.image_url, since many categories don't have it.
+  // Instead we derive a preview image from any active product within the category.
   const { data: categories, isLoading } = useQuery({
     queryKey: ["home-categories-optimized"],
     queryFn: async () => {
-      // Query 1: Get all categories
+      // Query 1: categories
       const { data: cats, error: catsError } = await supabase
         .from("categories")
-        .select("id, name, slug")
+        .select("id, name, slug, sort_order")
         .order("sort_order", { ascending: true });
 
       if (catsError) throw catsError;
       if (!cats || cats.length === 0) return [];
 
-      // Query 2: Get all product_categories with product images in one query
+      // Query 2: product_categories -> products -> images (single query)
       const { data: productCategories, error: pcError } = await supabase
         .from("product_categories")
-        .select(`
+        .select(
+          `
           category_id,
           products!inner (
             id,
             is_active,
-            product_images (url, is_main)
+            sort_order,
+            product_images (url, is_main, sort_order)
           )
-        `)
-        .in("category_id", cats.map(c => c.id));
+        `
+        )
+        .in(
+          "category_id",
+          cats.map((c) => c.id)
+        );
 
       if (pcError) throw pcError;
 
-      // Group by category and find first image for each
-      const categoryImageMap = new Map<string, { imageUrl: string; productCount: number }>();
-      
+      const byCategory = new Map<
+        string,
+        {
+          productCount: number;
+          bestImageUrl: string | null;
+          bestImageScore: number;
+        }
+      >();
+
+      const scoreImage = (p: any, img: any) => {
+        const mainBonus = img?.is_main ? 10_000 : 0;
+        const imgOrder = typeof img?.sort_order === "number" ? 1_000 - img.sort_order : 0;
+        const productOrder = typeof p?.sort_order === "number" ? 100 - p.sort_order : 0;
+        return mainBonus + imgOrder + productOrder;
+      };
+
       if (productCategories) {
-        for (const pc of productCategories) {
-          const product = pc.products as any;
+        for (const pc of productCategories as any[]) {
+          const product = pc.products;
           if (!product?.is_active) continue;
-          
-          const existing = categoryImageMap.get(pc.category_id);
-          const currentCount = existing?.productCount || 0;
-          
-          // Only set image if we don't have one yet
-          if (!existing?.imageUrl && product?.product_images?.length > 0) {
-            const mainImg = product.product_images.find((img: any) => img.is_main);
-            const imageUrl = mainImg?.url || product.product_images[0]?.url;
-            categoryImageMap.set(pc.category_id, { 
-              imageUrl, 
-              productCount: currentCount + 1 
-            });
-          } else {
-            categoryImageMap.set(pc.category_id, { 
-              imageUrl: existing?.imageUrl || '', 
-              productCount: currentCount + 1 
-            });
+
+          const existing = byCategory.get(pc.category_id) || {
+            productCount: 0,
+            bestImageUrl: null,
+            bestImageScore: -1,
+          };
+
+          existing.productCount += 1;
+
+          const images = product.product_images || [];
+          for (const img of images) {
+            const url = img?.url;
+            if (!url) continue;
+            const s = scoreImage(product, img);
+            if (s > existing.bestImageScore) {
+              existing.bestImageScore = s;
+              existing.bestImageUrl = url;
+            }
           }
+
+          byCategory.set(pc.category_id, existing);
         }
       }
 
-      // Combine categories with their images
-      const categoriesWithImages = cats
-        .map(cat => ({
-          ...cat,
-          imageUrl: categoryImageMap.get(cat.id)?.imageUrl || null,
-          productCount: categoryImageMap.get(cat.id)?.productCount || 0,
-        }))
-        .filter(c => c.productCount > 0 && c.imageUrl)
+      // Keep categories that have products, even if no image (fallback gradient will be used)
+      return cats
+        .map((cat) => {
+          const meta = byCategory.get(cat.id);
+          return {
+            id: cat.id,
+            name: cat.name,
+            slug: cat.slug,
+            sort_order: (cat as any).sort_order ?? 0,
+            imageUrl: meta?.bestImageUrl ?? null,
+            productCount: meta?.productCount ?? 0,
+          };
+        })
+        .filter((c) => c.productCount > 0)
         .slice(0, 8);
-
-      return categoriesWithImages;
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
+    refetchOnWindowFocus: false,
   });
 
   if (isLoading) {
