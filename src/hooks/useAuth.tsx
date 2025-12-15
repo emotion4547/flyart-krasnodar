@@ -2,11 +2,14 @@ import { useState, useEffect, createContext, useContext, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
+type RoleStatus = 'loading' | 'admin' | 'not-admin' | 'error';
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   isAdmin: boolean;
   isLoading: boolean;
+  roleStatus: RoleStatus;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -17,51 +20,49 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [roleStatus, setRoleStatus] = useState<RoleStatus>('loading');
   const [isLoading, setIsLoading] = useState(true);
-  const [isRoleLoading, setIsRoleLoading] = useState(false);
 
-  const checkAdminRole = async (userId: string) => {
-    setIsRoleLoading(true);
+  const checkAdminRole = async (userId: string): Promise<RoleStatus> => {
     try {
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', userId);
       
-      if (!error && data && data.length > 0) {
-        const roles = data.map(r => r.role);
-        setIsAdmin(roles.includes('admin') || roles.includes('manager'));
-      } else {
-        setIsAdmin(false);
+      if (error) {
+        console.error('Error checking admin role:', error);
+        return 'error';
       }
+      
+      if (data && data.length > 0) {
+        const roles = data.map(r => r.role);
+        return (roles.includes('admin') || roles.includes('manager')) ? 'admin' : 'not-admin';
+      }
+      return 'not-admin';
     } catch (err) {
       console.error('Error checking admin role:', err);
-      setIsAdmin(false);
-    } finally {
-      setIsRoleLoading(false);
+      return 'error';
     }
   };
 
   useEffect(() => {
     // IMPORTANT: onAuthStateChange callback must stay synchronous to avoid deadlocks.
-    // We only update local state here, and defer any database checks with setTimeout.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          setIsRoleLoading(true);
+          setRoleStatus('loading');
           setTimeout(() => {
-            checkAdminRole(session.user.id).finally(() => {
-              setIsRoleLoading(false);
+            checkAdminRole(session.user.id).then((status) => {
+              setRoleStatus(status);
               setIsLoading(false);
             });
           }, 0);
         } else {
-          setIsAdmin(false);
-          setIsRoleLoading(false);
+          setRoleStatus('not-admin');
           setIsLoading(false);
         }
       }
@@ -72,14 +73,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        setIsRoleLoading(true);
-        checkAdminRole(session.user.id).finally(() => {
-          setIsRoleLoading(false);
+        setRoleStatus('loading');
+        checkAdminRole(session.user.id).then((status) => {
+          setRoleStatus(status);
           setIsLoading(false);
         });
       } else {
-        setIsAdmin(false);
-        setIsRoleLoading(false);
+        setRoleStatus('not-admin');
         setIsLoading(false);
       }
     });
@@ -106,11 +106,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
-    setIsAdmin(false);
+    setRoleStatus('not-admin');
   };
 
+  const isAdmin = roleStatus === 'admin';
+
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, isLoading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, isLoading, roleStatus, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );

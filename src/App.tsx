@@ -1,11 +1,12 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, QueryCache } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/hooks/useAuth";
 import { FloatingContactButton } from "@/components/FloatingContactButton";
+import { toast } from "sonner";
 import Index from "./pages/Index";
 import Cart from "./pages/Cart";
 import Catalog from "./pages/Catalog";
@@ -43,7 +44,21 @@ const queryClient = new QueryClient({
       staleTime: 60 * 1000,
       gcTime: 1000 * 60 * 30,
     },
+    mutations: {
+      retry: 1,
+    },
   },
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      console.error(`[QueryError] ${String(query.queryKey)}:`, error);
+      // Only toast for user-facing queries when no cached data exists
+      if (query.state.data === undefined) {
+        toast.error("Ошибка загрузки данных", {
+          description: error instanceof Error ? error.message : "Попробуйте обновить страницу",
+        });
+      }
+    },
+  }),
 });
 
 function AppContent() {
