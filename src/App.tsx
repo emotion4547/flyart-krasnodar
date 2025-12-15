@@ -35,7 +35,16 @@ import Import from "./pages/admin/Import";
 import Settings from "./pages/admin/Settings";
 import UsersManagement from "./pages/admin/UsersManagement";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      refetchOnWindowFocus: false,
+      staleTime: 60 * 1000,
+      gcTime: 1000 * 60 * 30,
+    },
+  },
+});
 
 function AppContent() {
   const location = useLocation();
