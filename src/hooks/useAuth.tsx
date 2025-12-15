@@ -45,15 +45,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Use setTimeout to avoid Supabase deadlock
-          setTimeout(() => {
-            checkAdminRole(session.user.id);
-          }, 0);
+          // Wait for role check to complete before setting isLoading to false
+          await checkAdminRole(session.user.id);
         } else {
           setIsAdmin(false);
         }
