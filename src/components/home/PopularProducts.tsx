@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function PopularProducts() {
-  const { data: products, isLoading } = useQuery({
+  const { data: products, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ["popular-products"],
     queryFn: async () => {
       const { data: productsData, error } = await supabase
@@ -33,9 +33,10 @@ export function PopularProducts() {
         .limit(8);
 
       if (error) throw error;
-      return productsData;
+      return productsData ?? [];
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    retry: 3,
   });
 
   return (
@@ -75,10 +76,38 @@ export function PopularProducts() {
               </div>
             ))}
           </div>
+        ) : isError ? (
+          <div className="rounded-xl border border-border bg-card p-6 md:p-8">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <p className="text-foreground font-medium">Не удалось загрузить популярные композиции</p>
+                <p className="text-muted-foreground text-sm mt-1">
+                  {error instanceof Error ? error.message : "Попробуйте обновить страницу"}
+                </p>
+              </div>
+              <Button
+                variant="tiffanyOutline"
+                onClick={() => refetch()}
+                disabled={isFetching}
+                className="md:self-start"
+              >
+                {isFetching ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Обновляем…
+                  </>
+                ) : (
+                  "Повторить"
+                )}
+              </Button>
+            </div>
+          </div>
         ) : products && products.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {products.map((product, index) => {
-              const mainImage = product.product_images?.find((img) => img.is_main) || product.product_images?.[0];
+              const mainImage =
+                product.product_images?.find((img) => img.is_main) ||
+                product.product_images?.[0];
               return (
                 <div
                   key={product.id}
@@ -103,12 +132,8 @@ export function PopularProducts() {
           </div>
         ) : (
           <div className="text-center py-16">
-            <p className="text-muted-foreground text-lg mb-4">
-              Товары скоро появятся
-            </p>
-            <p className="text-muted-foreground text-sm">
-              Следите за обновлениями каталога
-            </p>
+            <p className="text-muted-foreground text-lg mb-4">Товары скоро появятся</p>
+            <p className="text-muted-foreground text-sm">Следите за обновлениями каталога</p>
           </div>
         )}
       </div>
