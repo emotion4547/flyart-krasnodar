@@ -31,6 +31,8 @@ import {
   Upload,
   ChevronRight,
   UserCog,
+  AlertTriangle,
+  RefreshCw,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -51,7 +53,7 @@ const menuItems = [
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const { user, isAdmin, isLoading, signOut } = useAuth();
+  const { user, isAdmin, isLoading, roleStatus, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -63,53 +65,69 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }, [user, isLoading, navigate]);
 
   useEffect(() => {
-    // Only redirect non-admin users after isAdmin has been properly checked
-    // We need to wait for the role check to complete
-    if (!isLoading && user && isAdmin === false) {
-      // Double-check by waiting a moment for role to load
-      const timer = setTimeout(() => {
-        if (!isAdmin) {
-          navigate('/');
-        }
-      }, 500);
-      return () => clearTimeout(timer);
+    // Redirect non-admin users only after role check completed (not loading, not error)
+    if (!isLoading && user && roleStatus === 'not-admin') {
+      navigate('/');
     }
-  }, [user, isAdmin, isLoading, navigate]);
+  }, [user, roleStatus, isLoading, navigate]);
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/admin4547/login');
   };
 
+  const handleRetry = () => {
+    window.location.reload();
+  };
+
   // Show loading while checking auth state
-  if (isLoading) {
+  if (isLoading || roleStatus === 'loading') {
     return (
       <div className="min-h-screen bg-muted/30 flex items-center justify-center">
-        <div className="space-y-4 w-64">
+        <div className="space-y-4 w-64 text-center">
           <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-4 w-3/4 mx-auto" />
+          <Skeleton className="h-4 w-1/2 mx-auto" />
+          <p className="text-sm text-muted-foreground mt-4">Проверка доступа...</p>
         </div>
       </div>
     );
   }
 
-  // Show loading while waiting for admin role check
+  // Show error state with retry option
+  if (roleStatus === 'error') {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <div className="text-center space-y-4 max-w-md p-6">
+          <div className="h-16 w-16 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
+            <AlertTriangle className="h-8 w-8 text-destructive" />
+          </div>
+          <h2 className="text-xl font-semibold">Ошибка загрузки</h2>
+          <p className="text-muted-foreground">
+            Не удалось проверить права доступа. Возможно, проблема с сетью или сервером.
+          </p>
+          <div className="flex gap-3 justify-center">
+            <Button variant="outline" onClick={handleRetry}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Повторить
+            </Button>
+            <Button variant="ghost" onClick={handleSignOut}>
+              Выйти
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // No user - will redirect
   if (!user) {
     return null;
   }
 
-  // Show loading state while isAdmin is being determined (not yet true)
+  // Not admin - will redirect
   if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
-        <div className="space-y-4 w-64">
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (

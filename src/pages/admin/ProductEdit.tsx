@@ -62,7 +62,7 @@ export default function ProductEdit() {
           product_categories (category_id)
         `)
         .eq('id', id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
