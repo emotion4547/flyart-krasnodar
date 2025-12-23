@@ -1,4 +1,4 @@
-import { Truck, Smartphone, Wallet, ShieldCheck, Sparkles } from "lucide-react";
+import { Truck, Smartphone, Wallet, ShieldCheck } from "lucide-react";
 
 const advantages = [
   {
@@ -31,6 +31,16 @@ const advantages = [
   },
 ];
 
+// Конфетти частицы
+const confettiParticles = [
+  { className: "animate-confetti-1 bg-gold", size: "w-2 h-2", position: "top-1/3 right-1/4" },
+  { className: "animate-confetti-2 bg-tiffany", size: "w-1.5 h-1.5", position: "top-1/2 right-1/3" },
+  { className: "animate-confetti-3 bg-cta", size: "w-2 h-2", position: "top-2/5 right-1/5" },
+  { className: "animate-confetti-4 bg-peach-dark", size: "w-1.5 h-1.5", position: "top-1/2 right-1/4" },
+  { className: "animate-confetti-5 bg-gold", size: "w-1 h-1", position: "top-1/3 right-1/3" },
+  { className: "animate-confetti-6 bg-tiffany-dark", size: "w-1.5 h-1.5", position: "top-2/5 right-2/5" },
+];
+
 export function AdvantagesSection() {
   return (
     <section className="section-padding bg-background">
@@ -56,18 +66,23 @@ export function AdvantagesSection() {
                 className="group relative p-6 rounded-2xl bg-card border border-border/50 hover:border-tiffany/30 transition-all duration-300 hover:shadow-card animate-fade-up overflow-hidden"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                {/* Декоративные салютики */}
-                <Sparkles className="absolute top-3 right-3 h-4 w-4 text-gold/40 group-hover:text-gold/70 transition-colors" />
-                <Sparkles className="absolute top-8 right-8 h-3 w-3 text-tiffany/30 group-hover:text-tiffany/60 transition-colors rotate-12" />
-                <Sparkles className="absolute bottom-4 right-6 h-3.5 w-3.5 text-cta/25 group-hover:text-cta/50 transition-colors -rotate-12" />
+                {/* Анимированные конфетти */}
+                <div className="absolute inset-0 pointer-events-none">
+                  {confettiParticles.map((particle, i) => (
+                    <div
+                      key={i}
+                      className={`absolute ${particle.position} ${particle.size} ${particle.className} rounded-full opacity-70`}
+                    />
+                  ))}
+                </div>
                 
-                <div className={`h-14 w-14 rounded-2xl ${advantage.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
+                <div className={`relative z-10 h-14 w-14 rounded-2xl ${advantage.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
                   <Icon className={`h-7 w-7 ${advantage.iconColor}`} />
                 </div>
-                <h3 className="font-semibold text-foreground text-lg mb-2">
+                <h3 className="relative z-10 font-semibold text-foreground text-lg mb-2">
                   {advantage.title}
                 </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
+                <p className="relative z-10 text-muted-foreground text-sm leading-relaxed">
                   {advantage.description}
                 </p>
               </div>
