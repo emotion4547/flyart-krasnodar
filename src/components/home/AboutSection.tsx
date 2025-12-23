@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+import aboutBalloons from "@/assets/about-balloons.jpg";
 
 export function AboutSection() {
   return (
@@ -9,7 +10,7 @@ export function AboutSection() {
           <div className="relative">
             <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-card">
               <img
-                src="https://images.unsplash.com/photo-1464349153735-7db50ed83c84?w=800&h=600&fit=crop"
+                src={aboutBalloons}
                 alt="Воздушные шары FlyArt"
                 className="w-full h-full object-cover"
               />
