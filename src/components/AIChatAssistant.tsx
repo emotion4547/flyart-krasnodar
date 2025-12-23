@@ -4,13 +4,61 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
+
+interface Product {
+  id: string;
+  title: string;
+  slug: string;
+  price: number;
+  price_old?: number;
+  image?: string;
+  is_hit?: boolean;
+  is_new?: boolean;
+  is_sale?: boolean;
+}
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  products?: Product[];
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-assistant`;
+
+const ProductCard = ({ product }: { product: Product }) => (
+  <Link 
+    to={`/product/${product.slug}`}
+    className="block bg-background border border-border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+  >
+    {product.image && (
+      <div className="aspect-square bg-muted">
+        <img 
+          src={product.image} 
+          alt={product.title}
+          className="w-full h-full object-cover"
+        />
+      </div>
+    )}
+    <div className="p-2">
+      <p className="text-xs font-medium line-clamp-2 mb-1">{product.title}</p>
+      <div className="flex items-center gap-1">
+        <span className="text-sm font-bold text-primary">{product.price}₽</span>
+        {product.price_old && (
+          <span className="text-xs text-muted-foreground line-through">{product.price_old}₽</span>
+        )}
+      </div>
+    </div>
+  </Link>
+);
+
+const ProductsGrid = ({ products }: { products: Product[] }) => (
+  <div className="grid grid-cols-2 gap-2 mt-2">
+    {products.map(product => (
+      <ProductCard key={product.id} product={product} />
+    ))}
+  </div>
+);
 
 export const AIChatAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,7 +85,7 @@ export const AIChatAssistant = () => {
     if (messages.length === 0) {
       setMessages([{
         role: 'assistant',
-        content: 'Привет! 🎈 Я помощник магазина FlyArt. Помогу выбрать воздушные шары, расскажу о доставке и ценах. Чем могу помочь?'
+        content: 'Привет! 🎈 Я помощник магазина FlyArt. Помогу выбрать воздушные шары, покажу товары из каталога, расскажу о доставке и ценах. Что вас интересует?'
       }]);
     }
   };
@@ -52,6 +100,7 @@ export const AIChatAssistant = () => {
     setIsLoading(true);
 
     let assistantContent = '';
+    let products: Product[] = [];
 
     try {
       const response = await fetch(CHAT_URL, {
@@ -77,7 +126,7 @@ export const AIChatAssistant = () => {
       }
 
       // Add empty assistant message
-      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: '', products: [] }]);
 
       let buffer = '';
 
@@ -101,12 +150,32 @@ export const AIChatAssistant = () => {
 
           try {
             const parsed = JSON.parse(jsonStr);
+            
+            // Check if this is a products event
+            if (parsed.type === 'products' && parsed.products) {
+              products = parsed.products;
+              setMessages(prev => {
+                const updated = [...prev];
+                updated[updated.length - 1] = { 
+                  ...updated[updated.length - 1], 
+                  products 
+                };
+                return updated;
+              });
+              continue;
+            }
+            
+            // Regular text delta
             const content = parsed.choices?.[0]?.delta?.content;
             if (content) {
               assistantContent += content;
               setMessages(prev => {
                 const updated = [...prev];
-                updated[updated.length - 1] = { role: 'assistant', content: assistantContent };
+                updated[updated.length - 1] = { 
+                  role: 'assistant', 
+                  content: assistantContent,
+                  products
+                };
                 return updated;
               });
             }
@@ -153,7 +222,7 @@ export const AIChatAssistant = () => {
         className={cn(
           "fixed bottom-4 right-4 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-background border border-border rounded-2xl shadow-2xl transition-all duration-300 overflow-hidden",
           "flex flex-col",
-          isOpen ? "opacity-100 scale-100 h-[500px] max-h-[80vh]" : "opacity-0 scale-95 h-0 pointer-events-none"
+          isOpen ? "opacity-100 scale-100 h-[550px] max-h-[85vh]" : "opacity-0 scale-95 h-0 pointer-events-none"
         )}
       >
         {/* Header */}
@@ -164,7 +233,7 @@ export const AIChatAssistant = () => {
             </div>
             <div>
               <h3 className="font-semibold text-sm">Помощник FlyArt</h3>
-              <p className="text-xs opacity-80">Онлайн</p>
+              <p className="text-xs opacity-80">Помогу выбрать шары</p>
             </div>
           </div>
           <button
@@ -183,8 +252,8 @@ export const AIChatAssistant = () => {
               <div
                 key={index}
                 className={cn(
-                  "flex",
-                  message.role === 'user' ? "justify-end" : "justify-start"
+                  "flex flex-col",
+                  message.role === 'user' ? "items-end" : "items-start"
                 )}
               >
                 <div
@@ -199,6 +268,11 @@ export const AIChatAssistant = () => {
                     <Loader2 className="w-4 h-4 animate-spin" />
                   )}
                 </div>
+                {message.products && message.products.length > 0 && (
+                  <div className="w-full max-w-[85%] mt-2">
+                    <ProductsGrid products={message.products} />
+                  </div>
+                )}
               </div>
             ))}
             {isLoading && messages[messages.length - 1]?.role === 'user' && (
