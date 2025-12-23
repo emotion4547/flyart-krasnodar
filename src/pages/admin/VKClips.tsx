@@ -6,14 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -22,6 +14,23 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Play, ExternalLink, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface VKClip {
   id: string;
@@ -32,6 +41,88 @@ interface VKClip {
   created_at: string;
 }
 
+interface SortableClipRowProps {
+  clip: VKClip;
+  index: number;
+  onEdit: (clip: VKClip) => void;
+  onDelete: (id: string) => void;
+  onToggleActive: (id: string, is_active: boolean) => void;
+}
+
+function SortableClipRow({ clip, index, onEdit, onDelete, onToggleActive }: SortableClipRowProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: clip.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-4 p-4 bg-card border rounded-lg ${
+        isDragging ? "shadow-lg ring-2 ring-primary" : ""
+      }`}
+    >
+      <button
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing touch-none"
+      >
+        <GripVertical className="h-5 w-5 text-muted-foreground" />
+      </button>
+      
+      <div className="w-8 text-center text-muted-foreground font-medium">
+        {index + 1}
+      </div>
+      
+      <div className="flex-1 min-w-0">
+        <p className="font-medium truncate">{clip.title || "Без названия"}</p>
+        <a
+          href={clip.vk_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+        >
+          <ExternalLink className="h-3 w-3" />
+          Открыть в VK
+        </a>
+      </div>
+      
+      <Switch
+        checked={clip.is_active}
+        onCheckedChange={(checked) => onToggleActive(clip.id, checked)}
+      />
+      
+      <div className="flex items-center gap-1">
+        <Button variant="ghost" size="icon" onClick={() => onEdit(clip)}>
+          <Pencil className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => {
+            if (confirm("Удалить этот клип?")) {
+              onDelete(clip.id);
+            }
+          }}
+        >
+          <Trash2 className="h-4 w-4 text-destructive" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function VKClips() {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -39,9 +130,15 @@ export default function VKClips() {
   const [formData, setFormData] = useState({
     title: "",
     vk_url: "",
-    sort_order: 0,
     is_active: true,
   });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const { data: clips = [], isLoading } = useQuery({
     queryKey: ["admin-vk-clips"],
@@ -57,14 +154,13 @@ export default function VKClips() {
   });
 
   const saveMutation = useMutation({
-    mutationFn: async (data: typeof formData & { id?: string }) => {
+    mutationFn: async (data: typeof formData & { id?: string; sort_order?: number }) => {
       if (data.id) {
         const { error } = await supabase
           .from("vk_clips")
           .update({
             title: data.title || null,
             vk_url: data.vk_url,
-            sort_order: data.sort_order,
             is_active: data.is_active,
           })
           .eq("id", data.id);
@@ -73,7 +169,7 @@ export default function VKClips() {
         const { error } = await supabase.from("vk_clips").insert({
           title: data.title || null,
           vk_url: data.vk_url,
-          sort_order: data.sort_order,
+          sort_order: data.sort_order ?? clips.length,
           is_active: data.is_active,
         });
         if (error) throw error;
@@ -87,6 +183,23 @@ export default function VKClips() {
     },
     onError: (error) => {
       toast.error("Ошибка сохранения", { description: error.message });
+    },
+  });
+
+  const reorderMutation = useMutation({
+    mutationFn: async (reorderedClips: { id: string; sort_order: number }[]) => {
+      const updates = reorderedClips.map(({ id, sort_order }) =>
+        supabase.from("vk_clips").update({ sort_order }).eq("id", id)
+      );
+      await Promise.all(updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["vk-clips"] });
+      toast.success("Порядок сохранен");
+    },
+    onError: (error) => {
+      toast.error("Ошибка сохранения порядка", { description: error.message });
+      queryClient.invalidateQueries({ queryKey: ["admin-vk-clips"] });
     },
   });
 
@@ -119,13 +232,31 @@ export default function VKClips() {
     },
   });
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const oldIndex = clips.findIndex((clip) => clip.id === active.id);
+      const newIndex = clips.findIndex((clip) => clip.id === over.id);
+      
+      const reordered = arrayMove(clips, oldIndex, newIndex);
+      
+      // Optimistically update the cache
+      queryClient.setQueryData(["admin-vk-clips"], reordered);
+      
+      // Save the new order
+      reorderMutation.mutate(
+        reordered.map((clip, index) => ({ id: clip.id, sort_order: index }))
+      );
+    }
+  };
+
   const handleOpenDialog = (clip?: VKClip) => {
     if (clip) {
       setEditingClip(clip);
       setFormData({
         title: clip.title || "",
         vk_url: clip.vk_url,
-        sort_order: clip.sort_order,
         is_active: clip.is_active,
       });
     } else {
@@ -133,7 +264,6 @@ export default function VKClips() {
       setFormData({
         title: "",
         vk_url: "",
-        sort_order: clips.length,
         is_active: true,
       });
     }
@@ -143,7 +273,7 @@ export default function VKClips() {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setEditingClip(null);
-    setFormData({ title: "", vk_url: "", sort_order: 0, is_active: true });
+    setFormData({ title: "", vk_url: "", is_active: true });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -154,7 +284,11 @@ export default function VKClips() {
       });
       return;
     }
-    saveMutation.mutate({ ...formData, id: editingClip?.id });
+    saveMutation.mutate({ 
+      ...formData, 
+      id: editingClip?.id,
+      sort_order: clips.length,
+    });
   };
 
   return (
@@ -163,7 +297,7 @@ export default function VKClips() {
         <div>
           <h1 className="text-2xl font-bold">VK Клипы</h1>
           <p className="text-muted-foreground">
-            Управление галереей видео на главной странице
+            Перетаскивайте клипы для изменения порядка
           </p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -204,20 +338,6 @@ export default function VKClips() {
                     setFormData({ ...formData, title: e.target.value })
                   }
                   placeholder="Композиция для дня рождения"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="sort_order">Порядок сортировки</Label>
-                <Input
-                  id="sort_order"
-                  type="number"
-                  value={formData.sort_order}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      sort_order: parseInt(e.target.value) || 0,
-                    })
-                  }
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -264,76 +384,31 @@ export default function VKClips() {
           </Button>
         </div>
       ) : (
-        <div className="border rounded-lg">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">#</TableHead>
-                <TableHead>Название</TableHead>
-                <TableHead>Ссылка</TableHead>
-                <TableHead className="w-24">Активен</TableHead>
-                <TableHead className="w-32">Действия</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={clips.map((c) => c.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="space-y-2">
               {clips.map((clip, index) => (
-                <TableRow key={clip.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <GripVertical className="h-4 w-4 text-muted-foreground" />
-                      {index + 1}
-                    </div>
-                  </TableCell>
-                  <TableCell>{clip.title || "—"}</TableCell>
-                  <TableCell>
-                    <a
-                      href={clip.vk_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-primary hover:underline text-sm"
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                      Открыть
-                    </a>
-                  </TableCell>
-                  <TableCell>
-                    <Switch
-                      checked={clip.is_active}
-                      onCheckedChange={(checked) =>
-                        toggleActiveMutation.mutate({
-                          id: clip.id,
-                          is_active: checked,
-                        })
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleOpenDialog(clip)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => {
-                          if (confirm("Удалить этот клип?")) {
-                            deleteMutation.mutate(clip.id);
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <SortableClipRow
+                  key={clip.id}
+                  clip={clip}
+                  index={index}
+                  onEdit={handleOpenDialog}
+                  onDelete={(id) => deleteMutation.mutate(id)}
+                  onToggleActive={(id, is_active) =>
+                    toggleActiveMutation.mutate({ id, is_active })
+                  }
+                />
               ))}
-            </TableBody>
-          </Table>
-        </div>
+            </div>
+          </SortableContext>
+        </DndContext>
       )}
     </div>
   );
