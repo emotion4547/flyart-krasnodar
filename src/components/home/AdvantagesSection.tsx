@@ -1,4 +1,4 @@
-import { Truck, Smartphone, Wallet, ShieldCheck } from "lucide-react";
+import { Truck, Smartphone, Wallet, ShieldCheck, Sparkles } from "lucide-react";
 
 const advantages = [
   {
@@ -53,9 +53,14 @@ export function AdvantagesSection() {
             return (
               <div
                 key={advantage.title}
-                className="group p-6 rounded-2xl bg-card border border-border/50 hover:border-tiffany/30 transition-all duration-300 hover:shadow-card animate-fade-up"
+                className="group relative p-6 rounded-2xl bg-card border border-border/50 hover:border-tiffany/30 transition-all duration-300 hover:shadow-card animate-fade-up overflow-hidden"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
+                {/* Декоративные салютики */}
+                <Sparkles className="absolute top-3 right-3 h-4 w-4 text-gold/40 group-hover:text-gold/70 transition-colors" />
+                <Sparkles className="absolute top-8 right-8 h-3 w-3 text-tiffany/30 group-hover:text-tiffany/60 transition-colors rotate-12" />
+                <Sparkles className="absolute bottom-4 right-6 h-3.5 w-3.5 text-cta/25 group-hover:text-cta/50 transition-colors -rotate-12" />
+                
                 <div className={`h-14 w-14 rounded-2xl ${advantage.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
                   <Icon className={`h-7 w-7 ${advantage.iconColor}`} />
                 </div>
