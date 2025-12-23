@@ -79,6 +79,68 @@ export type Database = {
           },
         ]
       }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          products: Json | null
+          role: string
+          session_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          products?: Json | null
+          role: string
+          session_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          products?: Json | null
+          role?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_sessions: {
+        Row: {
+          client_info: Json | null
+          created_at: string
+          id: string
+          last_message_at: string | null
+          messages_count: number
+          updated_at: string
+        }
+        Insert: {
+          client_info?: Json | null
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+          messages_count?: number
+          updated_at?: string
+        }
+        Update: {
+          client_info?: Json | null
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+          messages_count?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contact_requests: {
         Row: {
           comment: string | null
