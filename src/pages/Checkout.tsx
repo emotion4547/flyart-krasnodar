@@ -144,14 +144,31 @@ const Checkout = () => {
 
       // Handle online payment
       if (effectivePaymentMethod === 'online') {
-        // For now, show a message that online payment will be available soon
-        // When Robokassa is fully integrated, this will redirect to payment
-        toast({
-          title: "Онлайн-оплата",
-          description: "Функция онлайн-оплаты скоро будет доступна. Заказ создан, мы свяжемся с вами.",
+        // Call Robokassa init edge function
+        const { data: paymentData, error: paymentError } = await supabase.functions.invoke('robokassa-init', {
+          body: {
+            orderId: order.id,
+            orderNumber: order.order_number,
+            amount: totalPrice,
+            description: `Заказ ${order.order_number} - FlyArt`,
+            email: data.email || undefined,
+          },
         });
+
+        if (paymentError || !paymentData?.paymentUrl) {
+          console.error("Payment init error:", paymentError || paymentData);
+          toast({
+            title: "Ошибка",
+            description: "Не удалось инициализировать оплату. Попробуйте позже или выберите другой способ оплаты.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        // Clear cart and redirect to Robokassa
         clearCart();
-        navigate(`/order-success/${order.order_number}`);
+        window.location.href = paymentData.paymentUrl;
         return;
       }
 
