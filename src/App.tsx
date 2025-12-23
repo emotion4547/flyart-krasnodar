@@ -22,6 +22,8 @@ import Privacy from "./pages/Privacy";
 import Offer from "./pages/Offer";
 import NotFound from "./pages/NotFound";
 import DesignSystem from "./pages/DesignSystem";
+import IndexNoir from "./pages/IndexNoir";
+import IndexNeoPastel from "./pages/IndexNeoPastel";
 
 // Admin pages
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -84,6 +86,8 @@ function AppContent() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/offer" element={<Offer />} />
         <Route path="/design-system" element={<DesignSystem />} />
+        <Route path="/noir" element={<IndexNoir />} />
+        <Route path="/neo-pastel" element={<IndexNeoPastel />} />
         
         {/* Admin routes */}
         <Route path="/admin4547/login" element={<AdminLogin />} />
