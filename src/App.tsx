@@ -32,6 +32,7 @@ import ProductEdit from "./pages/admin/ProductEdit";
 import Categories from "./pages/admin/Categories";
 import Orders from "./pages/admin/Orders";
 import Clients from "./pages/admin/Clients";
+import VKClips from "./pages/admin/VKClips";
 import Marketing from "./pages/admin/Marketing";
 import Content from "./pages/admin/Content";
 import Import from "./pages/admin/Import";
@@ -93,6 +94,7 @@ function AppContent() {
         <Route path="/admin4547/categories" element={<AdminLayout><Categories /></AdminLayout>} />
         <Route path="/admin4547/orders" element={<AdminLayout><Orders /></AdminLayout>} />
         <Route path="/admin4547/clients" element={<AdminLayout><Clients /></AdminLayout>} />
+        <Route path="/admin4547/vk-clips" element={<AdminLayout><VKClips /></AdminLayout>} />
         <Route path="/admin4547/marketing" element={<AdminLayout><Marketing /></AdminLayout>} />
         <Route path="/admin4547/content" element={<AdminLayout><Content /></AdminLayout>} />
         <Route path="/admin4547/import" element={<AdminLayout><Import /></AdminLayout>} />

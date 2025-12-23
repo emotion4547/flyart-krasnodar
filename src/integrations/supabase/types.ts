@@ -548,6 +548,36 @@ export type Database = {
         }
         Relationships: []
       }
+      vk_clips: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean | null
+          sort_order: number | null
+          title: string | null
+          updated_at: string
+          vk_url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title?: string | null
+          updated_at?: string
+          vk_url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title?: string | null
+          updated_at?: string
+          vk_url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
