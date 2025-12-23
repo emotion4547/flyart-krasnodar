@@ -108,6 +108,11 @@ serve(async (req: Request): Promise<Response> => {
       ? "https://auth.robokassa.ru/Merchant/Index.aspx"
       : "https://auth.robokassa.ru/Merchant/Index.aspx";
 
+    // Get the site URL from request origin or use default
+    const origin = req.headers.get("origin") || "https://fashari.ru";
+    const successUrl = `${origin}/order-success/${orderNumber}?payment=success`;
+    const failUrl = `${origin}/order-success/${orderNumber}?payment=failed`;
+
     const params = new URLSearchParams({
       MerchantLogin: merchantLogin,
       OutSum: formattedAmount,
@@ -116,6 +121,8 @@ serve(async (req: Request): Promise<Response> => {
       SignatureValue: signature,
       IsTest: isTestMode ? "1" : "0",
       Shp_orderId: orderId,
+      SuccessURL: successUrl,
+      FailURL: failUrl,
     });
 
     // Add email if provided

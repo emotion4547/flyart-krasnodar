@@ -1,11 +1,17 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
-import { Link, useParams } from "react-router-dom";
-import { CheckCircle, Phone, ArrowRight } from "lucide-react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import { CheckCircle, Phone, ArrowRight, XCircle, CreditCard } from "lucide-react";
 
 const OrderSuccess = () => {
   const { orderNumber } = useParams<{ orderNumber: string }>();
+  const [searchParams] = useSearchParams();
+  const paymentStatus = searchParams.get("payment");
+  
+  const isPaymentSuccess = paymentStatus === "success";
+  const isPaymentFailed = paymentStatus === "failed";
+  const isPaid = isPaymentSuccess;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -13,12 +19,18 @@ const OrderSuccess = () => {
       <main className="flex-1 section-padding bg-warm-cream">
         <div className="container-custom">
           <div className="max-w-2xl mx-auto text-center py-16">
-            <div className="h-24 w-24 rounded-full bg-tiffany-light flex items-center justify-center mx-auto mb-6 animate-scale-in">
-              <CheckCircle className="h-12 w-12 text-tiffany" />
+            <div className={`h-24 w-24 rounded-full flex items-center justify-center mx-auto mb-6 animate-scale-in ${
+              isPaymentFailed ? 'bg-destructive/10' : 'bg-tiffany-light'
+            }`}>
+              {isPaymentFailed ? (
+                <XCircle className="h-12 w-12 text-destructive" />
+              ) : (
+                <CheckCircle className="h-12 w-12 text-tiffany" />
+              )}
             </div>
             
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 animate-fade-up">
-              Заказ оформлен!
+              {isPaymentFailed ? "Оплата не прошла" : "Заказ оформлен!"}
             </h1>
             
             <div className="gold-line max-w-xs mx-auto mb-6" />
@@ -33,33 +45,60 @@ const OrderSuccess = () => {
                 {orderNumber}
               </p>
             )}
+
+            {isPaid && (
+              <div className="inline-flex items-center gap-2 bg-tiffany/10 text-tiffany px-4 py-2 rounded-full mb-6 animate-fade-up" style={{ animationDelay: "0.17s" }}>
+                <CreditCard className="h-4 w-4" />
+                <span className="font-medium">Оплата успешно получена</span>
+              </div>
+            )}
             
             <p className="text-muted-foreground mb-8 max-w-md mx-auto animate-fade-up" style={{ animationDelay: "0.2s" }}>
-              Спасибо за заказ! Мы свяжемся с вами в ближайшее время для подтверждения деталей доставки.
+              {isPaymentFailed 
+                ? "К сожалению, оплата не была завершена. Вы можете попробовать снова или выбрать другой способ оплаты."
+                : "Спасибо за заказ! Мы свяжемся с вами в ближайшее время для подтверждения деталей доставки."
+              }
             </p>
 
             <div className="bg-card rounded-2xl p-6 border border-border/50 mb-8 animate-fade-up" style={{ animationDelay: "0.25s" }}>
-              <h2 className="font-semibold text-foreground mb-3">Что дальше?</h2>
+              <h2 className="font-semibold text-foreground mb-3">
+                {isPaymentFailed ? "Что можно сделать?" : "Что дальше?"}
+              </h2>
               <ul className="text-left text-muted-foreground space-y-2 text-sm">
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-tiffany mt-0.5 flex-shrink-0" />
-                  Наш менеджер позвонит вам для подтверждения заказа
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-tiffany mt-0.5 flex-shrink-0" />
-                  Мы подготовим вашу композицию с заботой
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-tiffany mt-0.5 flex-shrink-0" />
-                  Доставим шары в указанное время и место
-                </li>
+                {isPaymentFailed ? (
+                  <>
+                    <li className="flex items-start gap-2">
+                      <XCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                      Проверьте баланс карты и попробуйте снова
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Phone className="h-4 w-4 text-tiffany mt-0.5 flex-shrink-0" />
+                      Свяжитесь с нами для оплаты при получении
+                    </li>
+                  </>
+                ) : (
+                  <>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-tiffany mt-0.5 flex-shrink-0" />
+                      {isPaid ? "Оплата получена, заказ передан в обработку" : "Наш менеджер позвонит вам для подтверждения заказа"}
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-tiffany mt-0.5 flex-shrink-0" />
+                      Мы подготовим вашу композицию с заботой
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-tiffany mt-0.5 flex-shrink-0" />
+                      Доставим шары в указанное время и место
+                    </li>
+                  </>
+                )}
               </ul>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style={{ animationDelay: "0.3s" }}>
               <Link to="/catalog">
                 <Button variant="cta" size="lg">
-                  Продолжить покупки
+                  {isPaymentFailed ? "Вернуться в каталог" : "Продолжить покупки"}
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
