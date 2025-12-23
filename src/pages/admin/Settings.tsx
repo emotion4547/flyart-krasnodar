@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Save, Store, Truck, CreditCard, Plus, Trash2 } from 'lucide-react';
+import { Save, Store, Truck, CreditCard, Plus, Trash2, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useSettings } from '@/hooks/useSettings';
 
 interface GeneralSettings {
@@ -35,6 +36,10 @@ interface PaymentSettings {
   cardPayment: boolean;
   cashPayment: boolean;
   onlinePayment: boolean;
+  robokassaMerchantLogin: string;
+  robokassaPassword1: string;
+  robokassaPassword2: string;
+  robokassaTestMode: boolean;
 }
 
 const defaultGeneral: GeneralSettings = {
@@ -57,9 +62,15 @@ const defaultPayment: PaymentSettings = {
   cardPayment: true,
   cashPayment: true,
   onlinePayment: false,
+  robokassaMerchantLogin: '',
+  robokassaPassword1: '',
+  robokassaPassword2: '',
+  robokassaTestMode: true,
 };
 
 export default function Settings() {
+  const [showPassword1, setShowPassword1] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
   const { data: generalData, isLoading: generalLoading, save: saveGeneral, isSaving: savingGeneral } = 
     useSettings<GeneralSettings>('general', defaultGeneral);
   const { data: deliveryData, isLoading: deliveryLoading, save: saveDelivery, isSaving: savingDelivery } = 
@@ -314,16 +325,108 @@ export default function Settings() {
                 />
               </div>
 
-              <div className="flex items-center justify-between py-2">
+              <div className="flex items-center justify-between py-2 border-t pt-4">
                 <div>
-                  <Label>Онлайн-оплата</Label>
-                  <p className="text-sm text-muted-foreground">Оплата на сайте через платёжную систему</p>
+                  <Label>Онлайн-оплата (Робокасса)</Label>
+                  <p className="text-sm text-muted-foreground">Оплата на сайте через Робокассу</p>
                 </div>
                 <Switch
                   checked={paymentSettings.onlinePayment}
                   onCheckedChange={(checked) => setPaymentSettings({ ...paymentSettings, onlinePayment: checked })}
                 />
               </div>
+
+              {/* Robokassa settings - shown when online payment is enabled */}
+              {paymentSettings.onlinePayment && (
+                <div className="space-y-4 p-4 rounded-lg bg-muted/50 border border-border">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CreditCard className="h-4 w-4 text-primary" />
+                    <Label className="text-base font-semibold">Настройки Робокассы</Label>
+                  </div>
+
+                  {/* Status indicator */}
+                  {paymentSettings.robokassaMerchantLogin && paymentSettings.robokassaPassword1 && paymentSettings.robokassaPassword2 ? (
+                    <Alert className="border-green-200 bg-green-50">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <AlertDescription className="text-green-700">
+                        Робокасса настроена {paymentSettings.robokassaTestMode ? '(тестовый режим)' : '(боевой режим)'}
+                      </AlertDescription>
+                    </Alert>
+                  ) : (
+                    <Alert className="border-amber-200 bg-amber-50">
+                      <AlertCircle className="h-4 w-4 text-amber-600" />
+                      <AlertDescription className="text-amber-700">
+                        Заполните все поля для активации онлайн-оплаты
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label>Идентификатор магазина (MerchantLogin)</Label>
+                    <Input
+                      value={paymentSettings.robokassaMerchantLogin}
+                      onChange={(e) => setPaymentSettings({ ...paymentSettings, robokassaMerchantLogin: e.target.value })}
+                      placeholder="Ваш MerchantLogin из личного кабинета Робокассы"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Пароль #1 (для формирования подписи)</Label>
+                    <div className="relative">
+                      <Input
+                        type={showPassword1 ? 'text' : 'password'}
+                        value={paymentSettings.robokassaPassword1}
+                        onChange={(e) => setPaymentSettings({ ...paymentSettings, robokassaPassword1: e.target.value })}
+                        placeholder="Password #1"
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword1(!showPassword1)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showPassword1 ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Пароль #2 (для проверки уведомлений)</Label>
+                    <div className="relative">
+                      <Input
+                        type={showPassword2 ? 'text' : 'password'}
+                        value={paymentSettings.robokassaPassword2}
+                        onChange={(e) => setPaymentSettings({ ...paymentSettings, robokassaPassword2: e.target.value })}
+                        placeholder="Password #2"
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword2(!showPassword2)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showPassword2 ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between py-2">
+                    <div>
+                      <Label>Тестовый режим</Label>
+                      <p className="text-sm text-muted-foreground">Использовать тестовый сервер Робокассы</p>
+                    </div>
+                    <Switch
+                      checked={paymentSettings.robokassaTestMode}
+                      onCheckedChange={(checked) => setPaymentSettings({ ...paymentSettings, robokassaTestMode: checked })}
+                    />
+                  </div>
+
+                  <p className="text-xs text-muted-foreground">
+                    Ключи можно получить в <a href="https://partner.robokassa.ru/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">личном кабинете Робокассы</a>. 
+                    Для тестирования используйте тестовый режим.
+                  </p>
+                </div>
+              )}
 
               <Button onClick={() => savePayment(paymentSettings)} disabled={savingPayment}>
                 <Save className="h-4 w-4 mr-2" />
