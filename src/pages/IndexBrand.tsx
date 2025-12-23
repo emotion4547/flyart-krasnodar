@@ -9,12 +9,12 @@ import { ReviewsSection } from "@/components/home/ReviewsSection";
 import { AboutSection } from "@/components/home/AboutSection";
 import { SEO } from "@/components/SEO";
 
-const IndexCarnival = () => {
+const IndexBrand = () => {
   return (
-    <div className="theme-carnival min-h-screen flex flex-col bg-background">
+    <div className="theme-brand min-h-screen flex flex-col bg-background">
       <SEO 
-        title="FlyArt Карнавал — Яркие воздушные шары в Красноярске"
-        description="Сочные краски праздника! Воздушные шары с доставкой в Красноярске. Энергия и позитив для вашего события."
+        title="FlyArt Brand — Премиальные воздушные шары в Красноярске"
+        description="Роскошь и элегантность. Премиальные воздушные шары с золотыми акцентами для особых моментов."
       />
       <Header />
       <main className="flex-1">
@@ -31,4 +31,4 @@ const IndexCarnival = () => {
   );
 };
 
-export default IndexCarnival;
+export default IndexBrand;
