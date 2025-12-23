@@ -7,6 +7,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/hooks/useAuth";
 import { FloatingContactButton } from "@/components/FloatingContactButton";
 import { AIChatAssistant } from "@/components/AIChatAssistant";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import { toast } from "sonner";
 import Index from "./pages/Index";
 import Cart from "./pages/Cart";
@@ -71,6 +72,7 @@ function AppContent() {
 
   return (
     <>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/cart" element={<Cart />} />
