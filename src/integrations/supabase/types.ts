@@ -503,6 +503,48 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          author_avatar: string | null
+          author_name: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          rating: number
+          sort_order: number | null
+          source: string | null
+          source_url: string | null
+          text: string
+          updated_at: string
+        }
+        Insert: {
+          author_avatar?: string | null
+          author_name: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          rating?: number
+          sort_order?: number | null
+          source?: string | null
+          source_url?: string | null
+          text: string
+          updated_at?: string
+        }
+        Update: {
+          author_avatar?: string | null
+          author_name?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          rating?: number
+          sort_order?: number | null
+          source?: string | null
+          source_url?: string | null
+          text?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       settings: {
         Row: {
           created_at: string

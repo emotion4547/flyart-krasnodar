@@ -34,6 +34,7 @@ import {
   AlertTriangle,
   RefreshCw,
   Play,
+  MessageSquareText,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -46,6 +47,7 @@ const menuItems = [
   { title: 'Категории', url: '/admin4547/categories', icon: FolderTree },
   { title: 'Заказы', url: '/admin4547/orders', icon: ShoppingCart },
   { title: 'Клиенты', url: '/admin4547/clients', icon: Users },
+  { title: 'Отзывы', url: '/admin4547/reviews', icon: MessageSquareText },
   { title: 'VK Клипы', url: '/admin4547/vk-clips', icon: Play },
   { title: 'Маркетинг / SEO', url: '/admin4547/marketing', icon: BarChart3 },
   { title: 'Контент', url: '/admin4547/content', icon: FileText },
