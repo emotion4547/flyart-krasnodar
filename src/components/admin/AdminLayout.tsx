@@ -33,6 +33,7 @@ import {
   UserCog,
   AlertTriangle,
   RefreshCw,
+  Play,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -45,6 +46,7 @@ const menuItems = [
   { title: 'Категории', url: '/admin4547/categories', icon: FolderTree },
   { title: 'Заказы', url: '/admin4547/orders', icon: ShoppingCart },
   { title: 'Клиенты', url: '/admin4547/clients', icon: Users },
+  { title: 'VK Клипы', url: '/admin4547/vk-clips', icon: Play },
   { title: 'Маркетинг / SEO', url: '/admin4547/marketing', icon: BarChart3 },
   { title: 'Контент', url: '/admin4547/content', icon: FileText },
   { title: 'Импорт Excel', url: '/admin4547/import', icon: Upload },
