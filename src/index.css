@@ -121,61 +121,119 @@
   }
 
   /* ========================================
-     THEME: Premium Noir (Dark Luxury)
+     THEME: Juicy Carnival (Сочный Карнавал)
      ======================================== */
-  .theme-noir {
-    --background: 222 47% 3%;
-    --foreground: 210 40% 98%;
+  .theme-carnival {
+    --background: 0 0% 100%;
+    --foreground: 215 25% 27%;
 
-    --card: 217 33% 8%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 27%;
 
-    --popover: 217 33% 8%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 27%;
 
-    --primary: 270 70% 32%;
+    --primary: 25 95% 53%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 30% 15%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 25 100% 96%;
+    --secondary-foreground: 215 25% 27%;
 
-    --muted: 217 25% 14%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 25 100% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 82 85% 67%;
-    --accent-foreground: 222 47% 3%;
+    --accent: 168 76% 50%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62% 50%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 217 25% 14%;
-    --input: 217 25% 14%;
-    --ring: 270 70% 50%;
+    --border: 25 50% 90%;
+    --input: 25 50% 90%;
+    --ring: 25 95% 53%;
 
-    /* Custom tokens for Noir */
-    --cta: 280 60% 80%;
-    --cta-foreground: 222 47% 3%;
-    --cta-hover: 280 60% 70%;
+    /* Custom tokens for Carnival */
+    --cta: 263 70% 58%;
+    --cta-foreground: 0 0% 100%;
+    --cta-hover: 263 70% 50%;
     
-    --tiffany: 82 85% 67%;
-    --tiffany-light: 82 50% 20%;
-    --tiffany-dark: 82 85% 50%;
+    --tiffany: 168 76% 50%;
+    --tiffany-light: 168 50% 92%;
+    --tiffany-dark: 168 76% 40%;
     
-    --peach: 270 40% 20%;
-    --peach-dark: 270 50% 30%;
+    --peach: 25 100% 96%;
+    --peach-dark: 25 100% 90%;
     
-    --gold: 280 60% 80%;
-    --gold-light: 270 30% 15%;
+    --gold: 25 95% 53%;
+    --gold-light: 25 100% 96%;
     
-    --graphite: 210 40% 98%;
-    --graphite-light: 215 20% 65%;
+    --graphite: 215 25% 27%;
+    --graphite-light: 215 16% 47%;
     
-    --warm-white: 217 33% 8%;
-    --warm-cream: 217 25% 10%;
+    --warm-white: 0 0% 100%;
+    --warm-cream: 25 100% 98%;
 
-    --shadow-soft: 0 4px 20px -4px hsl(270 70% 50% / 0.15);
-    --shadow-card: 0 8px 30px -8px hsl(270 70% 50% / 0.2);
-    --shadow-hover: 0 12px 40px -8px hsl(82 85% 67% / 0.2);
+    --shadow-soft: 0 4px 20px -4px hsl(25 95% 53% / 0.12);
+    --shadow-card: 0 8px 30px -8px hsl(25 95% 53% / 0.15);
+    --shadow-hover: 0 12px 40px -8px hsl(263 70% 58% / 0.2);
+  }
+
+  /* ========================================
+     THEME: Brand (Olive & Gold Luxury)
+     ======================================== */
+  .theme-brand {
+    --background: 144 18% 14%;
+    --foreground: 60 9% 95%;
+
+    --card: 150 17% 16%;
+    --card-foreground: 60 9% 95%;
+
+    --popover: 150 17% 16%;
+    --popover-foreground: 60 9% 95%;
+
+    --primary: 43 75% 52%;
+    --primary-foreground: 150 20% 12%;
+
+    --secondary: 144 15% 20%;
+    --secondary-foreground: 60 9% 95%;
+
+    --muted: 145 15% 20%;
+    --muted-foreground: 100 12% 55%;
+
+    --accent: 8 100% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 8 100% 65%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 145 15% 22%;
+    --input: 145 15% 22%;
+    --ring: 43 75% 52%;
+
+    /* Custom tokens for Brand */
+    --cta: 43 75% 52%;
+    --cta-foreground: 150 20% 12%;
+    --cta-hover: 43 75% 45%;
+    
+    --tiffany: 130 20% 47%;
+    --tiffany-light: 130 15% 25%;
+    --tiffany-dark: 130 20% 35%;
+    
+    --peach: 8 60% 30%;
+    --peach-dark: 8 60% 40%;
+    
+    --gold: 43 75% 52%;
+    --gold-light: 43 60% 40%;
+    
+    --graphite: 60 9% 95%;
+    --graphite-light: 100 12% 55%;
+    
+    --warm-white: 150 17% 16%;
+    --warm-cream: 145 15% 20%;
+
+    --shadow-soft: 0 4px 20px -4px hsl(43 75% 52% / 0.15);
+    --shadow-card: 0 8px 30px -8px hsl(43 75% 52% / 0.2);
+    --shadow-hover: 0 12px 40px -8px hsl(43 75% 52% / 0.25);
   }
 
   /* ========================================
