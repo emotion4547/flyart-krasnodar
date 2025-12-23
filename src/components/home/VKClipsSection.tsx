@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Play } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface VKClip {
   id: string;
@@ -21,6 +22,7 @@ const getVKEmbedUrl = (url: string) => {
 
 export const VKClipsSection = () => {
   const [isPaused, setIsPaused] = useState(false);
+  const isMobile = useIsMobile();
   const trackRef = useRef<HTMLDivElement>(null);
 
   const { data: clips = [], isLoading } = useQuery({
@@ -43,6 +45,9 @@ export const VKClipsSection = () => {
 
   // Duplicate clips for seamless loop
   const duplicatedClips = [...clips, ...clips];
+
+  // Slower speed on mobile (higher duration = slower)
+  const animationDuration = isMobile ? clips.length * 8 : clips.length * 5;
 
   return (
     <section className="py-12 md:py-16 bg-muted/30">
@@ -77,7 +82,7 @@ export const VKClipsSection = () => {
             ref={trackRef}
             className="flex gap-4"
             style={{
-              animation: `scroll ${clips.length * 5}s linear infinite`,
+              animation: `scroll ${animationDuration}s linear infinite`,
               animationPlayState: isPaused ? 'paused' : 'running',
               width: 'fit-content',
             }}
