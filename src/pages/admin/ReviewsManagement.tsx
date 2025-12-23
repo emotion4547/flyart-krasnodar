@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -31,7 +31,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Eye, EyeOff, Star, MessageSquare, ExternalLink } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, EyeOff, Star, MessageSquare, ExternalLink, Upload, X, Loader2 } from 'lucide-react';
 
 interface Review {
   id: string;
@@ -61,6 +61,9 @@ export default function ReviewsManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [formData, setFormData] = useState(emptyReview);
+  const [isUploading, setIsUploading] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   const { data: reviews, isLoading } = useQuery({
@@ -160,6 +163,7 @@ export default function ReviewsManagement() {
   const handleOpenCreate = () => {
     setEditingReview(null);
     setFormData(emptyReview);
+    setAvatarPreview(null);
     setIsDialogOpen(true);
   };
 
@@ -175,6 +179,7 @@ export default function ReviewsManagement() {
       is_active: review.is_active,
       sort_order: review.sort_order,
     });
+    setAvatarPreview(review.author_avatar || null);
     setIsDialogOpen(true);
   };
 
@@ -182,6 +187,64 @@ export default function ReviewsManagement() {
     setIsDialogOpen(false);
     setEditingReview(null);
     setFormData(emptyReview);
+    setAvatarPreview(null);
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Выберите изображение');
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Размер файла не должен превышать 2MB');
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('review-avatars')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('review-avatars')
+        .getPublicUrl(fileName);
+
+      const publicUrl = urlData.publicUrl;
+
+      setFormData({ ...formData, author_avatar: publicUrl });
+      setAvatarPreview(publicUrl);
+      toast.success('Аватар загружен');
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Ошибка при загрузке аватара');
+    } finally {
+      setIsUploading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemoveAvatar = () => {
+    setFormData({ ...formData, author_avatar: '' });
+    setAvatarPreview(null);
   };
 
   const handleSubmit = () => {
@@ -397,14 +460,61 @@ export default function ReviewsManagement() {
             </div>
 
             <div className="space-y-2">
-              <Label>URL аватара</Label>
-              <Input
-                value={formData.author_avatar}
-                onChange={(e) =>
-                  setFormData({ ...formData, author_avatar: e.target.value })
-                }
-                placeholder="https://..."
-              />
+              <Label>Аватар автора</Label>
+              <div className="flex items-center gap-4">
+                {avatarPreview ? (
+                  <div className="relative">
+                    <img
+                      src={avatarPreview}
+                      alt="Avatar preview"
+                      className="w-16 h-16 rounded-full object-cover border-2 border-border"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveAvatar}
+                      className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive/90"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center border-2 border-dashed border-border">
+                    <Upload className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    id="avatar-upload"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Загрузка...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Загрузить фото
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    JPG, PNG до 2MB
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-2">
