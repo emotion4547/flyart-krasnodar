@@ -21,6 +21,7 @@ import Reviews from "./pages/Reviews";
 import Privacy from "./pages/Privacy";
 import Offer from "./pages/Offer";
 import NotFound from "./pages/NotFound";
+import DesignSystem from "./pages/DesignSystem";
 
 // Admin pages
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -82,6 +83,7 @@ function AppContent() {
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/offer" element={<Offer />} />
+        <Route path="/design-system" element={<DesignSystem />} />
         
         {/* Admin routes */}
         <Route path="/admin4547/login" element={<AdminLogin />} />
