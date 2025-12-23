@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Play } from "lucide-react";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface VKClip {
@@ -22,8 +22,13 @@ const getVKEmbedUrl = (url: string) => {
 
 export const VKClipsSection = () => {
   const [isPaused, setIsPaused] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
   const isMobile = useIsMobile();
-  const trackRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<number>();
+  const lastTimeRef = useRef<number>(0);
+  const touchStartRef = useRef<number>(0);
+  const touchScrollRef = useRef<number>(0);
 
   const { data: clips = [], isLoading } = useQuery({
     queryKey: ["vk-clips"],
@@ -39,15 +44,73 @@ export const VKClipsSection = () => {
     },
   });
 
+  // Calculate total width of one set of clips
+  const clipWidth = isMobile ? 160 : 180;
+  const gap = 16;
+  const totalWidth = clips.length * (clipWidth + gap);
+
+  // Speed: pixels per second (slower on mobile)
+  const speed = isMobile ? 30 : 50;
+
+  const animate = useCallback((currentTime: number) => {
+    if (!lastTimeRef.current) {
+      lastTimeRef.current = currentTime;
+    }
+
+    const deltaTime = currentTime - lastTimeRef.current;
+    lastTimeRef.current = currentTime;
+
+    if (!isPaused && totalWidth > 0) {
+      setScrollPosition((prev) => {
+        const newPos = prev + (speed * deltaTime) / 1000;
+        // Reset when we've scrolled past one full set
+        return newPos >= totalWidth ? newPos - totalWidth : newPos;
+      });
+    }
+
+    animationRef.current = requestAnimationFrame(animate);
+  }, [isPaused, totalWidth, speed]);
+
+  useEffect(() => {
+    if (clips.length > 0) {
+      animationRef.current = requestAnimationFrame(animate);
+    }
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [animate, clips.length]);
+
+  // Touch handlers for swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsPaused(true);
+    touchStartRef.current = e.touches[0].clientX;
+    touchScrollRef.current = scrollPosition;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const touchDelta = touchStartRef.current - e.touches[0].clientX;
+    let newPos = touchScrollRef.current + touchDelta;
+    
+    // Keep within bounds
+    if (newPos < 0) newPos = totalWidth + newPos;
+    if (newPos >= totalWidth) newPos = newPos - totalWidth;
+    
+    setScrollPosition(newPos);
+  };
+
+  const handleTouchEnd = () => {
+    setIsPaused(false);
+    lastTimeRef.current = 0;
+  };
+
   if (isLoading || clips.length === 0) {
     return null;
   }
 
   // Duplicate clips for seamless loop
-  const duplicatedClips = [...clips, ...clips];
-
-  // Slower speed on mobile (higher duration = slower)
-  const animationDuration = isMobile ? clips.length * 8 : clips.length * 5;
+  const duplicatedClips = [...clips, ...clips, ...clips];
 
   return (
     <section className="py-12 md:py-16 bg-muted/30">
@@ -66,24 +129,26 @@ export const VKClipsSection = () => {
         </div>
       </div>
 
-      {/* Carousel container - full width with overflow hidden */}
+      {/* Carousel container */}
       <div className="container mx-auto px-4">
         <div 
-          className="relative overflow-hidden rounded-xl"
+          ref={containerRef}
+          className="relative overflow-hidden rounded-xl touch-pan-x"
           onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
+          onMouseLeave={() => { setIsPaused(false); lastTimeRef.current = 0; }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
           {/* Gradient overlays */}
-          <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-muted/80 to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-muted/80 to-transparent z-10 pointer-events-none" />
+          <div className="absolute left-0 top-0 bottom-0 w-12 md:w-16 bg-gradient-to-r from-muted/80 to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-12 md:w-16 bg-gradient-to-l from-muted/80 to-transparent z-10 pointer-events-none" />
 
           {/* Scrolling track */}
           <div
-            ref={trackRef}
-            className="flex gap-4"
+            className="flex gap-4 will-change-transform"
             style={{
-              animation: `scroll ${animationDuration}s linear infinite`,
-              animationPlayState: isPaused ? 'paused' : 'running',
+              transform: `translateX(-${scrollPosition}px)`,
               width: 'fit-content',
             }}
           >
@@ -116,17 +181,6 @@ export const VKClipsSection = () => {
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes scroll {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-      `}</style>
     </section>
   );
 };
