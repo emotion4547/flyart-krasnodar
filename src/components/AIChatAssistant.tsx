@@ -216,7 +216,7 @@ export const AIChatAssistant = () => {
     <>
       {/* Chat Button */}
       <div className={cn(
-        "fixed bottom-24 right-6 z-50",
+        "fixed bottom-[7.5rem] right-6 z-50",
         isOpen && "scale-0 opacity-0 pointer-events-none"
       )}>
         <div className="relative">
@@ -225,7 +225,7 @@ export const AIChatAssistant = () => {
           </span>
           <button
             onClick={handleOpen}
-            className="h-16 w-16 rounded-full shadow-xl bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center transition-all duration-300"
+            className="h-16 w-16 rounded-full shadow-xl bg-tiffany hover:bg-tiffany-dark text-white flex items-center justify-center transition-all duration-300"
             aria-label="Открыть чат с ассистентом"
           >
             <MessageCircle className="w-7 h-7" />
