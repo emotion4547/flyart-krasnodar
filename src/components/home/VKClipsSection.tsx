@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Play } from "lucide-react";
+import { Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
 interface VKClip {
   id: string;
@@ -19,6 +21,10 @@ const getVKEmbedUrl = (url: string) => {
 };
 
 export const VKClipsSection = () => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
   const { data: clips = [], isLoading } = useQuery({
     queryKey: ["vk-clips"],
     queryFn: async () => {
@@ -32,6 +38,30 @@ export const VKClipsSection = () => {
       return data as VKClip[];
     },
   });
+
+  const checkScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+    return () => window.removeEventListener("resize", checkScroll);
+  }, [clips]);
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const scrollAmount = 300;
+      scrollRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
 
   if (isLoading || clips.length === 0) {
     return null;
@@ -53,33 +83,71 @@ export const VKClipsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {clips.map((clip) => (
-            <a
-              key={clip.id}
-              href={clip.vk_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative aspect-[9/16] bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+        <div className="relative">
+          {/* Scroll buttons */}
+          {canScrollLeft && (
+            <Button
+              variant="secondary"
+              size="icon"
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 shadow-lg hidden md:flex"
+              onClick={() => scroll("left")}
             >
-              <iframe
-                src={getVKEmbedUrl(clip.vk_url) || ""}
-                className="w-full h-full pointer-events-none"
-                allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-                allowFullScreen
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="absolute bottom-3 left-3 right-3">
-                  {clip.title && (
-                    <p className="text-white text-sm font-medium truncate">
-                      {clip.title}
-                    </p>
-                  )}
-                  <p className="text-white/70 text-xs">Смотреть в VK →</p>
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+          )}
+          {canScrollRight && (
+            <Button
+              variant="secondary"
+              size="icon"
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 shadow-lg hidden md:flex"
+              onClick={() => scroll("right")}
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          )}
+
+          {/* Gradient overlays */}
+          {canScrollLeft && (
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-muted/80 to-transparent z-[5] pointer-events-none" />
+          )}
+          {canScrollRight && (
+            <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-muted/80 to-transparent z-[5] pointer-events-none" />
+          )}
+
+          {/* Scrollable container */}
+          <div
+            ref={scrollRef}
+            onScroll={checkScroll}
+            className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 px-1 snap-x snap-mandatory"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {clips.map((clip) => (
+              <a
+                key={clip.id}
+                href={clip.vk_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative flex-shrink-0 w-[200px] md:w-[240px] aspect-[9/16] bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 snap-start"
+              >
+                <iframe
+                  src={getVKEmbedUrl(clip.vk_url) || ""}
+                  className="w-full h-full pointer-events-none"
+                  allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                  allowFullScreen
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute bottom-3 left-3 right-3">
+                    {clip.title && (
+                      <p className="text-white text-sm font-medium truncate">
+                        {clip.title}
+                      </p>
+                    )}
+                    <p className="text-white/70 text-xs">Смотреть в VK →</p>
+                  </div>
                 </div>
-              </div>
-            </a>
-          ))}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </section>
