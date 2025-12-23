@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Play, ChevronLeft, ChevronRight } from "lucide-react";
-import { useRef, useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { Play } from "lucide-react";
+import { useRef, useState } from "react";
 
 interface VKClip {
   id: string;
@@ -21,9 +20,8 @@ const getVKEmbedUrl = (url: string) => {
 };
 
 export const VKClipsSection = () => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const trackRef = useRef<HTMLDivElement>(null);
 
   const { data: clips = [], isLoading } = useQuery({
     queryKey: ["vk-clips"],
@@ -39,33 +37,12 @@ export const VKClipsSection = () => {
     },
   });
 
-  const checkScroll = () => {
-    if (scrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-    }
-  };
-
-  useEffect(() => {
-    checkScroll();
-    window.addEventListener("resize", checkScroll);
-    return () => window.removeEventListener("resize", checkScroll);
-  }, [clips]);
-
-  const scroll = (direction: "left" | "right") => {
-    if (scrollRef.current) {
-      const scrollAmount = 300;
-      scrollRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
-      });
-    }
-  };
-
   if (isLoading || clips.length === 0) {
     return null;
   }
+
+  // Duplicate clips for seamless loop
+  const duplicatedClips = [...clips, ...clips];
 
   return (
     <section className="py-12 md:py-16 bg-muted/30">
@@ -82,52 +59,36 @@ export const VKClipsSection = () => {
             Видео с нашими композициями и закулисьем
           </p>
         </div>
+      </div>
 
-        <div className="relative">
-          {/* Scroll buttons */}
-          {canScrollLeft && (
-            <Button
-              variant="secondary"
-              size="icon"
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 shadow-lg hidden md:flex"
-              onClick={() => scroll("left")}
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-          )}
-          {canScrollRight && (
-            <Button
-              variant="secondary"
-              size="icon"
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 shadow-lg hidden md:flex"
-              onClick={() => scroll("right")}
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          )}
-
+      {/* Carousel container - full width with overflow hidden */}
+      <div className="container mx-auto px-4">
+        <div 
+          className="relative overflow-hidden rounded-xl"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
           {/* Gradient overlays */}
-          {canScrollLeft && (
-            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-muted/80 to-transparent z-[5] pointer-events-none" />
-          )}
-          {canScrollRight && (
-            <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-muted/80 to-transparent z-[5] pointer-events-none" />
-          )}
+          <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-muted/80 to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-muted/80 to-transparent z-10 pointer-events-none" />
 
-          {/* Scrollable container */}
+          {/* Scrolling track */}
           <div
-            ref={scrollRef}
-            onScroll={checkScroll}
-            className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 px-1 snap-x snap-mandatory"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            ref={trackRef}
+            className="flex gap-4"
+            style={{
+              animation: `scroll ${clips.length * 5}s linear infinite`,
+              animationPlayState: isPaused ? 'paused' : 'running',
+              width: 'fit-content',
+            }}
           >
-            {clips.map((clip) => (
+            {duplicatedClips.map((clip, index) => (
               <a
-                key={clip.id}
+                key={`${clip.id}-${index}`}
                 href={clip.vk_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative flex-shrink-0 w-[200px] md:w-[240px] aspect-[9/16] bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 snap-start"
+                className="group relative flex-shrink-0 w-[160px] md:w-[180px] aspect-[9/16] bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105"
               >
                 <iframe
                   src={getVKEmbedUrl(clip.vk_url) || ""}
@@ -150,6 +111,17 @@ export const VKClipsSection = () => {
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes scroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+      `}</style>
     </section>
   );
 };
