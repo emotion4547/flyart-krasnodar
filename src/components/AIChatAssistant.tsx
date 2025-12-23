@@ -60,11 +60,19 @@ const ProductsGrid = ({ products }: { products: Product[] }) => (
   </div>
 );
 
+const QUICK_SUGGESTIONS = [
+  { label: '🎂 Шары на ДР', query: 'Покажи шары на день рождения' },
+  { label: '💒 На свадьбу', query: 'Какие есть шары для свадьбы?' },
+  { label: '👶 Выписка', query: 'Шары для выписки из роддома' },
+  { label: '🚚 Доставка', query: 'Расскажи про доставку и цены' },
+];
+
 export const AIChatAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -90,10 +98,12 @@ export const AIChatAssistant = () => {
     }
   };
 
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (messageText?: string) => {
+    const text = messageText || input.trim();
+    if (!text || isLoading) return;
 
-    const userMessage: Message = { role: 'user', content: input.trim() };
+    setShowSuggestions(false);
+    const userMessage: Message = { role: 'user', content: text };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     setInput('');
@@ -283,6 +293,22 @@ export const AIChatAssistant = () => {
               </div>
             )}
           </div>
+
+          {/* Quick Suggestions */}
+          {showSuggestions && messages.length <= 1 && (
+            <div className="flex flex-wrap gap-2 mt-3 px-1">
+              {QUICK_SUGGESTIONS.map((suggestion) => (
+                <button
+                  key={suggestion.label}
+                  onClick={() => sendMessage(suggestion.query)}
+                  disabled={isLoading}
+                  className="text-xs bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-full transition-colors disabled:opacity-50"
+                >
+                  {suggestion.label}
+                </button>
+              ))}
+            </div>
+          )}
         </ScrollArea>
 
         {/* Input */}
@@ -298,7 +324,7 @@ export const AIChatAssistant = () => {
               className="flex-1"
             />
             <Button 
-              onClick={sendMessage} 
+              onClick={() => sendMessage()} 
               disabled={!input.trim() || isLoading}
               size="icon"
               className="shrink-0"
