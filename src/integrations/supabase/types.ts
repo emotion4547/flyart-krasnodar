@@ -233,6 +233,7 @@ export type Database = {
           id: string
           manager_comment: string | null
           order_number: string
+          payment_method: string | null
           status: string
           subtotal: number
           total: number
@@ -251,6 +252,7 @@ export type Database = {
           id?: string
           manager_comment?: string | null
           order_number: string
+          payment_method?: string | null
           status?: string
           subtotal: number
           total: number
@@ -269,6 +271,7 @@ export type Database = {
           id?: string
           manager_comment?: string | null
           order_number?: string
+          payment_method?: string | null
           status?: string
           subtotal?: number
           total?: number
