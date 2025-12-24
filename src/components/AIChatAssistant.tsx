@@ -22,6 +22,7 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   products?: Product[];
+  citations?: string[];
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-assistant`;
@@ -63,8 +64,9 @@ const ProductsGrid = ({ products }: { products: Product[] }) => (
 const QUICK_SUGGESTIONS = [
   { label: '🎂 Шары на ДР', query: 'Покажи шары на день рождения' },
   { label: '💒 На свадьбу', query: 'Какие есть шары для свадьбы?' },
-  { label: '👶 Выписка', query: 'Шары для выписки из роддома' },
+  { label: '📍 Контакты', query: 'Как с вами связаться? Адрес и телефон' },
   { label: '🚚 Доставка', query: 'Расскажи про доставку и цены' },
+  { label: '💡 Идеи декора', query: 'Идеи как украсить комнату на день рождения' },
 ];
 
 export const AIChatAssistant = () => {
@@ -111,6 +113,7 @@ export const AIChatAssistant = () => {
 
     let assistantContent = '';
     let products: Product[] = [];
+    let citations: string[] = [];
 
     try {
       const response = await fetch(CHAT_URL, {
@@ -136,7 +139,7 @@ export const AIChatAssistant = () => {
       }
 
       // Add empty assistant message
-      setMessages(prev => [...prev, { role: 'assistant', content: '', products: [] }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: '', products: [], citations: [] }]);
 
       let buffer = '';
 
@@ -174,6 +177,20 @@ export const AIChatAssistant = () => {
               });
               continue;
             }
+
+            // Check if this is a citations event
+            if (parsed.type === 'citations' && parsed.citations) {
+              citations = parsed.citations;
+              setMessages(prev => {
+                const updated = [...prev];
+                updated[updated.length - 1] = { 
+                  ...updated[updated.length - 1], 
+                  citations 
+                };
+                return updated;
+              });
+              continue;
+            }
             
             // Regular text delta
             const content = parsed.choices?.[0]?.delta?.content;
@@ -184,7 +201,8 @@ export const AIChatAssistant = () => {
                 updated[updated.length - 1] = { 
                   role: 'assistant', 
                   content: assistantContent,
-                  products
+                  products,
+                  citations
                 };
                 return updated;
               });
@@ -287,6 +305,24 @@ export const AIChatAssistant = () => {
                 {message.products && message.products.length > 0 && (
                   <div className="w-full max-w-[85%] mt-2">
                     <ProductsGrid products={message.products} />
+                  </div>
+                )}
+                {message.citations && message.citations.length > 0 && (
+                  <div className="w-full max-w-[85%] mt-2 text-xs text-muted-foreground">
+                    <p className="font-medium mb-1">Источники:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {message.citations.slice(0, 3).map((citation, i) => (
+                        <a
+                          key={i}
+                          href={citation}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 bg-muted/50 hover:bg-muted px-2 py-0.5 rounded text-primary underline-offset-2 hover:underline"
+                        >
+                          {new URL(citation).hostname.replace('www.', '')}
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
