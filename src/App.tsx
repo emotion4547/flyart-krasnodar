@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/hooks/useAuth";
 import { FloatingContactButton } from "@/components/FloatingContactButton";
+import { PWAInstallBanner } from "@/components/PWAInstallBanner";
 
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { toast } from "sonner";
@@ -108,7 +109,12 @@ function AppContent() {
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {!isAdminRoute && <FloatingContactButton />}
+      {!isAdminRoute && (
+        <>
+          <FloatingContactButton />
+          <PWAInstallBanner />
+        </>
+      )}
     </>
   );
 }
