@@ -36,10 +36,9 @@ interface PaymentSettings {
   cardPayment: boolean;
   cashPayment: boolean;
   onlinePayment: boolean;
-  robokassaMerchantLogin: string;
-  robokassaPassword1: string;
-  robokassaPassword2: string;
-  robokassaTestMode: boolean;
+  yookassaShopId: string;
+  yookassaSecretKey: string;
+  yookassaTestMode: boolean;
 }
 
 const defaultGeneral: GeneralSettings = {
@@ -62,15 +61,13 @@ const defaultPayment: PaymentSettings = {
   cardPayment: true,
   cashPayment: true,
   onlinePayment: false,
-  robokassaMerchantLogin: '',
-  robokassaPassword1: '',
-  robokassaPassword2: '',
-  robokassaTestMode: true,
+  yookassaShopId: '',
+  yookassaSecretKey: '',
+  yookassaTestMode: true,
 };
 
 export default function Settings() {
   const [showPassword1, setShowPassword1] = useState(false);
-  const [showPassword2, setShowPassword2] = useState(false);
   const { data: generalData, isLoading: generalLoading, save: saveGeneral, isSaving: savingGeneral } = 
     useSettings<GeneralSettings>('general', defaultGeneral);
   const { data: deliveryData, isLoading: deliveryLoading, save: saveDelivery, isSaving: savingDelivery } = 
@@ -327,8 +324,8 @@ export default function Settings() {
 
               <div className="flex items-center justify-between py-2 border-t pt-4">
                 <div>
-                  <Label>Онлайн-оплата (Робокасса)</Label>
-                  <p className="text-sm text-muted-foreground">Оплата на сайте через Робокассу</p>
+                  <Label>Онлайн-оплата (ЮKassa)</Label>
+                  <p className="text-sm text-muted-foreground">Оплата на сайте через ЮKassa</p>
                 </div>
                 <Switch
                   checked={paymentSettings.onlinePayment}
@@ -336,20 +333,20 @@ export default function Settings() {
                 />
               </div>
 
-              {/* Robokassa settings - shown when online payment is enabled */}
+              {/* YooKassa settings - shown when online payment is enabled */}
               {paymentSettings.onlinePayment && (
                 <div className="space-y-4 p-4 rounded-lg bg-muted/50 border border-border">
                   <div className="flex items-center gap-2 mb-2">
                     <CreditCard className="h-4 w-4 text-primary" />
-                    <Label className="text-base font-semibold">Настройки Робокассы</Label>
+                    <Label className="text-base font-semibold">Настройки ЮKassa</Label>
                   </div>
 
                   {/* Status indicator */}
-                  {paymentSettings.robokassaMerchantLogin && paymentSettings.robokassaPassword1 && paymentSettings.robokassaPassword2 ? (
+                  {paymentSettings.yookassaShopId && paymentSettings.yookassaSecretKey ? (
                     <Alert className="border-green-200 bg-green-50">
                       <CheckCircle2 className="h-4 w-4 text-green-600" />
                       <AlertDescription className="text-green-700">
-                        Робокасса настроена {paymentSettings.robokassaTestMode ? '(тестовый режим)' : '(боевой режим)'}
+                        ЮKassa настроена {paymentSettings.yookassaTestMode ? '(тестовый режим)' : '(боевой режим)'}
                       </AlertDescription>
                     </Alert>
                   ) : (
@@ -362,22 +359,22 @@ export default function Settings() {
                   )}
 
                   <div className="space-y-2">
-                    <Label>Идентификатор магазина (MerchantLogin)</Label>
+                    <Label>Shop ID (Идентификатор магазина)</Label>
                     <Input
-                      value={paymentSettings.robokassaMerchantLogin}
-                      onChange={(e) => setPaymentSettings({ ...paymentSettings, robokassaMerchantLogin: e.target.value })}
-                      placeholder="Ваш MerchantLogin из личного кабинета Робокассы"
+                      value={paymentSettings.yookassaShopId}
+                      onChange={(e) => setPaymentSettings({ ...paymentSettings, yookassaShopId: e.target.value })}
+                      placeholder="Ваш Shop ID из личного кабинета ЮKassa"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Пароль #1 (для формирования подписи)</Label>
+                    <Label>Секретный ключ</Label>
                     <div className="relative">
                       <Input
                         type={showPassword1 ? 'text' : 'password'}
-                        value={paymentSettings.robokassaPassword1}
-                        onChange={(e) => setPaymentSettings({ ...paymentSettings, robokassaPassword1: e.target.value })}
-                        placeholder="Password #1"
+                        value={paymentSettings.yookassaSecretKey}
+                        onChange={(e) => setPaymentSettings({ ...paymentSettings, yookassaSecretKey: e.target.value })}
+                        placeholder="Секретный ключ API"
                         className="pr-10"
                       />
                       <button
@@ -388,42 +385,25 @@ export default function Settings() {
                         {showPassword1 ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Пароль #2 (для проверки уведомлений)</Label>
-                    <div className="relative">
-                      <Input
-                        type={showPassword2 ? 'text' : 'password'}
-                        value={paymentSettings.robokassaPassword2}
-                        onChange={(e) => setPaymentSettings({ ...paymentSettings, robokassaPassword2: e.target.value })}
-                        placeholder="Password #2"
-                        className="pr-10"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword2(!showPassword2)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                      >
-                        {showPassword2 ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Найдите в личном кабинете ЮKassa: Интеграция → Ключи API
+                    </p>
                   </div>
 
                   <div className="flex items-center justify-between py-2">
                     <div>
                       <Label>Тестовый режим</Label>
-                      <p className="text-sm text-muted-foreground">Использовать тестовый сервер Робокассы</p>
+                      <p className="text-sm text-muted-foreground">Включить для тестирования без реальных платежей</p>
                     </div>
                     <Switch
-                      checked={paymentSettings.robokassaTestMode}
-                      onCheckedChange={(checked) => setPaymentSettings({ ...paymentSettings, robokassaTestMode: checked })}
+                      checked={paymentSettings.yookassaTestMode}
+                      onCheckedChange={(checked) => setPaymentSettings({ ...paymentSettings, yookassaTestMode: checked })}
                     />
                   </div>
 
                   <p className="text-xs text-muted-foreground">
-                    Ключи можно получить в <a href="https://partner.robokassa.ru/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">личном кабинете Робокассы</a>. 
-                    Для тестирования используйте тестовый режим.
+                    Ключи можно получить в <a href="https://yookassa.ru/my" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">личном кабинете ЮKassa</a>. 
+                    Для тестирования используйте тестовый магазин.
                   </p>
                 </div>
               )}

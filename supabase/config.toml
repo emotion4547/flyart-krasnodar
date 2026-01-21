@@ -3,8 +3,8 @@ project_id = "gsnqucupjpdlfeqpbjup"
 [functions.sitemap]
 verify_jwt = false
 
-[functions.robokassa-init]
+[functions.yookassa-init]
 verify_jwt = false
 
-[functions.robokassa-callback]
+[functions.yookassa-callback]
 verify_jwt = false

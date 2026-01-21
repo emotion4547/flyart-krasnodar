@@ -18,20 +18,18 @@ interface PaymentSettings {
   cardPayment: boolean;
   cashPayment: boolean;
   onlinePayment: boolean;
-  robokassaMerchantLogin: string;
-  robokassaPassword1: string;
-  robokassaPassword2: string;
-  robokassaTestMode: boolean;
+  yookassaShopId: string;
+  yookassaSecretKey: string;
+  yookassaTestMode: boolean;
 }
 
 const defaultPayment: PaymentSettings = {
   cardPayment: true,
   cashPayment: true,
   onlinePayment: false,
-  robokassaMerchantLogin: '',
-  robokassaPassword1: '',
-  robokassaPassword2: '',
-  robokassaTestMode: true,
+  yookassaShopId: '',
+  yookassaSecretKey: '',
+  yookassaTestMode: true,
 };
 
 const checkoutSchema = z.object({
@@ -54,9 +52,8 @@ const Checkout = () => {
 
   // Check if online payment is fully configured
   const isOnlinePaymentConfigured = paymentSettings.onlinePayment && 
-    paymentSettings.robokassaMerchantLogin && 
-    paymentSettings.robokassaPassword1 && 
-    paymentSettings.robokassaPassword2;
+    paymentSettings.yookassaShopId && 
+    paymentSettings.yookassaSecretKey;
 
   // Get available payment methods
   const availablePaymentMethods = [];
@@ -144,8 +141,8 @@ const Checkout = () => {
 
       // Handle online payment
       if (effectivePaymentMethod === 'online') {
-        // Call Robokassa init edge function
-        const { data: paymentData, error: paymentError } = await supabase.functions.invoke('robokassa-init', {
+        // Call YooKassa init edge function
+        const { data: paymentData, error: paymentError } = await supabase.functions.invoke('yookassa-init', {
           body: {
             orderId: order.id,
             orderNumber: order.order_number,
@@ -166,7 +163,7 @@ const Checkout = () => {
           return;
         }
 
-        // Clear cart and redirect to Robokassa
+        // Clear cart and redirect to YooKassa
         clearCart();
         window.location.href = paymentData.paymentUrl;
         return;
