@@ -64,7 +64,8 @@ const Product = () => {
         .maybeSingle();
 
       if (error) throw error;
-      return data?.categories;
+      // Return null if no category found (not an error)
+      return data?.categories ?? null;
     },
     enabled: !!product?.id,
   });
