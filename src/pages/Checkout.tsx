@@ -32,10 +32,20 @@ const defaultPayment: PaymentSettings = {
   yookassaTestMode: true,
 };
 
-const checkoutSchema = z.object({
+// Base schema - email is optional for offline payments
+const baseCheckoutSchema = z.object({
   name: z.string().trim().min(2, "Минимум 2 символа").max(100, "Максимум 100 символов"),
   phone: z.string().trim().min(10, "Введите корректный номер телефона").max(20),
   email: z.string().trim().email("Введите корректный email").optional().or(z.literal("")),
+  address: z.string().trim().min(5, "Введите адрес доставки").max(500),
+  comment: z.string().max(1000).optional(),
+});
+
+// Schema for online payment - email is required for receipt (54-ФЗ)
+const onlinePaymentCheckoutSchema = z.object({
+  name: z.string().trim().min(2, "Минимум 2 символа").max(100, "Максимум 100 символов"),
+  phone: z.string().trim().min(10, "Введите корректный номер телефона").max(20),
+  email: z.string().trim().min(1, "Email обязателен для онлайн-оплаты").email("Введите корректный email"),
   address: z.string().trim().min(5, "Введите адрес доставки").max(500),
   comment: z.string().max(1000).optional(),
 });
@@ -83,6 +93,11 @@ const Checkout = () => {
       address: formData.get("address") as string,
       comment: formData.get("comment") as string,
     };
+
+    // Choose schema based on payment method - online requires email for receipt
+    const checkoutSchema = effectivePaymentMethod === 'online' 
+      ? onlinePaymentCheckoutSchema 
+      : baseCheckoutSchema;
 
     // Validate
     const result = checkoutSchema.safeParse(data);
@@ -269,7 +284,9 @@ const Checkout = () => {
                       )}
                     </div>
                     <div className="space-y-2 sm:col-span-2">
-                      <Label htmlFor="email">Email (необязательно)</Label>
+                      <Label htmlFor="email">
+                        Email {effectivePaymentMethod === 'online' ? '*' : '(необязательно)'}
+                      </Label>
                       <Input
                         id="email"
                         name="email"
@@ -279,6 +296,9 @@ const Checkout = () => {
                       />
                       {errors.email && (
                         <p className="text-xs text-destructive">{errors.email}</p>
+                      )}
+                      {effectivePaymentMethod === 'online' && !errors.email && (
+                        <p className="text-xs text-muted-foreground">Для отправки электронного чека</p>
                       )}
                     </div>
                   </div>
