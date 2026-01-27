@@ -107,12 +107,13 @@ serve(async (req: Request): Promise<Response> => {
           const message = `💳 <b>Оплата получена!</b>
 
 📦 Заказ: <b>${order.order_number}</b>
+🆔 YooKassa ID: <code>${paymentId}</code>
 💰 Сумма: <b>${amount} ₽</b>
 👤 Клиент: ${order.customer_name}
 📱 Телефон: ${order.customer_phone}
 ${order.customer_email ? `📧 Email: ${order.customer_email}` : ""}
 
-✅ Статус: Оплачен`;
+✅ Статус YooKassa: <b>${paymentStatus}</b>`;
 
           await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
             method: "POST",
