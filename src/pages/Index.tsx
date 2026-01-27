@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/home/HeroSection";
+import { CollectionsSection } from "@/components/home/CollectionsSection";
 import { CategoriesSection } from "@/components/home/CategoriesSection";
 import { PopularProducts } from "@/components/home/PopularProducts";
 import { VKClipsSection } from "@/components/home/VKClipsSection";
@@ -17,6 +18,7 @@ const Index = () => {
       <Header />
       <main className="flex-1">
         <HeroSection />
+        <CollectionsSection />
         <CategoriesSection />
         <PopularProducts />
         <VKClipsSection />

@@ -7,9 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Save, Store, Truck, CreditCard, Plus, Trash2, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { Save, Store, Truck, CreditCard, Plus, Trash2, AlertCircle, CheckCircle2, Eye, EyeOff, Phone, MessageCircle, Building2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useSettings } from '@/hooks/useSettings';
+import { ContactSettings } from '@/components/admin/ContactSettings';
+import { MessengerLinksSettings } from '@/components/admin/MessengerLinksSettings';
+import { RequisitesSettings } from '@/components/admin/RequisitesSettings';
 
 interface GeneralSettings {
   siteName: string;
@@ -124,10 +127,31 @@ export default function Settings() {
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="general">Общие</TabsTrigger>
-          <TabsTrigger value="delivery">Доставка</TabsTrigger>
-          <TabsTrigger value="payment">Оплата</TabsTrigger>
+        <TabsList className="flex-wrap h-auto gap-1">
+          <TabsTrigger value="general" className="gap-2">
+            <Store className="h-4 w-4" />
+            Общие
+          </TabsTrigger>
+          <TabsTrigger value="contacts" className="gap-2">
+            <Phone className="h-4 w-4" />
+            Контакты
+          </TabsTrigger>
+          <TabsTrigger value="messengers" className="gap-2">
+            <MessageCircle className="h-4 w-4" />
+            Связь
+          </TabsTrigger>
+          <TabsTrigger value="requisites" className="gap-2">
+            <Building2 className="h-4 w-4" />
+            Реквизиты
+          </TabsTrigger>
+          <TabsTrigger value="delivery" className="gap-2">
+            <Truck className="h-4 w-4" />
+            Доставка
+          </TabsTrigger>
+          <TabsTrigger value="payment" className="gap-2">
+            <CreditCard className="h-4 w-4" />
+            Оплата
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="space-y-6">
@@ -197,6 +221,18 @@ export default function Settings() {
               </Button>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="contacts" className="space-y-6">
+          <ContactSettings />
+        </TabsContent>
+
+        <TabsContent value="messengers" className="space-y-6">
+          <MessengerLinksSettings />
+        </TabsContent>
+
+        <TabsContent value="requisites" className="space-y-6">
+          <RequisitesSettings />
         </TabsContent>
 
         <TabsContent value="delivery" className="space-y-6">

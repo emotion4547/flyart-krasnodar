@@ -3,21 +3,50 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Truck, Gift } from "lucide-react";
 import { Link } from "react-router-dom";
 import { CallbackDialog } from "@/components/CallbackDialog";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+interface HeroVideoSettings {
+  url?: string;
+  fallback: string;
+}
 
 export function HeroSection() {
   const [callbackOpen, setCallbackOpen] = useState(false);
+  
+  // Fetch hero video settings
+  const { data: videoSettings } = useQuery({
+    queryKey: ["settings", "hero_video"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("value")
+        .eq("key", "hero_video")
+        .maybeSingle();
+      
+      if (error) throw error;
+      if (data?.value && typeof data.value === 'object' && 'url' in data.value) {
+        return data.value as unknown as HeroVideoSettings;
+      }
+      return { fallback: "/videos/hero-balloons.mp4" };
+    },
+  });
+
+  const videoUrl = videoSettings?.url || videoSettings?.fallback || "/videos/hero-balloons.mp4";
+
   return (
     <section className="relative overflow-hidden min-h-[85vh] md:min-h-screen flex flex-col">
       {/* Video background */}
       <div className="absolute inset-0 z-0">
         <video
+          key={videoUrl}
           autoPlay
           loop
           muted
           playsInline
           className="w-full h-full object-cover"
         >
-          <source src="/videos/hero-balloons.mp4" type="video/mp4" />
+          <source src={videoUrl} type="video/mp4" />
         </video>
         {/* Overlay for better text readability */}
         <div className="absolute inset-0 bg-background/20" />

@@ -25,6 +25,7 @@ import Offer from "./pages/Offer";
 import NotFound from "./pages/NotFound";
 import DesignSystem from "./pages/DesignSystem";
 import Sitemap from "./pages/Sitemap";
+import Collection from "./pages/Collection";
 
 // Admin pages
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -85,6 +86,7 @@ function AppContent() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/offer" element={<Offer />} />
         <Route path="/sitemap" element={<Sitemap />} />
+        <Route path="/collection/:slug" element={<Collection />} />
         <Route path="/design-system" element={<DesignSystem />} />
         
         {/* Admin routes */}

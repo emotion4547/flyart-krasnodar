@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ProductCard } from "@/components/home/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -196,6 +197,12 @@ const Catalog = () => {
     </div>
   );
 
+  // Get current category name for breadcrumbs
+  const currentCategory = categories?.find(c => c.id === selectedCategory);
+  const breadcrumbItems = currentCategory 
+    ? [{ label: "Каталог", href: "/catalog" }]
+    : [];
+
   return (
     <div className="min-h-screen flex flex-col">
       <SEO 
@@ -206,11 +213,17 @@ const Catalog = () => {
       <Header />
       <main className="flex-1 section-padding bg-warm-cream">
         <div className="container-custom">
+          {/* Breadcrumbs */}
+          <Breadcrumbs 
+            items={breadcrumbItems} 
+            currentPage={currentCategory?.name || "Каталог"} 
+          />
+
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-                Каталог
+                {currentCategory?.name || "Каталог"}
               </h1>
               <div className="gold-line max-w-xs mb-4" />
               <p className="text-muted-foreground">
