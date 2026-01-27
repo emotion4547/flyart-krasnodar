@@ -61,11 +61,15 @@ export function CategoriesSection() {
         }
       >();
 
-      const scoreImage = (p: any, img: any) => {
+      const scoreImage = (p: any, img: any, categoryId: string) => {
+        // Use a hash based on category ID to pick different images for variety
+        const categoryHash = categoryId.charCodeAt(0) + categoryId.charCodeAt(categoryId.length - 1);
         const mainBonus = img?.is_main ? 10_000 : 0;
         const imgOrder = typeof img?.sort_order === "number" ? 1_000 - img.sort_order : 0;
         const productOrder = typeof p?.sort_order === "number" ? 100 - p.sort_order : 0;
-        return mainBonus + imgOrder + productOrder;
+        // Add variety factor based on category
+        const varietyBonus = (categoryHash % 5) * 500;
+        return mainBonus + imgOrder + productOrder + varietyBonus;
       };
 
       if (productCategories) {
@@ -85,7 +89,7 @@ export function CategoriesSection() {
           for (const img of images) {
             const url = img?.url;
             if (!url) continue;
-            const s = scoreImage(product, img);
+            const s = scoreImage(product, img, pc.category_id);
             if (s > existing.bestImageScore) {
               existing.bestImageScore = s;
               existing.bestImageUrl = url;
