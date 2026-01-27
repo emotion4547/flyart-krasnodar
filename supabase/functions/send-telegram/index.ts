@@ -27,6 +27,8 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
+    console.log(`Sending to chat_id: ${chatId}, token length: ${botToken.length}`);
+
     const { message, parseMode = "HTML" }: TelegramRequest = await req.json();
 
     if (!message) {
