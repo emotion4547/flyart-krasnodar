@@ -3,12 +3,12 @@ import { Phone, MapPin, Clock, Mail, Heart } from "lucide-react";
 
 const footerLinks = {
   catalog: [
-    { name: "Для девочки", href: "/catalog/girl" },
-    { name: "Для мальчика", href: "/catalog/boy" },
-    { name: "Для девушки", href: "/catalog/woman" },
-    { name: "Для мужчины", href: "/catalog/man" },
-    { name: "Выписка", href: "/catalog/discharge" },
-    { name: "Гендер пати", href: "/catalog/gender-party" },
+    { name: "Для девочки", href: "/catalog/dlya-devochki" },
+    { name: "Для мальчика", href: "/catalog/dlya-malchika" },
+    { name: "Для девушки", href: "/catalog/dlya-devushki" },
+    { name: "Для мужчины", href: "/catalog/dlya-muzhchiny" },
+    { name: "14 февраля", href: "/catalog/14-fevralya" },
+    { name: "Большие шары", href: "/catalog/bolshiye-shary" },
   ],
   info: [
     { name: "Доставка и оплата", href: "/delivery" },
@@ -42,11 +42,11 @@ export function Footer() {
             </p>
             <div className="flex flex-col gap-3">
               <a 
-                href="tel:+79001234567" 
+                href="tel:+79237714004" 
                 className="flex items-center gap-2 text-primary-foreground hover:text-tiffany transition-colors"
               >
                 <Phone className="h-4 w-4 text-tiffany" />
-                +7 (900) 123-45-67
+                +7 (923) 771-40-04
               </a>
               <div className="flex items-center gap-2 text-primary-foreground/70 text-sm">
                 <Clock className="h-4 w-4 text-gold" />

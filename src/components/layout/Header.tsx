@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/CartContext";
 import { SearchDialog } from "./SearchDialog";
-
+import { CallbackDialog } from "@/components/CallbackDialog";
 const navigation = [
   { name: "Каталог", href: "/catalog", icon: LayoutGrid, highlight: true },
   { name: "Доставка и оплата", href: "/delivery", icon: Truck },
@@ -16,6 +16,7 @@ const navigation = [
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const [callbackOpen, setCallbackOpen] = useState(false);
   const { totalItems } = useCart();
 
   return (
@@ -84,9 +85,14 @@ export function Header() {
               </Button>
             </Link>
 
-            <Button variant="cta" className="hidden md:flex whitespace-nowrap">
+            <Button 
+              variant="cta" 
+              className="hidden md:flex whitespace-nowrap"
+              onClick={() => setCallbackOpen(true)}
+            >
               Заказать
             </Button>
+            <CallbackDialog open={callbackOpen} onOpenChange={setCallbackOpen} showTrigger={false} />
 
             {/* Mobile menu */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -122,11 +128,11 @@ export function Header() {
                   
                   <div className="flex flex-col gap-3 px-4">
                     <a 
-                      href="tel:+79001234567" 
+                      href="tel:+79237714004" 
                       className="flex items-center gap-2 font-medium text-foreground"
                     >
                       <Phone className="h-5 w-5 text-tiffany" />
-                      +7 (900) 123-45-67
+                      +7 (923) 771-40-04
                     </a>
                     <div className="flex items-center gap-2 text-muted-foreground text-sm">
                       <Clock className="h-4 w-4" />
@@ -141,7 +147,15 @@ export function Header() {
                     </Button>
                   </Link>
 
-                  <Button variant="cta" size="lg" className="mx-4">
+                  <Button 
+                    variant="cta" 
+                    size="lg" 
+                    className="mx-4"
+                    onClick={() => {
+                      setIsOpen(false);
+                      setCallbackOpen(true);
+                    }}
+                  >
                     Заказать шары
                   </Button>
                 </div>
