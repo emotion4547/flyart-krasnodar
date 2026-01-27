@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Loader2, Search, Plus, X, Package, FolderTree } from 'lucide-react';
+import { Loader2, Search, X, Package, FolderTree, Upload, ImageIcon, Trash2 } from 'lucide-react';
 
 interface Collection {
   id: string;
@@ -43,6 +43,8 @@ export default function CollectionEditor({ collection, onClose }: CollectionEdit
   const [productSearch, setProductSearch] = useState('');
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -234,12 +236,123 @@ export default function CollectionEditor({ collection, onClose }: CollectionEdit
           </div>
 
           <div className="space-y-2">
-            <Label>URL изображения</Label>
-            <Input
-              value={form.image_url}
-              onChange={(e) => setForm({ ...form, image_url: e.target.value })}
-              placeholder="https://..."
+            <Label>Изображение обложки</Label>
+            
+            {/* Image preview */}
+            {form.image_url && (
+              <div className="relative w-full h-40 rounded-lg overflow-hidden border bg-muted">
+                <img
+                  src={form.image_url}
+                  alt="Обложка подборки"
+                  className="w-full h-full object-cover"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-2 right-2 h-8 w-8"
+                  onClick={() => setForm({ ...form, image_url: '' })}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            
+            {/* Upload area */}
+            {!form.image_url && (
+              <div
+                className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <ImageIcon className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  Нажмите для загрузки изображения
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  JPG, PNG, WebP до 5 МБ
+                </p>
+              </div>
+            )}
+            
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                
+                if (file.size > 5 * 1024 * 1024) {
+                  toast.error('Файл слишком большой (максимум 5 МБ)');
+                  return;
+                }
+                
+                setIsUploading(true);
+                try {
+                  const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+                  const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+                  
+                  const { error: uploadError } = await supabase.storage
+                    .from('collection-images')
+                    .upload(fileName, file);
+                  
+                  if (uploadError) throw uploadError;
+                  
+                  const { data: { publicUrl } } = supabase.storage
+                    .from('collection-images')
+                    .getPublicUrl(fileName);
+                  
+                  setForm({ ...form, image_url: publicUrl });
+                  toast.success('Изображение загружено');
+                } catch (error: any) {
+                  toast.error('Ошибка загрузки: ' + (error.message || 'Неизвестная ошибка'));
+                } finally {
+                  setIsUploading(false);
+                  if (fileInputRef.current) fileInputRef.current.value = '';
+                }
+              }}
             />
+            
+            {isUploading && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Загрузка...
+              </div>
+            )}
+            
+            {/* Manual URL input */}
+            {form.image_url && (
+              <div className="flex gap-2 mt-2">
+                <Input
+                  value={form.image_url}
+                  onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                  placeholder="Или вставьте URL..."
+                  className="text-xs"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            
+            {!form.image_url && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span>или</span>
+                <Input
+                  value={form.image_url}
+                  onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                  placeholder="Вставьте URL изображения..."
+                  className="text-xs h-8"
+                />
+              </div>
+            )}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
