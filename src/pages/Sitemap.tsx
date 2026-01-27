@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Home, ShoppingBag, Truck, Shield, Star, MapPin, FileText, ScrollText } from "lucide-react";
 
 const sitemapData = [
@@ -39,6 +40,7 @@ const Sitemap = () => {
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-tiffany-light via-background to-peach py-12 md:py-20">
           <div className="container-custom">
+            <Breadcrumbs />
             <div className="max-w-3xl">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
                 Карта сайта

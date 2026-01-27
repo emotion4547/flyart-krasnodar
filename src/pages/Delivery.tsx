@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Truck, CreditCard, MapPin, Clock, Banknote, QrCode } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 
 const deliveryZones = [
   { zone: "Центр города", price: "200 руб." },
@@ -24,6 +25,7 @@ const Delivery = () => {
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-tiffany-light via-background to-peach py-12 md:py-20">
           <div className="container-custom">
+            <Breadcrumbs />
             <div className="max-w-3xl">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
                 Доставка и оплата

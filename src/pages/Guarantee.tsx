@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Shield, AlertTriangle, Clock, MessageCircle, CheckCircle, XCircle } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 
 const guaranteeRules = [
   {
@@ -38,6 +39,7 @@ const Guarantee = () => {
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-tiffany-light via-background to-peach py-12 md:py-20">
           <div className="container-custom">
+            <Breadcrumbs />
             <div className="max-w-3xl">
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-14 w-14 rounded-2xl bg-tiffany flex items-center justify-center">

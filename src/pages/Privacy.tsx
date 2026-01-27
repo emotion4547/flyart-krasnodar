@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Shield } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 
 const Privacy = () => {
   return (
@@ -17,6 +18,7 @@ const Privacy = () => {
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-tiffany-light via-background to-peach py-12 md:py-20">
           <div className="container-custom">
+            <Breadcrumbs />
             <div className="max-w-3xl">
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-14 w-14 rounded-2xl bg-tiffany flex items-center justify-center">
@@ -50,7 +52,7 @@ const Privacy = () => {
                 <ul className="list-disc pl-6 text-muted-foreground space-y-2 mb-6">
                   <li><strong>«Персональные данные»</strong> — любая информация, относящаяся к прямо или косвенно определённому физическому лицу (субъекту персональных данных).</li>
                   <li><strong>«Обработка персональных данных»</strong> — любое действие с персональными данными, совершаемое с использованием средств автоматизации или без них.</li>
-                  <li><strong>«Оператор»</strong> — ИП Портных Татьяна Сергеевна, ИНН 245723126950.</li>
+                  <li><strong>«Оператор»</strong> — ИП Портных Татьяна Сергеевна, ИНН 245723126950, ОГРНИП 326246800002871.</li>
                   <li><strong>«Пользователь»</strong> — лицо, имеющее доступ к Сайту и использующее его.</li>
                 </ul>
 
@@ -130,6 +132,11 @@ const Privacy = () => {
                 <div className="bg-warm-cream rounded-xl p-6">
                   <p className="text-foreground mb-2"><strong>ИП Портных Татьяна Сергеевна</strong></p>
                   <p className="text-muted-foreground mb-1">ИНН: 245723126950</p>
+                  <p className="text-muted-foreground mb-1">ОГРНИП: 326246800002871</p>
+                  <p className="text-muted-foreground mb-1">Расчётный счёт: 40802 810 7 3171 0011289</p>
+                  <p className="text-muted-foreground mb-1">Банк: Красноярское отделение N 8646 ПАО Сбербанк</p>
+                  <p className="text-muted-foreground mb-1">БИК: 040407627</p>
+                  <p className="text-muted-foreground mb-1">Корсчёт: 30101 810 8 0000 0000627</p>
                   <p className="text-muted-foreground mb-1">Телефон: +7 (923) 771-40-04</p>
                   <p className="text-muted-foreground">Email: tatyanaportnykh@gmail.com</p>
                 </div>

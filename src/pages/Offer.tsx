@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FileText } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 
 const Offer = () => {
   return (
@@ -17,6 +18,7 @@ const Offer = () => {
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-tiffany-light via-background to-peach py-12 md:py-20">
           <div className="container-custom">
+            <Breadcrumbs />
             <div className="max-w-3xl">
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-14 w-14 rounded-2xl bg-tiffany flex items-center justify-center">
@@ -122,6 +124,11 @@ const Offer = () => {
                 <div className="bg-warm-cream rounded-xl p-6">
                   <p className="text-foreground mb-2"><strong>ИП Портных Татьяна Сергеевна</strong></p>
                   <p className="text-muted-foreground mb-1">ИНН: 245723126950</p>
+                  <p className="text-muted-foreground mb-1">ОГРНИП: 326246800002871</p>
+                  <p className="text-muted-foreground mb-1">Расчётный счёт: 40802 810 7 3171 0011289</p>
+                  <p className="text-muted-foreground mb-1">Банк: Красноярское отделение N 8646 ПАО Сбербанк</p>
+                  <p className="text-muted-foreground mb-1">БИК: 040407627</p>
+                  <p className="text-muted-foreground mb-1">Корсчёт: 30101 810 8 0000 0000627</p>
                   <p className="text-muted-foreground mb-1">Адрес: г. Красноярск, ул. Александра Матросова 30ст57</p>
                   <p className="text-muted-foreground mb-1">Телефон: +7 (923) 771-40-04</p>
                   <p className="text-muted-foreground">Email: tatyanaportnykh@gmail.com</p>

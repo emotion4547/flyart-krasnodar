@@ -1,15 +1,9 @@
 import { Link } from "react-router-dom";
-import { Phone, MapPin, Clock, Mail, Heart } from "lucide-react";
+import { Phone, MapPin, Clock, Heart } from "lucide-react";
+import { useFooterCategories } from "@/hooks/useCategories";
+import { useContactInfo, formatPhone, getRawPhone } from "@/hooks/useContactInfo";
 
 const footerLinks = {
-  catalog: [
-    { name: "Для девочки", href: "/catalog/dlya-devochki" },
-    { name: "Для мальчика", href: "/catalog/dlya-malchika" },
-    { name: "Для девушки", href: "/catalog/dlya-devushki" },
-    { name: "Для мужчины", href: "/catalog/dlya-muzhchiny" },
-    { name: "14 февраля", href: "/catalog/14-fevralya" },
-    { name: "Большие шары", href: "/catalog/bolshiye-shary" },
-  ],
   info: [
     { name: "Доставка и оплата", href: "/delivery" },
     { name: "Гарантия", href: "/guarantee" },
@@ -24,6 +18,9 @@ const footerLinks = {
 };
 
 export function Footer() {
+  const { data: categories = [] } = useFooterCategories();
+  const { contactInfo } = useContactInfo();
+
   return (
     <footer className="bg-foreground text-primary-foreground">
       {/* Main footer */}
@@ -42,15 +39,15 @@ export function Footer() {
             </p>
             <div className="flex flex-col gap-3">
               <a 
-                href="tel:+79237714004" 
+                href={`tel:${getRawPhone(contactInfo.phone)}`}
                 className="flex items-center gap-2 text-primary-foreground hover:text-tiffany transition-colors"
               >
                 <Phone className="h-4 w-4 text-tiffany" />
-                +7 (923) 771-40-04
+                {formatPhone(contactInfo.phone)}
               </a>
               <div className="flex items-center gap-2 text-primary-foreground/70 text-sm">
                 <Clock className="h-4 w-4 text-gold" />
-                Пн-Вс: 9:00 - 21:00
+                {contactInfo.workingHours}
               </div>
               <div className="flex items-center gap-2 text-primary-foreground/70 text-sm">
                 <MapPin className="h-4 w-4 text-gold" />
@@ -59,19 +56,19 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Catalog links */}
+          {/* Catalog links - Dynamic from DB */}
           <div>
             <h4 className="font-semibold text-primary-foreground mb-4 text-sm uppercase tracking-wider">
               Каталог
             </h4>
             <ul className="space-y-2">
-              {footerLinks.catalog.map((link) => (
-                <li key={link.name}>
+              {categories.map((category) => (
+                <li key={category.id}>
                   <Link 
-                    to={link.href}
+                    to={`/catalog/${category.slug}`}
                     className="text-primary-foreground/70 hover:text-tiffany transition-colors text-sm"
                   >
-                    {link.name}
+                    {category.name}
                   </Link>
                 </li>
               ))}
