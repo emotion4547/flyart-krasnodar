@@ -81,6 +81,23 @@ export function FloatingContactButton() {
             </svg>
           </div>
         </a>
+
+        {/* MAX Messenger */}
+        <a
+          href="https://max.ru/u/f9LHodD0cOIgsBJYhwYzvgXVZQEOZWcZYTilnvjWf02P4dHFbb4aELVqSGQ"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center gap-3"
+        >
+          <span className="bg-card text-foreground text-sm font-medium px-4 py-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            MAX
+          </span>
+          <div className={`${iconButtonClass} bg-gradient-to-br from-[#FF6B35] to-[#FF3366] text-white`}>
+            <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-5-5 1.41-1.41L11 14.17l7.59-7.59L20 8l-9 9z"/>
+            </svg>
+          </div>
+        </a>
       </div>
 
       {/* Main button */}

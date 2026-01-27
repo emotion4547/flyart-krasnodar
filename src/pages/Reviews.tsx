@@ -1,9 +1,10 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { Star, MessageSquarePlus, StarHalf } from "lucide-react";
+import { Star, MessageSquarePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ContactForm } from "@/components/home/ContactForm";
 import { SEO } from "@/components/SEO";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 
 const Reviews = () => {
   return (
@@ -19,6 +20,7 @@ const Reviews = () => {
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-tiffany-light via-background to-peach py-12 md:py-20">
           <div className="container-custom">
+            <Breadcrumbs />
             <div className="max-w-3xl">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
                 Отзывы

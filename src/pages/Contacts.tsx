@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Phone, Mail, MapPin, Clock, MessageCircle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SEO } from "@/components/SEO";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 
 const Contacts = () => {
   return (
@@ -18,6 +19,7 @@ const Contacts = () => {
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-tiffany-light via-background to-peach py-12 md:py-20">
           <div className="container-custom">
+            <Breadcrumbs />
             <div className="max-w-3xl">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
                 Контакты
@@ -115,6 +117,11 @@ const Contacts = () => {
                   <div className="text-sm text-muted-foreground space-y-1">
                     <p><span className="font-medium text-foreground">ИП:</span> Портных Татьяна Сергеевна</p>
                     <p><span className="font-medium text-foreground">ИНН:</span> 245723126950</p>
+                    <p><span className="font-medium text-foreground">ОГРНИП:</span> 326246800002871</p>
+                    <p><span className="font-medium text-foreground">Расчётный счёт:</span> 40802 810 7 3171 0011289</p>
+                    <p className="pt-2"><span className="font-medium text-foreground">Банк:</span> Красноярское отделение N 8646 ПАО Сбербанк</p>
+                    <p><span className="font-medium text-foreground">БИК:</span> 040407627</p>
+                    <p><span className="font-medium text-foreground">Корсчёт:</span> 30101 810 8 0000 0000627</p>
                   </div>
                 </div>
 
@@ -138,13 +145,18 @@ const Contacts = () => {
                       Telegram
                     </a>
                   </Button>
+                  <Button variant="outline" size="lg" className="flex-1 min-w-[200px]" asChild>
+                    <a href="https://max.ru/u/f9LHodD0cOIgsBJYhwYzvgXVZQEOZWcZYTilnvjWf02P4dHFbb4aELVqSGQ" target="_blank" rel="noopener noreferrer">
+                      MAX
+                    </a>
+                  </Button>
                 </div>
               </div>
 
               {/* Map */}
               <div className="bg-card rounded-2xl overflow-hidden shadow-soft h-[500px] lg:h-auto">
                 <iframe 
-                  src="https://yandex.ru/map-widget/v1/?um=constructor%3A8a8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e&amp;source=constructor&amp;ll=92.893099,56.010563&amp;z=16&amp;pt=92.893099,56.010563,pm2rdm"
+                  src="https://yandex.ru/map-widget/v1/?ll=92.887274,55.974025&z=16&pt=92.887274,55.974025,pm2rdm"
                   width="100%" 
                   height="100%" 
                   frameBorder="0"

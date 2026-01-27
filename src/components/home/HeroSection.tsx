@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Truck, Gift } from "lucide-react";
 import { Link } from "react-router-dom";
+import { CallbackDialog } from "@/components/CallbackDialog";
 
 export function HeroSection() {
+  const [callbackOpen, setCallbackOpen] = useState(false);
   return (
     <section className="relative overflow-hidden min-h-[85vh] md:min-h-screen flex flex-col">
       {/* Video background */}
@@ -54,13 +57,19 @@ export function HeroSection() {
 
             {/* CTA buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-10 animate-fade-up" style={{ animationDelay: '0.3s' }}>
-              <Button variant="hero" size="xl" asChild>
-                <Link to="/catalog">Заказать шары</Link>
+              <Button variant="hero" size="xl" onClick={() => setCallbackOpen(true)}>
+                Заказать шары
               </Button>
               <Button variant="heroSecondary" size="xl" asChild>
                 <Link to="/catalog">Смотреть каталог</Link>
               </Button>
             </div>
+            
+            <CallbackDialog 
+              open={callbackOpen} 
+              onOpenChange={setCallbackOpen} 
+              showTrigger={false} 
+            />
 
             {/* Features */}
             <div className="grid grid-cols-3 gap-2 md:gap-6 max-w-3xl animate-fade-up w-full" style={{ animationDelay: '0.4s' }}>
