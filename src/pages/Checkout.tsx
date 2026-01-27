@@ -182,28 +182,8 @@ const Checkout = () => {
           return;
         }
 
-        // Send Telegram notification for online payment orders
-        try {
-          await supabase.functions.invoke('send-telegram', {
-            body: {
-              message: `🛒 <b>Новый заказ (ожидает оплаты)</b>
-
-📦 Заказ: <b>${order.order_number}</b>
-🆔 YooKassa ID: <code>${paymentData.paymentId}</code>
-💰 Сумма: <b>${totalPrice} ₽</b>
-👤 Клиент: ${data.name}
-📱 Телефон: ${data.phone}
-${data.email ? `📧 Email: ${data.email}` : ""}
-📍 Адрес: ${data.address}
-${data.comment ? `💬 Комментарий: ${data.comment}` : ""}
-
-⏳ Ожидает онлайн-оплаты...`,
-            },
-          });
-        } catch (tgError) {
-          console.error("Telegram notification error:", tgError);
-        }
-
+        // NOTE: For online payments, Telegram notification is sent from yookassa-callback
+        // only AFTER successful payment confirmation, not here at checkout
         // Clear cart and redirect to YooKassa
         clearCart();
         window.location.href = paymentData.paymentUrl;
