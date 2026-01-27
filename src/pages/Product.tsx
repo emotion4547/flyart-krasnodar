@@ -1,5 +1,6 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ProductCard } from "@/components/home/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -8,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
-import { ShoppingCart, Minus, Plus, ChevronLeft, Check, Truck, Shield, Gift, MapPin, CreditCard } from "lucide-react";
+import { ShoppingCart, Minus, Plus, Check, Truck, Shield, Gift, MapPin, CreditCard } from "lucide-react";
 import { useState } from "react";
 import { SEO } from "@/components/SEO";
 import { ProductSchema } from "@/components/ProductSchema";
@@ -43,6 +44,29 @@ const Product = () => {
       return data;
     },
     enabled: !!slug,
+  });
+
+  // Fetch product category for breadcrumbs
+  const { data: productCategory } = useQuery({
+    queryKey: ["product-category", product?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_categories")
+        .select(`
+          categories (
+            id,
+            name,
+            slug
+          )
+        `)
+        .eq("product_id", product!.id)
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data?.categories;
+    },
+    enabled: !!product?.id,
   });
 
   // Fetch related products
@@ -148,6 +172,15 @@ const Product = () => {
 
   const mainImageUrl = mainImage?.url || "/placeholder.svg";
 
+  // Build breadcrumb items
+  const breadcrumbItems = [
+    { label: "Каталог", href: "/catalog" },
+    ...(productCategory ? [{
+      label: productCategory.name,
+      href: `/catalog?category=${productCategory.id}`
+    }] : []),
+  ];
+
   return (
     <div className="min-h-screen flex flex-col">
       <SEO 
@@ -167,15 +200,9 @@ const Product = () => {
       />
       <Header />
       <main className="flex-1 bg-warm-cream">
-        {/* Breadcrumb */}
-        <div className="container-custom py-4">
-          <Link
-            to="/catalog"
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-tiffany transition-colors"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Назад в каталог
-          </Link>
+        {/* Breadcrumbs */}
+        <div className="container-custom pt-4">
+          <Breadcrumbs items={breadcrumbItems} currentPage={product.title} />
         </div>
 
         <div className="container-custom pb-16">
