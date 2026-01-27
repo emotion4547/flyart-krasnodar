@@ -43,16 +43,11 @@ interface AdminLayoutProps {
 
 const menuItems = [
   { title: 'Дашборд', url: '/admin4547', icon: LayoutDashboard },
-  { title: 'Товары', url: '/admin4547/products', icon: Package },
-  { title: 'Категории', url: '/admin4547/categories', icon: FolderTree },
+  { title: 'Каталог', url: '/admin4547/catalog', icon: Package },
   { title: 'Заказы', url: '/admin4547/orders', icon: ShoppingCart },
   { title: 'Клиенты', url: '/admin4547/clients', icon: Users },
-  { title: 'Отзывы', url: '/admin4547/reviews', icon: MessageSquareText },
-  { title: 'VK Клипы', url: '/admin4547/vk-clips', icon: Play },
-  { title: 'Маркетинг / SEO', url: '/admin4547/marketing', icon: BarChart3 },
   { title: 'Контент', url: '/admin4547/content', icon: FileText },
-  { title: 'Импорт Excel', url: '/admin4547/import', icon: Upload },
-  { title: 'Пользователи', url: '/admin4547/users', icon: UserCog },
+  { title: 'Маркетинг', url: '/admin4547/marketing', icon: BarChart3 },
   { title: 'Настройки', url: '/admin4547/settings', icon: Settings },
 ];
 

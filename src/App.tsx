@@ -30,18 +30,13 @@ import Sitemap from "./pages/Sitemap";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminLayout from "./components/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
-import Products from "./pages/admin/Products";
 import ProductEdit from "./pages/admin/ProductEdit";
-import Categories from "./pages/admin/Categories";
 import Orders from "./pages/admin/Orders";
-import Clients from "./pages/admin/Clients";
-import VKClips from "./pages/admin/VKClips";
-import ReviewsManagement from "./pages/admin/ReviewsManagement";
 import Marketing from "./pages/admin/Marketing";
-import Content from "./pages/admin/Content";
-import Import from "./pages/admin/Import";
 import Settings from "./pages/admin/Settings";
-import UsersManagement from "./pages/admin/UsersManagement";
+import CatalogHub from "./pages/admin/CatalogHub";
+import ClientsHub from "./pages/admin/ClientsHub";
+import ContentHub from "./pages/admin/ContentHub";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -95,17 +90,12 @@ function AppContent() {
         {/* Admin routes */}
         <Route path="/admin4547/login" element={<AdminLogin />} />
         <Route path="/admin4547" element={<AdminLayout><Dashboard /></AdminLayout>} />
-        <Route path="/admin4547/products" element={<AdminLayout><Products /></AdminLayout>} />
-        <Route path="/admin4547/products/:id" element={<AdminLayout><ProductEdit /></AdminLayout>} />
-        <Route path="/admin4547/categories" element={<AdminLayout><Categories /></AdminLayout>} />
+        <Route path="/admin4547/catalog" element={<AdminLayout><CatalogHub /></AdminLayout>} />
+        <Route path="/admin4547/catalog/:id" element={<AdminLayout><ProductEdit /></AdminLayout>} />
         <Route path="/admin4547/orders" element={<AdminLayout><Orders /></AdminLayout>} />
-        <Route path="/admin4547/clients" element={<AdminLayout><Clients /></AdminLayout>} />
-        <Route path="/admin4547/vk-clips" element={<AdminLayout><VKClips /></AdminLayout>} />
-        <Route path="/admin4547/reviews" element={<AdminLayout><ReviewsManagement /></AdminLayout>} />
+        <Route path="/admin4547/clients" element={<AdminLayout><ClientsHub /></AdminLayout>} />
+        <Route path="/admin4547/content" element={<AdminLayout><ContentHub /></AdminLayout>} />
         <Route path="/admin4547/marketing" element={<AdminLayout><Marketing /></AdminLayout>} />
-        <Route path="/admin4547/content" element={<AdminLayout><Content /></AdminLayout>} />
-        <Route path="/admin4547/import" element={<AdminLayout><Import /></AdminLayout>} />
-        <Route path="/admin4547/users" element={<AdminLayout><UsersManagement /></AdminLayout>} />
         <Route path="/admin4547/settings" element={<AdminLayout><Settings /></AdminLayout>} />
         
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
