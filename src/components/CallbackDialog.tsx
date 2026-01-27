@@ -31,11 +31,21 @@ const formatPhone = (value: string): string => {
   return `+7 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7, 9)}-${digits.slice(9, 11)}`;
 };
 
-export function CallbackDialog() {
-  const [open, setOpen] = useState(false);
+interface CallbackDialogProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  showTrigger?: boolean;
+}
+
+export function CallbackDialog({ open: controlledOpen, onOpenChange, showTrigger = true }: CallbackDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled ? (onOpenChange ?? (() => {})) : setInternalOpen;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,16 +83,18 @@ export function CallbackDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button 
-          variant="tiffany" 
-          size="sm" 
-          className="gap-2 hidden sm:flex"
-        >
-          <Phone className="h-4 w-4" />
-          Обратный звонок
-        </Button>
-      </DialogTrigger>
+      {showTrigger && (
+        <DialogTrigger asChild>
+          <Button 
+            variant="tiffany" 
+            size="sm" 
+            className="gap-2 hidden sm:flex"
+          >
+            <Phone className="h-4 w-4" />
+            Обратный звонок
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-md bg-card">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-foreground">

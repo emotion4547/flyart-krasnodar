@@ -133,7 +133,7 @@ const Contacts = () => {
                     </a>
                   </Button>
                   <Button variant="outline" size="lg" className="flex-1 min-w-[200px]" asChild>
-                    <a href="https://t.me/+79237714004" target="_blank" rel="noopener noreferrer">
+                    <a href="https://t.me/FlyArtKRSK" target="_blank" rel="noopener noreferrer">
                       <Send className="h-5 w-5 mr-2" />
                       Telegram
                     </a>
