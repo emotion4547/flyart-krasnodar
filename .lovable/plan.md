@@ -1,31 +1,59 @@
+# FlyArt Project — Changelog
 
+## Обновления 27 января 2026
 
-# Создание файла changelog-2026-01-27.md
+### Интеграция YooKassa (онлайн-оплата)
 
-## Цель
-Создать документ с описанием всех изменений, внесённых в проект за 27 января 2026 года.
+- **Edge Functions:**
+  - `yookassa-init` — инициализация платежа, создание ссылки на оплату
+  - `yookassa-callback` — обработка webhook-уведомлений от YooKassa
 
-## Расположение файла
-`docs/changelog-2026-01-27.md`
+- **Настройки платежей** в таблице `settings` (key: `payment`):
+  - `yookassaShopId` — Shop ID (1251407)
+  - `yookassaSecretKey` — секретный ключ
+  - `onlinePayment: true` — включение онлайн-оплаты
+  - `cardPayment: true` — оплата картой при получении
+  - `cashPayment: true` — оплата наличными
 
-## Содержимое файла
+- **Статусы заказов** (constraint `orders_status_check`):
+  - `new`, `pending_payment`, `paid`, `processing`, `delivering`, `delivered`, `cancelled`, `payment_failed`
 
-```markdown
-# Changelog — 27 января 2026
+- **Валидация email:** обязателен при онлайн-оплате (требование 54-ФЗ для чеков)
 
-## Обзор
-
-Масштабное обновление админ-панели и добавление функционала подборок товаров для праздников.
+- **Rollback механизм:** если YooKassa не инициализирует платёж, заказ автоматически удаляется
 
 ---
 
-## Frontend изменения
+### Telegram-уведомления
 
-### 1. Реорганизация админ-панели (12 → 7 разделов)
+- **Edge Function:** `send-telegram` — отправка сообщений через Telegram Bot API
 
-**Было:** Дашборд, Товары, Категории, Заказы, Клиенты, Отзывы, VK Клипы, Маркетинг, Контент, Импорт, Пользователи, Настройки
+- **Секреты:**
+  - `TELEGRAM_BOT_TOKEN` — токен бота
+  - `TELEGRAM_CHAT_ID` — ID чата для уведомлений
 
-**Стало:**
+- **Уведомления отправляются:**
+  - 🛒 **Новый заказ** (оффлайн-оплата) — сразу при создании заказа
+  - 💳 **Оплата получена** (онлайн-оплата) — только после подтверждения оплаты от YooKassa (`succeeded`)
+
+- **Информация в уведомлении об оплате:**
+  - Номер заказа
+  - YooKassa Payment ID
+  - Статус платежа
+  - Сумма
+  - Данные клиента
+
+---
+
+### RLS-политики для анонимного checkout
+
+- `orders` — INSERT для `anon`, SELECT для `anon` и `authenticated`
+- `order_items` — INSERT для `anon`, SELECT для `anon` и `authenticated`
+
+---
+
+### Реорганизация админ-панели (12 → 7 разделов)
+
 | Раздел | Вкладки |
 |--------|---------|
 | Дашборд | — |
@@ -36,153 +64,44 @@
 | Маркетинг | — |
 | Настройки | Общие, Контакты, Связь, Реквизиты |
 
-### 2. Новые компоненты
+---
 
-#### Хабы (объединяющие страницы):
-- `src/pages/admin/CatalogHub.tsx` — товары, категории, импорт
-- `src/pages/admin/ClientsHub.tsx` — заявки, отзывы
-- `src/pages/admin/ContentHub.tsx` — страницы, VK клипы, подборки, hero-видео
+### Функционал подборок (Collections)
 
-#### Контент-компоненты (вкладки внутри хабов):
-- `src/pages/admin/ProductsContent.tsx`
-- `src/pages/admin/CategoriesContent.tsx`
-- `src/pages/admin/ImportContent.tsx`
-- `src/pages/admin/ClientsContent.tsx`
-- `src/pages/admin/ReviewsContent.tsx`
-- `src/pages/admin/PagesContent.tsx`
-- `src/pages/admin/VKClipsContent.tsx`
-
-#### Настройки:
-- `src/components/admin/ContactSettings.tsx` — редактирование контактов
-- `src/components/admin/MessengerLinksSettings.tsx` — управление FloatingContactButton
-- `src/components/admin/RequisitesSettings.tsx` — юридические реквизиты
-- `src/components/admin/HeroVideoSettings.tsx` — загрузка фонового видео
-
-#### Подборки:
-- `src/components/admin/CollectionsManager.tsx` — список подборок
-- `src/components/admin/CollectionEditor.tsx` — редактор подборки с загрузкой изображений
-- `src/components/home/CollectionsSection.tsx` — блок на главной странице
-- `src/pages/Collection.tsx` — публичная страница подборки
-
-### 3. Изменённые компоненты
-
-- `src/components/admin/AdminLayout.tsx` — новое меню из 7 пунктов
-- `src/App.tsx` — новые маршруты для хабов и подборок
-- `src/pages/admin/Settings.tsx` — 4 новые вкладки
-- `src/components/home/HeroSection.tsx` — динамическая загрузка видео
-- `src/components/FloatingContactButton.tsx` — данные из настроек БД
-- `src/pages/Catalog.tsx` — добавлены breadcrumbs
-- `src/pages/Product.tsx` — breadcrumbs с категорией товара
-
-### 4. UI/UX улучшения главной страницы
-
-- **Блок "Подборки":**
-  - Заголовок переименован в "На повестке дня"
-  - Удалена надпись "Актуальное"
-  - Добавлена золотая декоративная линия
-  - Заголовок отцентрирован
-  - Высота карточек уменьшена до `h-24`
-  - Отступы оптимизированы (`py-8 md:py-12`)
-
-- **Блок "Популярные разделы":**
-  - Добавлен алгоритм автоматического выбора обложек из товаров категории
-  - Функция `varietyBonus` для разнообразия изображений между категориями
+- **Таблицы:** `collections`, `collection_items`
+- **Компоненты:**
+  - `CollectionsManager.tsx` — управление подборками
+  - `CollectionEditor.tsx` — редактор с загрузкой изображений
+  - `CollectionsSection.tsx` — блок "На повестке дня" на главной
+  - `Collection.tsx` — публичная страница подборки `/collection/:slug`
 
 ---
 
-## База данных (Supabase)
+### Настройки в админ-панели
 
-### Новые таблицы
-
-#### `collections`
-| Поле | Тип | Описание |
-|------|-----|----------|
-| id | uuid | PK |
-| name | text | Название подборки |
-| slug | text | URL-slug |
-| description | text | Описание |
-| image_url | text | URL обложки |
-| is_active | boolean | Активность |
-| sort_order | integer | Порядок сортировки |
-| starts_at | timestamptz | Начало показа |
-| ends_at | timestamptz | Конец показа |
-| created_at | timestamptz | Дата создания |
-| updated_at | timestamptz | Дата обновления |
-
-#### `collection_items`
-| Поле | Тип | Описание |
-|------|-----|----------|
-| id | uuid | PK |
-| collection_id | uuid | FK → collections |
-| product_id | uuid | FK → products (опц.) |
-| category_id | uuid | FK → categories (опц.) |
-| sort_order | integer | Порядок в подборке |
-| created_at | timestamptz | Дата создания |
-
-### RLS-политики
-
-```sql
--- collections
-CREATE POLICY "Anyone can view active collections" ON collections
-  FOR SELECT USING (is_active = true);
-
-CREATE POLICY "Admins can manage collections" ON collections
-  FOR ALL USING (is_admin_or_manager(auth.uid()));
-
--- collection_items
-CREATE POLICY "Anyone can view collection items" ON collection_items
-  FOR SELECT USING (true);
-
-CREATE POLICY "Admins can manage collection items" ON collection_items
-  FOR ALL USING (is_admin_or_manager(auth.uid()));
-```
-
-### Storage buckets
-
-| Bucket | Описание | Доступ |
-|--------|----------|--------|
-| `hero-videos` | Фоновые видео Hero-блока | Публичный |
-| `collection-images` | Обложки подборок | Публичный |
-
-### Новые записи в таблице `settings`
-
-| Ключ | Описание |
-|------|----------|
+| Ключ в `settings` | Описание |
+|-------------------|----------|
 | `contact_info` | Телефон, email, адрес, часы работы, координаты |
-| `messenger_links` | Настройки каналов связи (WhatsApp, Telegram, VK, MAX) |
-| `requisites` | Юридические реквизиты (ИП, ИНН, банк, счета) |
+| `messenger_links` | Каналы связи (WhatsApp, Telegram, VK, MAX) |
+| `requisites` | Юридические реквизиты (ИП, ИНН, банк) |
 | `hero_video` | URL фонового видео |
+| `payment` | Настройки способов оплаты и YooKassa |
 
 ---
 
-## Новые маршруты
+### UI/UX улучшения
 
-### Публичные
-- `/collection/:slug` — страница подборки
-
-### Админ-панель
-- `/admin4547/catalog` — CatalogHub (вкладка Товары)
-- `/admin4547/catalog/categories` — CatalogHub (вкладка Категории)
-- `/admin4547/catalog/import` — CatalogHub (вкладка Импорт)
-- `/admin4547/clients` — ClientsHub (вкладка Заявки)
-- `/admin4547/clients/reviews` — ClientsHub (вкладка Отзывы)
-- `/admin4547/content` — ContentHub (вкладка Страницы)
-- `/admin4547/content/vk-clips` — ContentHub (вкладка VK Клипы)
-- `/admin4547/content/collections` — ContentHub (вкладка Подборки)
-- `/admin4547/content/hero-video` — ContentHub (вкладка Hero-видео)
+- **Breadcrumbs** на страницах каталога и товара
+- **Динамические контакты** из таблицы `settings`
+- **FloatingContactButton** с настраиваемыми каналами связи
+- **Автовыбор обложек категорий** из товаров с алгоритмом разнообразия
 
 ---
 
-## Итог
+## Файлы изменены сегодня
 
-- **Упрощённая навигация:** 7 разделов вместо 12
-- **Централизованное управление:** контакты, мессенджеры, реквизиты в одном месте
-- **Гибкий контент:** замена Hero-видео и создание подборок без изменения кода
-- **Улучшенный UX:** breadcrumbs, автоматические обложки категорий
-- **Масштабируемость:** легко добавлять новые вкладки и функции
-```
-
-## Действие
-
-Создать файл `docs/changelog-2026-01-27.md` с содержимым выше.
-
+- `src/pages/Checkout.tsx` — валидация email, Telegram-уведомления, rollback
+- `src/pages/Product.tsx` — исправлена ошибка загрузки категории
+- `supabase/functions/yookassa-init/index.ts` — инициализация платежа
+- `supabase/functions/yookassa-callback/index.ts` — webhook + Telegram (YooKassa ID, статус)
+- `supabase/functions/send-telegram/index.ts` — универсальная функция уведомлений
