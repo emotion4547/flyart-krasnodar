@@ -45,13 +45,14 @@ export function CollectionsSection() {
   }
 
   return (
-    <section className="section-padding bg-background">
+    <section className="py-8 md:py-12 bg-background">
       <div className="container-custom">
         {/* Header */}
-        <div className="mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
             На повестке дня
           </h2>
+          <div className="gold-line max-w-xs mx-auto" />
         </div>
 
         {isLoading ? (
