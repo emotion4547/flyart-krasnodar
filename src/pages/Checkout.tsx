@@ -154,8 +154,53 @@ const Checkout = () => {
 
       if (itemsError) throw itemsError;
 
+      // Send Telegram notification for new orders (offline payments)
+      if (effectivePaymentMethod !== 'online') {
+        try {
+          await supabase.functions.invoke('send-telegram', {
+            body: {
+              message: `🛒 <b>Новый заказ!</b>
+
+📦 Заказ: <b>${order.order_number}</b>
+💰 Сумма: <b>${totalPrice} ₽</b>
+👤 Клиент: ${data.name}
+📱 Телефон: ${data.phone}
+${data.email ? `📧 Email: ${data.email}` : ""}
+📍 Адрес: ${data.address}
+${data.comment ? `💬 Комментарий: ${data.comment}` : ""}
+
+💳 Оплата: ${effectivePaymentMethod === 'card' ? 'Картой при получении' : 'Наличными'}`,
+            },
+          });
+        } catch (tgError) {
+          console.error("Telegram notification error:", tgError);
+          // Don't fail the order if Telegram fails
+        }
+      }
+
       // Handle online payment
       if (effectivePaymentMethod === 'online') {
+        // Send Telegram notification for online payment orders
+        try {
+          await supabase.functions.invoke('send-telegram', {
+            body: {
+              message: `🛒 <b>Новый заказ (ожидает оплаты)</b>
+
+📦 Заказ: <b>${order.order_number}</b>
+💰 Сумма: <b>${totalPrice} ₽</b>
+👤 Клиент: ${data.name}
+📱 Телефон: ${data.phone}
+${data.email ? `📧 Email: ${data.email}` : ""}
+📍 Адрес: ${data.address}
+${data.comment ? `💬 Комментарий: ${data.comment}` : ""}
+
+⏳ Ожидает онлайн-оплаты...`,
+            },
+          });
+        } catch (tgError) {
+          console.error("Telegram notification error:", tgError);
+        }
+
         // Call YooKassa init edge function
         const { data: paymentData, error: paymentError } = await supabase.functions.invoke('yookassa-init', {
           body: {

@@ -97,6 +97,40 @@ serve(async (req: Request): Promise<Response> => {
 
     console.log(`YooKassa callback: Order ${order.order_number} updated to status: ${newOrderStatus}`);
 
+    // Send Telegram notification for successful payment
+    if (paymentStatus === "succeeded") {
+      try {
+        const botToken = Deno.env.get("TELEGRAM_BOT_TOKEN");
+        const chatId = Deno.env.get("TELEGRAM_CHAT_ID");
+        
+        if (botToken && chatId) {
+          const message = `💳 <b>Оплата получена!</b>
+
+📦 Заказ: <b>${order.order_number}</b>
+💰 Сумма: <b>${amount} ₽</b>
+👤 Клиент: ${order.customer_name}
+📱 Телефон: ${order.customer_phone}
+${order.customer_email ? `📧 Email: ${order.customer_email}` : ""}
+
+✅ Статус: Оплачен`;
+
+          await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: message,
+              parse_mode: "HTML",
+            }),
+          });
+          console.log("Telegram notification sent for payment");
+        }
+      } catch (tgError) {
+        console.error("Failed to send Telegram notification:", tgError);
+        // Don't fail the webhook if Telegram fails
+      }
+    }
+
     // Return OK response for YooKassa
     return new Response("OK", { 
       status: 200,
