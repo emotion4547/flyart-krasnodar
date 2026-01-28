@@ -222,13 +222,13 @@ export function FeaturedCategoriesManager() {
               Добавить раздел
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>
+          <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+            <DialogHeader className="pb-2">
+              <DialogTitle className="text-base">
                 {editingItem ? 'Редактирование раздела' : 'Добавить в популярные'}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
               <div className="space-y-2">
                 <Label>Категория *</Label>
                 <Select
