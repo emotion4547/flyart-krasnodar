@@ -22,6 +22,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ImageUploader } from '@/components/admin/ImageUploader';
 import { toast } from 'sonner';
 import { Plus, Edit, Trash2, FolderTree, Loader2 } from 'lucide-react';
 
@@ -193,24 +194,21 @@ export default function CategoriesContent() {
                 />
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="image_url">URL изображения</Label>
-                  <Input
-                    id="image_url"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="sort_order">Порядок сортировки</Label>
-                  <Input
-                    id="sort_order"
-                    type="number"
-                    value={formData.sort_order}
-                    onChange={(e) => setFormData({ ...formData, sort_order: e.target.value })}
-                  />
-                </div>
+              <ImageUploader
+                value={formData.image_url}
+                onChange={(url) => setFormData({ ...formData, image_url: url })}
+                folder="categories"
+                label="Обложка категории"
+              />
+
+              <div className="space-y-2">
+                <Label htmlFor="sort_order">Порядок сортировки</Label>
+                <Input
+                  id="sort_order"
+                  type="number"
+                  value={formData.sort_order}
+                  onChange={(e) => setFormData({ ...formData, sort_order: e.target.value })}
+                />
               </div>
 
               <div className="border-t pt-4">

@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ImageUploader } from '@/components/admin/ImageUploader';
 import { toast } from 'sonner';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
@@ -331,18 +332,12 @@ export default function ProductEdit() {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="imageUrl">URL изображения</Label>
-                  <Input
-                    id="imageUrl"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="https://..."
-                  />
-                  {imageUrl && (
-                    <img src={imageUrl} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded-lg" />
-                  )}
-                </div>
+                <ImageUploader
+                  value={imageUrl}
+                  onChange={setImageUrl}
+                  folder="products"
+                  label="Изображение товара"
+                />
               </CardContent>
             </Card>
           </TabsContent>
