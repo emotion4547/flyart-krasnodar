@@ -133,6 +133,50 @@ export default function VKClipsContent() {
     is_active: true,
   });
 
+  // Section visibility setting
+  const { data: sectionSettings, isLoading: settingsLoading } = useQuery({
+    queryKey: ["settings", "vk_clips_section"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("value")
+        .eq("key", "vk_clips_section")
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.value as { enabled: boolean }) ?? { enabled: true };
+    },
+  });
+
+  const toggleSectionMutation = useMutation({
+    mutationFn: async (enabled: boolean) => {
+      const { data: existing } = await supabase
+        .from("settings")
+        .select("id")
+        .eq("key", "vk_clips_section")
+        .maybeSingle();
+      
+      if (existing) {
+        const { error } = await supabase
+          .from("settings")
+          .update({ value: { enabled } })
+          .eq("key", "vk_clips_section");
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("settings")
+          .insert({ key: "vk_clips_section", value: { enabled } });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["settings", "vk_clips_section"] });
+      toast.success("Настройки секции сохранены");
+    },
+    onError: () => {
+      toast.error("Ошибка сохранения настроек");
+    },
+  });
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -289,8 +333,27 @@ export default function VKClipsContent() {
     });
   };
 
+  const sectionEnabled = sectionSettings?.enabled ?? true;
+
   return (
     <div className="space-y-6">
+      {/* Section toggle */}
+      <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
+        <div>
+          <p className="font-medium">Секция VK Клипов на главной</p>
+          <p className="text-sm text-muted-foreground">
+            {sectionEnabled 
+              ? "Секция отображается на главной странице" 
+              : "Секция скрыта для повышения производительности"}
+          </p>
+        </div>
+        <Switch
+          checked={sectionEnabled}
+          onCheckedChange={(checked) => toggleSectionMutation.mutate(checked)}
+          disabled={toggleSectionMutation.isPending || settingsLoading}
+        />
+      </div>
+
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
           Перетаскивайте клипы для изменения порядка
