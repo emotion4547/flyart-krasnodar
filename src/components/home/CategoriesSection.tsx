@@ -15,17 +15,43 @@ const categoryColors = [
   "from-tiffany-light to-gold-light",
 ];
 
+interface FeaturedCategory {
+  id: string;
+  category_id: string;
+  custom_image_url: string | null;
+  custom_title: string | null;
+  sort_order: number;
+  is_active: boolean;
+}
+
 export function CategoriesSection() {
-  // Optimized: Fetch categories with preview images in 2 queries.
-  // IMPORTANT: do NOT require category.image_url, since many categories don't have it.
-  // Instead we derive a preview image from any active product within the category.
-  const { data: categories, isLoading } = useQuery({
-    queryKey: ["home-categories-optimized"],
+  // First try to get manually configured featured categories
+  const { data: featuredCategories, isLoading: loadingFeatured } = useQuery({
+    queryKey: ["home-featured-categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("featured_categories")
+        .select(`
+          *,
+          category:categories(id, name, slug, image_url)
+        `)
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true });
+
+      if (error) throw error;
+      return data as (FeaturedCategory & { category: { id: string; name: string; slug: string; image_url: string | null } })[];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Fallback: fetch categories automatically if no featured configured
+  const { data: autoCategories, isLoading: loadingAuto } = useQuery({
+    queryKey: ["home-categories-auto"],
     queryFn: async () => {
       // Query 1: categories
       const { data: cats, error: catsError } = await supabase
         .from("categories")
-        .select("id, name, slug, sort_order")
+        .select("id, name, slug, image_url, sort_order")
         .order("sort_order", { ascending: true });
 
       if (catsError) throw catsError;
@@ -62,12 +88,10 @@ export function CategoriesSection() {
       >();
 
       const scoreImage = (p: any, img: any, categoryId: string) => {
-        // Use a hash based on category ID to pick different images for variety
         const categoryHash = categoryId.charCodeAt(0) + categoryId.charCodeAt(categoryId.length - 1);
         const mainBonus = img?.is_main ? 10_000 : 0;
         const imgOrder = typeof img?.sort_order === "number" ? 1_000 - img.sort_order : 0;
         const productOrder = typeof p?.sort_order === "number" ? 100 - p.sort_order : 0;
-        // Add variety factor based on category
         const varietyBonus = (categoryHash % 5) * 500;
         return mainBonus + imgOrder + productOrder + varietyBonus;
       };
@@ -100,7 +124,6 @@ export function CategoriesSection() {
         }
       }
 
-      // Keep categories that have products, even if no image (fallback gradient will be used)
       return cats
         .map((cat) => {
           const meta = byCategory.get(cat.id);
@@ -108,8 +131,7 @@ export function CategoriesSection() {
             id: cat.id,
             name: cat.name,
             slug: cat.slug,
-            sort_order: (cat as any).sort_order ?? 0,
-            imageUrl: meta?.bestImageUrl ?? null,
+            imageUrl: cat.image_url || meta?.bestImageUrl || null,
             productCount: meta?.productCount ?? 0,
           };
         })
@@ -117,9 +139,22 @@ export function CategoriesSection() {
         .slice(0, 8);
     },
     staleTime: 5 * 60 * 1000,
-    retry: 2,
-    refetchOnWindowFocus: false,
+    // Only run if no featured categories
+    enabled: !loadingFeatured && (!featuredCategories || featuredCategories.length === 0),
   });
+
+  const isLoading = loadingFeatured || (loadingAuto && (!featuredCategories || featuredCategories.length === 0));
+
+  // Use featured if available, otherwise auto
+  const useFeatured = featuredCategories && featuredCategories.length > 0;
+  const categories = useFeatured
+    ? featuredCategories.map((fc) => ({
+        id: fc.category?.id || fc.category_id,
+        name: fc.custom_title || fc.category?.name || "Категория",
+        slug: fc.category?.slug || "",
+        imageUrl: fc.custom_image_url || fc.category?.image_url || null,
+      }))
+    : autoCategories || [];
 
   if (isLoading) {
     return (
