@@ -24,6 +24,20 @@ export const VKClipsSection = () => {
   const [isPaused, setIsPaused] = useState(false);
   const isMobile = useIsMobile();
 
+  // Check if section is enabled
+  const { data: sectionSettings } = useQuery({
+    queryKey: ["settings", "vk_clips_section"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("value")
+        .eq("key", "vk_clips_section")
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.value as { enabled: boolean }) ?? { enabled: true };
+    },
+  });
+
   const { data: clips = [], isLoading } = useQuery({
     queryKey: ["vk-clips"],
     queryFn: async () => {
@@ -36,6 +50,8 @@ export const VKClipsSection = () => {
       if (error) throw error;
       return data as VKClip[];
     },
+    // Don't fetch clips if section is disabled
+    enabled: sectionSettings?.enabled !== false,
   });
 
   // Calculate animation duration based on number of clips (slower = smoother on mobile)
@@ -48,7 +64,8 @@ export const VKClipsSection = () => {
     return totalWidth / speed;
   }, [clips.length, isMobile]);
 
-  if (isLoading || clips.length === 0) {
+  // Return null if section is disabled, loading, or no clips
+  if (sectionSettings?.enabled === false || isLoading || clips.length === 0) {
     return null;
   }
 
