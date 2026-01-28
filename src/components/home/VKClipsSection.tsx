@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Play } from "lucide-react";
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useState, useMemo } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface VKClip {
@@ -22,13 +22,7 @@ const getVKEmbedUrl = (url: string) => {
 
 export const VKClipsSection = () => {
   const [isPaused, setIsPaused] = useState(false);
-  const [scrollPosition, setScrollPosition] = useState(0);
   const isMobile = useIsMobile();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number>();
-  const lastTimeRef = useRef<number>(0);
-  const touchStartRef = useRef<number>(0);
-  const touchScrollRef = useRef<number>(0);
 
   const { data: clips = [], isLoading } = useQuery({
     queryKey: ["vk-clips"],
@@ -44,73 +38,22 @@ export const VKClipsSection = () => {
     },
   });
 
-  // Calculate total width of one set of clips
-  const clipWidth = isMobile ? 160 : 180;
-  const gap = 16;
-  const totalWidth = clips.length * (clipWidth + gap);
-
-  // Speed: pixels per second (slower on mobile)
-  const speed = isMobile ? 30 : 50;
-
-  const animate = useCallback((currentTime: number) => {
-    if (!lastTimeRef.current) {
-      lastTimeRef.current = currentTime;
-    }
-
-    const deltaTime = currentTime - lastTimeRef.current;
-    lastTimeRef.current = currentTime;
-
-    if (!isPaused && totalWidth > 0) {
-      setScrollPosition((prev) => {
-        const newPos = prev + (speed * deltaTime) / 1000;
-        // Reset when we've scrolled past one full set
-        return newPos >= totalWidth ? newPos - totalWidth : newPos;
-      });
-    }
-
-    animationRef.current = requestAnimationFrame(animate);
-  }, [isPaused, totalWidth, speed]);
-
-  useEffect(() => {
-    if (clips.length > 0) {
-      animationRef.current = requestAnimationFrame(animate);
-    }
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [animate, clips.length]);
-
-  // Touch handlers for swipe
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsPaused(true);
-    touchStartRef.current = e.touches[0].clientX;
-    touchScrollRef.current = scrollPosition;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    const touchDelta = touchStartRef.current - e.touches[0].clientX;
-    let newPos = touchScrollRef.current + touchDelta;
-    
-    // Keep within bounds
-    if (newPos < 0) newPos = totalWidth + newPos;
-    if (newPos >= totalWidth) newPos = newPos - totalWidth;
-    
-    setScrollPosition(newPos);
-  };
-
-  const handleTouchEnd = () => {
-    setIsPaused(false);
-    lastTimeRef.current = 0;
-  };
+  // Calculate animation duration based on number of clips (slower = smoother on mobile)
+  const animationDuration = useMemo(() => {
+    const clipWidth = isMobile ? 160 : 180;
+    const gap = 16;
+    const totalWidth = clips.length * (clipWidth + gap);
+    // Pixels per second: slower on mobile for better performance
+    const speed = isMobile ? 25 : 40;
+    return totalWidth / speed;
+  }, [clips.length, isMobile]);
 
   if (isLoading || clips.length === 0) {
     return null;
   }
 
-  // Duplicate clips for seamless loop
-  const duplicatedClips = [...clips, ...clips, ...clips];
+  // Only duplicate once for seamless loop (reduces iframe count)
+  const duplicatedClips = [...clips, ...clips];
 
   return (
     <section className="py-12 md:py-16 bg-muted/30">
@@ -132,55 +75,95 @@ export const VKClipsSection = () => {
       {/* Carousel container */}
       <div className="container mx-auto px-4">
         <div 
-          ref={containerRef}
-          className="relative overflow-hidden rounded-xl touch-pan-x"
+          className="relative overflow-hidden rounded-xl"
           onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => { setIsPaused(false); lastTimeRef.current = 0; }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
+          onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
         >
           {/* Gradient overlays */}
           <div className="absolute left-0 top-0 bottom-0 w-12 md:w-16 bg-gradient-to-r from-muted/80 to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-12 md:w-16 bg-gradient-to-l from-muted/80 to-transparent z-10 pointer-events-none" />
 
-          {/* Scrolling track */}
+          {/* Scrolling track with CSS animation */}
           <div
-            className="flex gap-4 will-change-transform"
+            className="flex gap-4"
             style={{
-              transform: `translateX(-${scrollPosition}px)`,
               width: 'fit-content',
+              animation: `vk-scroll ${animationDuration}s linear infinite`,
+              animationPlayState: isPaused ? 'paused' : 'running',
             }}
           >
             {duplicatedClips.map((clip, index) => (
-              <a
-                key={`${clip.id}-${index}`}
-                href={clip.vk_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative flex-shrink-0 w-[160px] md:w-[180px] aspect-[9/16] bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105"
-              >
-                <iframe
-                  src={getVKEmbedUrl(clip.vk_url) || ""}
-                  className="w-full h-full pointer-events-none"
-                  allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-                  allowFullScreen
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="absolute bottom-3 left-3 right-3">
-                    {clip.title && (
-                      <p className="text-white text-sm font-medium truncate">
-                        {clip.title}
-                      </p>
-                    )}
-                    <p className="text-white/70 text-xs">Смотреть в VK →</p>
-                  </div>
-                </div>
-              </a>
+              <ClipCard key={`${clip.id}-${index}`} clip={clip} isMobile={isMobile} />
             ))}
           </div>
         </div>
       </div>
+
+      {/* CSS animation keyframes */}
+      <style>{`
+        @keyframes vk-scroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+      `}</style>
     </section>
+  );
+};
+
+// Separate component for lazy loading
+const ClipCard = ({ clip, isMobile }: { clip: VKClip; isMobile: boolean }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  const embedUrl = getVKEmbedUrl(clip.vk_url);
+
+  return (
+    <a
+      href={clip.vk_url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative flex-shrink-0 aspect-[9/16] bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-lg transition-shadow duration-300"
+      style={{ width: isMobile ? 160 : 180 }}
+      onMouseEnter={() => setIsVisible(true)}
+      onTouchStart={() => setIsVisible(true)}
+    >
+      {/* Placeholder until hover/touch */}
+      {!isVisible ? (
+        <div className="w-full h-full flex items-center justify-center bg-muted">
+          <Play className="h-8 w-8 text-muted-foreground" />
+        </div>
+      ) : embedUrl && !hasError ? (
+        <iframe
+          src={embedUrl}
+          className="w-full h-full pointer-events-none"
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+          allowFullScreen
+          loading="lazy"
+          onError={() => setHasError(true)}
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center bg-muted">
+          <Play className="h-8 w-8 text-muted-foreground" />
+        </div>
+      )}
+      
+      {/* Overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute bottom-3 left-3 right-3">
+          {clip.title && (
+            <p className="text-white text-sm font-medium truncate">
+              {clip.title}
+            </p>
+          )}
+          <p className="text-white/70 text-xs">Смотреть в VK →</p>
+        </div>
+      </div>
+    </a>
   );
 };
