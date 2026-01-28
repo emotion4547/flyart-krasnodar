@@ -259,6 +259,47 @@ export type Database = {
         }
         Relationships: []
       }
+      featured_categories: {
+        Row: {
+          category_id: string
+          created_at: string
+          custom_image_url: string | null
+          custom_title: string | null
+          id: string
+          is_active: boolean | null
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          custom_image_url?: string | null
+          custom_title?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          custom_image_url?: string | null
+          custom_title?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "featured_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: true
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string
