@@ -39,7 +39,64 @@ export function CategoriesSection() {
         .order("sort_order", { ascending: true });
 
       if (error) throw error;
-      return data as (FeaturedCategory & { category: { id: string; name: string; slug: string; image_url: string | null } })[];
+      
+      const featured = data as (FeaturedCategory & { category: { id: string; name: string; slug: string; image_url: string | null } })[];
+      
+      // For categories without custom image, fetch random product images
+      const categoriesNeedingImages = featured.filter(
+        fc => !fc.custom_image_url && !fc.category?.image_url
+      );
+      
+      if (categoriesNeedingImages.length === 0) return featured;
+      
+      // Fetch product images for these categories
+      const categoryIds = categoriesNeedingImages.map(fc => fc.category_id);
+      const { data: productCategories } = await supabase
+        .from("product_categories")
+        .select(`
+          category_id,
+          products!inner (
+            id,
+            is_active,
+            product_images (url)
+          )
+        `)
+        .in("category_id", categoryIds);
+      
+      // Build map of category -> random product image
+      const categoryImages = new Map<string, string>();
+      
+      if (productCategories) {
+        const imagesByCat = new Map<string, string[]>();
+        
+        for (const pc of productCategories as any[]) {
+          const product = pc.products;
+          if (!product?.is_active) continue;
+          
+          const images = product.product_images || [];
+          for (const img of images) {
+            if (img?.url) {
+              const existing = imagesByCat.get(pc.category_id) || [];
+              existing.push(img.url);
+              imagesByCat.set(pc.category_id, existing);
+            }
+          }
+        }
+        
+        // Pick random image for each category
+        for (const [catId, urls] of imagesByCat) {
+          if (urls.length > 0) {
+            const randomIndex = Math.floor(Math.random() * urls.length);
+            categoryImages.set(catId, urls[randomIndex]);
+          }
+        }
+      }
+      
+      // Attach random images to featured categories
+      return featured.map(fc => ({
+        ...fc,
+        _randomProductImage: categoryImages.get(fc.category_id) || null
+      }));
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -82,19 +139,9 @@ export function CategoriesSection() {
         string,
         {
           productCount: number;
-          bestImageUrl: string | null;
-          bestImageScore: number;
+          allImages: string[];
         }
       >();
-
-      const scoreImage = (p: any, img: any, categoryId: string) => {
-        const categoryHash = categoryId.charCodeAt(0) + categoryId.charCodeAt(categoryId.length - 1);
-        const mainBonus = img?.is_main ? 10_000 : 0;
-        const imgOrder = typeof img?.sort_order === "number" ? 1_000 - img.sort_order : 0;
-        const productOrder = typeof p?.sort_order === "number" ? 100 - p.sort_order : 0;
-        const varietyBonus = (categoryHash % 5) * 500;
-        return mainBonus + imgOrder + productOrder + varietyBonus;
-      };
 
       if (productCategories) {
         for (const pc of productCategories as any[]) {
@@ -103,20 +150,15 @@ export function CategoriesSection() {
 
           const existing = byCategory.get(pc.category_id) || {
             productCount: 0,
-            bestImageUrl: null,
-            bestImageScore: -1,
+            allImages: [],
           };
 
           existing.productCount += 1;
 
           const images = product.product_images || [];
           for (const img of images) {
-            const url = img?.url;
-            if (!url) continue;
-            const s = scoreImage(product, img, pc.category_id);
-            if (s > existing.bestImageScore) {
-              existing.bestImageScore = s;
-              existing.bestImageUrl = url;
+            if (img?.url) {
+              existing.allImages.push(img.url);
             }
           }
 
@@ -127,11 +169,17 @@ export function CategoriesSection() {
       return cats
         .map((cat) => {
           const meta = byCategory.get(cat.id);
+          // Pick random image if no category image
+          let imageUrl = cat.image_url;
+          if (!imageUrl && meta?.allImages && meta.allImages.length > 0) {
+            const randomIndex = Math.floor(Math.random() * meta.allImages.length);
+            imageUrl = meta.allImages[randomIndex];
+          }
           return {
             id: cat.id,
             name: cat.name,
             slug: cat.slug,
-            imageUrl: cat.image_url || meta?.bestImageUrl || null,
+            imageUrl,
             productCount: meta?.productCount ?? 0,
           };
         })
@@ -148,11 +196,11 @@ export function CategoriesSection() {
   // Use featured if available, otherwise auto
   const useFeatured = featuredCategories && featuredCategories.length > 0;
   const categories = useFeatured
-    ? featuredCategories.map((fc) => ({
+    ? featuredCategories.map((fc: any) => ({
         id: fc.category?.id || fc.category_id,
         name: fc.custom_title || fc.category?.name || "Категория",
         slug: fc.category?.slug || "",
-        imageUrl: fc.custom_image_url || fc.category?.image_url || null,
+        imageUrl: fc.custom_image_url || fc.category?.image_url || fc._randomProductImage || null,
       }))
     : autoCategories || [];
 
