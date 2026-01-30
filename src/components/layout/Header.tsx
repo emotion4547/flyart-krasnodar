@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import logoMuha from "@/assets/logo-muha.png";
 import { Menu, Phone, Clock, ShoppingCart, LayoutGrid, Truck, Shield, Star, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -28,8 +29,8 @@ export function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="relative">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-tiffany to-tiffany-dark flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-lg">F</span>
+              <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-sm">
+                <img src={logoMuha} alt="FlyArt" className="h-9 w-9 object-contain" />
               </div>
               <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-cta animate-pulse" />
             </div>
