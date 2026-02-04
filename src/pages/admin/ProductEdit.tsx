@@ -223,7 +223,7 @@ export default function ProductEdit() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={() => navigate('/admin4547/products')}>
+        <Button variant="ghost" onClick={() => navigate('/admin4547/catalog')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Назад
         </Button>
