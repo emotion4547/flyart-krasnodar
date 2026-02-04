@@ -47,6 +47,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    let currentUserId: string | null = null;
+
     // IMPORTANT: onAuthStateChange callback must stay synchronous to avoid deadlocks.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -54,14 +56,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          setRoleStatus('loading');
-          setTimeout(() => {
-            checkAdminRole(session.user.id).then((status) => {
-              setRoleStatus(status);
-              setIsLoading(false);
-            });
-          }, 0);
+          // Only re-check role if user changed (not on token refresh)
+          if (currentUserId !== session.user.id) {
+            currentUserId = session.user.id;
+            setRoleStatus('loading');
+            setTimeout(() => {
+              checkAdminRole(session.user.id).then((status) => {
+                setRoleStatus(status);
+                setIsLoading(false);
+              });
+            }, 0);
+          }
         } else {
+          currentUserId = null;
           setRoleStatus('not-admin');
           setIsLoading(false);
         }
@@ -73,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
 
       if (session?.user) {
+        currentUserId = session.user.id;
         setRoleStatus('loading');
         checkAdminRole(session.user.id).then((status) => {
           setRoleStatus(status);
