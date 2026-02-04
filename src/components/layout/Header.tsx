@@ -28,8 +28,8 @@ export function Header() {
         <div className="flex h-16 md:h-20 items-center justify-between gap-4">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-tiffany to-tiffany-dark flex items-center justify-center overflow-hidden shadow-sm">
-              <img src={logoMuha} alt="FlyArt" className="h-9 w-9 object-contain" />
+            <div className="relative h-10 w-10 rounded-full bg-gradient-to-br from-tiffany to-tiffany-dark flex items-center justify-center shadow-sm">
+              <img src={logoMuha} alt="FlyArt" className="absolute h-12 w-12 object-contain -top-1" />
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold text-foreground tracking-tight">FlyArt</span>
