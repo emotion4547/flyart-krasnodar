@@ -93,6 +93,8 @@ function AppContent() {
         <Route path="/admin4547/login" element={<AdminLogin />} />
         <Route path="/admin4547" element={<AdminLayout><Dashboard /></AdminLayout>} />
         <Route path="/admin4547/catalog" element={<AdminLayout><CatalogHub /></AdminLayout>} />
+        <Route path="/admin4547/products/new" element={<AdminLayout><ProductEdit /></AdminLayout>} />
+        <Route path="/admin4547/products/:id" element={<AdminLayout><ProductEdit /></AdminLayout>} />
         <Route path="/admin4547/catalog/:id" element={<AdminLayout><ProductEdit /></AdminLayout>} />
         <Route path="/admin4547/orders" element={<AdminLayout><Orders /></AdminLayout>} />
         <Route path="/admin4547/clients" element={<AdminLayout><ClientsHub /></AdminLayout>} />
