@@ -13,6 +13,7 @@ import { ShoppingCart, Minus, Plus, Check, Truck, Shield, Gift, MapPin, CreditCa
 import { useState } from "react";
 import { SEO } from "@/components/SEO";
 import { ProductSchema } from "@/components/ProductSchema";
+import { getProductDetailImage, getProductThumbnail } from "@/lib/imageOptimization";
 
 const Product = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -213,7 +214,7 @@ const Product = () => {
               {/* Main image */}
               <div className="aspect-square rounded-2xl overflow-hidden bg-card border border-border/50">
                 <img
-                  src={mainImage?.url || "/placeholder.svg"}
+                  src={getProductDetailImage(mainImage?.url || "/placeholder.svg")}
                   alt={mainImage?.alt_text || product.title}
                   loading="eager"
                   className="w-full h-full object-cover"
@@ -234,7 +235,7 @@ const Product = () => {
                       }`}
                     >
                       <img
-                        src={image.url}
+                        src={getProductThumbnail(image.url)}
                         alt={image.alt_text || `${product.title} - ${index + 1}`}
                         loading="lazy"
                         decoding="async"
