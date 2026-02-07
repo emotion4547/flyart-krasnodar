@@ -259,6 +259,90 @@ export type Database = {
         }
         Relationships: []
       }
+      coupon_uses: {
+        Row: {
+          coupon_id: string
+          created_at: string
+          id: string
+          order_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          coupon_id: string
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          coupon_id?: string
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_uses_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coupon_uses_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          id: string
+          is_active: boolean
+          max_uses: number | null
+          min_order_amount: number | null
+          updated_at: string
+          used_count: number
+          valid_from: string | null
+          valid_to: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          discount_type: string
+          discount_value: number
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_order_amount?: number | null
+          updated_at?: string
+          used_count?: number
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_order_amount?: number | null
+          updated_at?: string
+          used_count?: number
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Relationships: []
+      }
       featured_categories: {
         Row: {
           category_id: string
@@ -370,6 +454,7 @@ export type Database = {
           subtotal: number
           total: number
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           comment?: string | null
@@ -389,6 +474,7 @@ export type Database = {
           subtotal: number
           total: number
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           comment?: string | null
@@ -408,6 +494,7 @@ export type Database = {
           subtotal?: number
           total?: number
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -449,6 +536,57 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      pending_wheel_spins: {
+        Row: {
+          created_at: string
+          discount_type: string | null
+          discount_value: number | null
+          expires_at: string
+          gift_product_id: string | null
+          id: string
+          prize_type: string
+          segment_id: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          discount_type?: string | null
+          discount_value?: number | null
+          expires_at?: string
+          gift_product_id?: string | null
+          id?: string
+          prize_type: string
+          segment_id: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          discount_type?: string | null
+          discount_value?: number | null
+          expires_at?: string
+          gift_product_id?: string | null
+          id?: string
+          prize_type?: string
+          segment_id?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_wheel_spins_gift_product_id_fkey"
+            columns: ["gift_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pending_wheel_spins_segment_id_fkey"
+            columns: ["segment_id"]
+            isOneToOne: false
+            referencedRelation: "wheel_segments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_categories: {
         Row: {
@@ -617,6 +755,7 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          phone: string | null
           role: string
           updated_at: string
         }
@@ -625,6 +764,7 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
+          phone?: string | null
           role?: string
           updated_at?: string
         }
@@ -633,6 +773,7 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          phone?: string | null
           role?: string
           updated_at?: string
         }
@@ -704,6 +845,149 @@ export type Database = {
         }
         Relationships: []
       }
+      user_addresses: {
+        Row: {
+          apartment: string | null
+          city: string
+          created_at: string
+          entrance: string | null
+          floor: string | null
+          house: string
+          id: string
+          intercom: string | null
+          is_default: boolean
+          street: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          apartment?: string | null
+          city: string
+          created_at?: string
+          entrance?: string | null
+          floor?: string | null
+          house: string
+          id?: string
+          intercom?: string | null
+          is_default?: boolean
+          street: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          apartment?: string | null
+          city?: string
+          created_at?: string
+          entrance?: string | null
+          floor?: string | null
+          house?: string
+          id?: string
+          intercom?: string | null
+          is_default?: boolean
+          street?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_coupons: {
+        Row: {
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          expires_at: string
+          gift_product_id: string | null
+          gift_product_image: string | null
+          gift_product_name: string | null
+          id: string
+          is_used: boolean
+          order_id: string | null
+          prize_type: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          discount_type: string
+          discount_value: number
+          expires_at?: string
+          gift_product_id?: string | null
+          gift_product_image?: string | null
+          gift_product_name?: string | null
+          id?: string
+          is_used?: boolean
+          order_id?: string | null
+          prize_type?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string
+          gift_product_id?: string | null
+          gift_product_image?: string | null
+          gift_product_name?: string | null
+          id?: string
+          is_used?: boolean
+          order_id?: string | null
+          prize_type?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_coupons_gift_product_id_fkey"
+            columns: ["gift_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_coupons_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -724,6 +1008,45 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_wheel_spins: {
+        Row: {
+          coupon_id: string | null
+          id: string
+          segment_id: string | null
+          spun_at: string
+          user_id: string
+        }
+        Insert: {
+          coupon_id?: string | null
+          id?: string
+          segment_id?: string | null
+          spun_at?: string
+          user_id: string
+        }
+        Update: {
+          coupon_id?: string | null
+          id?: string
+          segment_id?: string | null
+          spun_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_wheel_spins_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "user_coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_wheel_spins_segment_id_fkey"
+            columns: ["segment_id"]
+            isOneToOne: false
+            referencedRelation: "wheel_segments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vk_clips: {
         Row: {
@@ -754,6 +1077,59 @@ export type Database = {
           vk_url?: string
         }
         Relationships: []
+      }
+      wheel_segments: {
+        Row: {
+          color: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          gift_product_id: string | null
+          id: string
+          is_active: boolean
+          label: string
+          prize_type: string
+          probability: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          discount_type?: string
+          discount_value: number
+          gift_product_id?: string | null
+          id?: string
+          is_active?: boolean
+          label: string
+          prize_type?: string
+          probability?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          gift_product_id?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string
+          prize_type?: string
+          probability?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wheel_segments_gift_product_id_fkey"
+            columns: ["gift_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

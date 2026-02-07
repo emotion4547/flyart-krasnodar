@@ -7,6 +7,8 @@ import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/hooks/useAuth";
 import { FloatingContactButton } from "@/components/FloatingContactButton";
 import { PWAInstallBanner } from "@/components/PWAInstallBanner";
+import { FortuneWheelTrigger } from "@/components/wheel/FortuneWheelTrigger";
+import { PendingSpinHandler } from "@/components/wheel/PendingSpinHandler";
 
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { toast } from "sonner";
@@ -27,6 +29,15 @@ import DesignSystem from "./pages/DesignSystem";
 import Sitemap from "./pages/Sitemap";
 import Collection from "./pages/Collection";
 
+// Auth & Account pages
+import Auth from "./pages/Auth";
+import Profile from "./pages/account/Profile";
+import AccountOrders from "./pages/account/Orders";
+import AccountAddresses from "./pages/account/Addresses";
+import AccountCoupons from "./pages/account/Coupons";
+import AccountFavorites from "./pages/account/Favorites";
+import AccountSettings from "./pages/account/Settings";
+
 // Admin pages
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -38,6 +49,8 @@ import Settings from "./pages/admin/Settings";
 import CatalogHub from "./pages/admin/CatalogHub";
 import ClientsHub from "./pages/admin/ClientsHub";
 import ContentHub from "./pages/admin/ContentHub";
+import AdminWheelContent from "./pages/admin/AdminWheelContent";
+import AdminCouponsContent from "./pages/admin/AdminCouponsContent";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -89,6 +102,17 @@ function AppContent() {
         <Route path="/collection/:slug" element={<Collection />} />
         <Route path="/design-system" element={<DesignSystem />} />
         
+        {/* Auth routes */}
+        <Route path="/auth" element={<Auth />} />
+        
+        {/* Account routes */}
+        <Route path="/account" element={<Profile />} />
+        <Route path="/account/orders" element={<AccountOrders />} />
+        <Route path="/account/addresses" element={<AccountAddresses />} />
+        <Route path="/account/coupons" element={<AccountCoupons />} />
+        <Route path="/account/favorites" element={<AccountFavorites />} />
+        <Route path="/account/settings" element={<AccountSettings />} />
+        
         {/* Admin routes */}
         <Route path="/admin4547/login" element={<AdminLogin />} />
         <Route path="/admin4547" element={<AdminLayout><Dashboard /></AdminLayout>} />
@@ -100,6 +124,8 @@ function AppContent() {
         <Route path="/admin4547/clients" element={<AdminLayout><ClientsHub /></AdminLayout>} />
         <Route path="/admin4547/content" element={<AdminLayout><ContentHub /></AdminLayout>} />
         <Route path="/admin4547/marketing" element={<AdminLayout><Marketing /></AdminLayout>} />
+        <Route path="/admin4547/wheel" element={<AdminLayout><AdminWheelContent /></AdminLayout>} />
+        <Route path="/admin4547/coupons" element={<AdminLayout><AdminCouponsContent /></AdminLayout>} />
         <Route path="/admin4547/settings" element={<AdminLayout><Settings /></AdminLayout>} />
         
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
@@ -109,6 +135,8 @@ function AppContent() {
         <>
           <FloatingContactButton />
           <PWAInstallBanner />
+          <FortuneWheelTrigger />
+          <PendingSpinHandler />
         </>
       )}
     </>
