@@ -161,12 +161,8 @@ const AdminCouponsContent = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Промокоды</h1>
-          <p className="text-muted-foreground">Управление скидочными кодами</p>
-        </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
