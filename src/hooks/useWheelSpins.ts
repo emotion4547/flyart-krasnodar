@@ -11,7 +11,7 @@ interface WheelSegment {
   label: string;
   discount_type: 'percentage' | 'fixed';
   discount_value: number;
-  prize_type: 'discount' | 'gift' | 'nothing';
+  prize_type: 'discount' | 'gift';
   gift_product_id: string | null;
   probability: number;
   color: string;

@@ -20,7 +20,7 @@ interface WheelSegment {
   label: string;
   discount_type: 'percentage' | 'fixed';
   discount_value: number;
-  prize_type: 'discount' | 'gift' | 'nothing';
+  prize_type: 'discount' | 'gift';
   gift_product_id: string | null;
   probability: number;
   color: string;
@@ -35,11 +35,6 @@ export function FortuneWheelDialog({ open, onOpenChange }: FortuneWheelDialogPro
   const [copiedCode, setCopiedCode] = useState(false);
 
   const handleSpinEnd = async (segment: WheelSegment) => {
-    if (segment.prize_type === 'nothing') {
-      setResult({ segment });
-      return;
-    }
-
     if (user) {
       // Авторизованный пользователь
       const spinResult = await recordSpin(segment);
@@ -138,26 +133,12 @@ export function FortuneWheelDialog({ open, onOpenChange }: FortuneWheelDialogPro
             </>
           ) : (
             <div className="py-4">
-              {result.segment.prize_type === 'nothing' ? (
-                <>
-                  <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                    <span className="text-4xl">😢</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">
-                    Не повезло...
-                  </h3>
-                  <p className="text-muted-foreground mb-6">
-                    Попробуйте ещё раз через 15 дней!
-                  </p>
-                </>
-              ) : (
-                <>
-                  <div className="h-20 w-20 rounded-full bg-tiffany-light flex items-center justify-center mx-auto mb-4">
-                    <PartyPopper className="h-10 w-10 text-tiffany" />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">
-                    Поздравляем! 🎉
-                  </h3>
+              <div className="h-20 w-20 rounded-full bg-tiffany-light flex items-center justify-center mx-auto mb-4">
+                <PartyPopper className="h-10 w-10 text-tiffany" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground mb-2">
+                Поздравляем! 🎉
+              </h3>
                   
                   <div className="bg-gradient-to-r from-tiffany-light to-gold-light rounded-2xl p-4 mb-4">
                     <div className="flex items-center justify-center gap-2 mb-2">
@@ -180,33 +161,33 @@ export function FortuneWheelDialog({ open, onOpenChange }: FortuneWheelDialogPro
                     </p>
                   </div>
 
-                  {result.couponCode ? (
-                    <>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Ваш промокод:
-                      </p>
-                      <div className="flex items-center gap-2 bg-muted rounded-lg p-3 mb-4">
-                        <code className="flex-1 font-mono text-lg font-bold text-foreground">
-                          {result.couponCode}
-                        </code>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={copyCode}
-                        >
-                          {copiedCode ? (
-                            <Check className="h-5 w-5 text-green-500" />
-                          ) : (
-                            <Copy className="h-5 w-5" />
-                          )}
-                        </Button>
-                      </div>
-                      <p className="text-xs text-muted-foreground mb-4">
-                        Купон действует 30 дней. Найти его можно в личном кабинете.
-                      </p>
-                    </>
-                  ) : (
-                    <div className="mb-4">
+              {result.couponCode ? (
+                <>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Ваш промокод:
+                  </p>
+                  <div className="flex items-center gap-2 bg-muted rounded-lg p-3 mb-4">
+                    <code className="flex-1 font-mono text-lg font-bold text-foreground">
+                      {result.couponCode}
+                    </code>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={copyCode}
+                    >
+                      {copiedCode ? (
+                        <Check className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <Copy className="h-5 w-5" />
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Купон действует 30 дней. Найти его можно в личном кабинете.
+                  </p>
+                </>
+              ) : (
+                <div className="mb-4">
                       <p className="text-sm text-muted-foreground mb-3">
                         Войдите, чтобы получить промокод
                       </p>
@@ -215,9 +196,7 @@ export function FortuneWheelDialog({ open, onOpenChange }: FortuneWheelDialogPro
                           Войти и получить
                         </Button>
                       </Link>
-                    </div>
-                  )}
-                </>
+                </div>
               )}
 
               <Button variant="outline" onClick={handleClose} className="w-full">

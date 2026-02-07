@@ -23,12 +23,6 @@ export function PendingSpinHandler() {
         const segment = segments.find(s => s.id === pending.segment_id);
         if (!segment) return;
 
-        // Skip if it was "nothing"
-        if (pending.prize_type === 'nothing') {
-          toast.info('Ваш предыдущий результат: "Попробуй ещё"');
-          return;
-        }
-
         // Generate coupon code
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         let couponCode = 'WHEEL-';
