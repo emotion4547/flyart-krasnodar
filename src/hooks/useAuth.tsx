@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { useState, useEffect, useRef, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -22,6 +22,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [roleStatus, setRoleStatus] = useState<RoleStatus>('loading');
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Use ref to track current user ID across auth state changes
+  // This prevents unnecessary role re-checks on token refreshes
+  const currentUserIdRef = useRef<string | null>(null);
+  const roleCheckCompleteRef = useRef(false);
 
   const checkAdminRole = async (userId: string): Promise<RoleStatus> => {
     try {
@@ -47,28 +52,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    let currentUserId: string | null = null;
+    let isMounted = true;
 
     // IMPORTANT: onAuthStateChange callback must stay synchronous to avoid deadlocks.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!isMounted) return;
+        
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          // Only re-check role if user changed (not on token refresh)
-          if (currentUserId !== session.user.id) {
-            currentUserId = session.user.id;
+          // CRITICAL: Only re-check role if user actually changed (different user ID)
+          // Token refreshes (TOKEN_REFRESHED event) should NOT trigger role re-check
+          const isNewUser = currentUserIdRef.current !== session.user.id;
+          
+          if (isNewUser) {
+            currentUserIdRef.current = session.user.id;
+            roleCheckCompleteRef.current = false;
             setRoleStatus('loading');
+            
             setTimeout(() => {
+              if (!isMounted) return;
               checkAdminRole(session.user.id).then((status) => {
-                setRoleStatus(status);
-                setIsLoading(false);
+                if (isMounted) {
+                  setRoleStatus(status);
+                  roleCheckCompleteRef.current = true;
+                  setIsLoading(false);
+                }
               });
             }, 0);
+          } else if (!roleCheckCompleteRef.current) {
+            // Same user but role check not complete yet - don't change anything
+            // This handles the case where getSession and onAuthStateChange race
+          } else {
+            // Same user, role already checked - just update loading state if needed
+            setIsLoading(false);
           }
         } else {
-          currentUserId = null;
+          currentUserIdRef.current = null;
+          roleCheckCompleteRef.current = false;
           setRoleStatus('not-admin');
           setIsLoading(false);
         }
@@ -76,23 +99,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!isMounted) return;
+      
       setSession(session);
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        currentUserId = session.user.id;
-        setRoleStatus('loading');
-        checkAdminRole(session.user.id).then((status) => {
-          setRoleStatus(status);
-          setIsLoading(false);
-        });
+        // Only check role if we haven't already (from onAuthStateChange)
+        if (currentUserIdRef.current !== session.user.id) {
+          currentUserIdRef.current = session.user.id;
+          roleCheckCompleteRef.current = false;
+          setRoleStatus('loading');
+          
+          checkAdminRole(session.user.id).then((status) => {
+            if (isMounted) {
+              setRoleStatus(status);
+              roleCheckCompleteRef.current = true;
+              setIsLoading(false);
+            }
+          });
+        }
       } else {
         setRoleStatus('not-admin');
         setIsLoading(false);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
