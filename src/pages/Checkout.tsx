@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,17 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/hooks/useSettings";
+import { useUserAddresses } from "@/hooks/useUserAddresses";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingBag, ArrowLeft, Check, Loader2, CreditCard, Banknote, Globe } from "lucide-react";
+import { ShoppingBag, ArrowLeft, Check, Loader2, CreditCard, Banknote, Globe, MapPin, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { z } from "zod";
 
 interface PaymentSettings {
@@ -55,9 +63,12 @@ const Checkout = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
+  const { addresses, isLoading: addressesLoading } = useUserAddresses();
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [paymentMethod, setPaymentMethod] = useState<string>("card");
+  const [selectedAddress, setSelectedAddress] = useState<string>("");
 
   // Get discount from cart page
   const discount = (location.state as { discount?: number })?.discount || 0;
@@ -381,6 +392,67 @@ ${data.comment ? `💬 Комментарий: ${data.comment}` : ""}
                     Доставка
                   </h2>
                   <div className="space-y-4">
+                    {/* Saved addresses dropdown */}
+                    {user && !addressesLoading && addresses.length > 0 && (
+                      <div className="space-y-2">
+                        <Label>Сохранённые адреса</Label>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button 
+                              variant="outline" 
+                              className="w-full justify-between text-left font-normal"
+                            >
+                              <span className="flex items-center gap-2 truncate">
+                                <MapPin className="h-4 w-4 shrink-0 text-tiffany" />
+                                {selectedAddress ? (
+                                  <span className="truncate">
+                                    {addresses.find(a => a.id === selectedAddress)?.title || 'Выбранный адрес'}
+                                  </span>
+                                ) : (
+                                  <span className="text-muted-foreground">Выбрать из сохранённых</span>
+                                )}
+                              </span>
+                              <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]">
+                            {addresses.map((addr) => {
+                              const fullAddress = `${addr.city}, ${addr.street}, д. ${addr.house}${addr.apartment ? `, кв. ${addr.apartment}` : ''}`;
+                              return (
+                                <DropdownMenuItem
+                                  key={addr.id}
+                                  onClick={() => {
+                                    setSelectedAddress(addr.id);
+                                    // Fill the textarea with the formatted address
+                                    const textarea = document.getElementById('address') as HTMLTextAreaElement;
+                                    if (textarea) {
+                                      let addressText = `${addr.city}, ${addr.street}, д. ${addr.house}`;
+                                      if (addr.apartment) addressText += `, кв. ${addr.apartment}`;
+                                      if (addr.entrance) addressText += `, подъезд ${addr.entrance}`;
+                                      if (addr.floor) addressText += `, этаж ${addr.floor}`;
+                                      if (addr.intercom) addressText += `, домофон ${addr.intercom}`;
+                                      textarea.value = addressText;
+                                    }
+                                  }}
+                                  className="flex flex-col items-start gap-1 cursor-pointer"
+                                >
+                                  <span className="font-medium flex items-center gap-2">
+                                    {addr.title}
+                                    {addr.is_default && (
+                                      <span className="text-xs bg-tiffany-light text-tiffany px-1.5 py-0.5 rounded">
+                                        По умолчанию
+                                      </span>
+                                    )}
+                                  </span>
+                                  <span className="text-sm text-muted-foreground">{fullAddress}</span>
+                                </DropdownMenuItem>
+                              );
+                            })}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    )}
+                    
                     <div className="space-y-2">
                       <Label htmlFor="address">Адрес доставки *</Label>
                       <Textarea
