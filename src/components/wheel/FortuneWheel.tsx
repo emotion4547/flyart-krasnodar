@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface WheelSegment {
   id: string;
@@ -40,26 +40,26 @@ export function FortuneWheel({ segments, onSpinEnd, isSpinning, setIsSpinning }:
     const selectedSegment = segments[selectedIndex];
     const segmentAngle = 360 / segments.length;
     
-    // Calculate target angle (center of segment)
+    // Calculate target angle (center of segment, pointer at top = 0°)
     const targetAngle = 360 - (selectedIndex * segmentAngle + segmentAngle / 2);
     
-    // Add 5-7 full rotations
-    const spins = 5 + Math.floor(Math.random() * 3);
+    // Add 6-9 full rotations for dramatic effect
+    const spins = 6 + Math.floor(Math.random() * 4);
     const finalRotation = rotation + (spins * 360) + targetAngle + (Math.random() * 10 - 5);
 
     setRotation(finalRotation);
 
-    // Notify when done
+    // Notify when done (match animation duration)
     setTimeout(() => {
       setIsSpinning(false);
       onSpinEnd(selectedSegment);
-    }, 4500);
+    }, 5000);
   }, [isSpinning, segments, rotation, onSpinEnd, setIsSpinning]);
 
   const segmentAngle = 360 / segments.length;
-  const radius = 150;
-  const centerX = 160;
-  const centerY = 160;
+  const radius = 140;
+  const centerX = 150;
+  const centerY = 150;
 
   // Create SVG path for segment
   const createSegmentPath = (index: number) => {
@@ -76,15 +76,27 @@ export function FortuneWheel({ segments, onSpinEnd, isSpinning, setIsSpinning }:
     return `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
   };
 
-  // Calculate text position for segment
-  const getTextPosition = (index: number) => {
-    const midAngle = ((index + 0.5) * segmentAngle - 90) * (Math.PI / 180);
-    const textRadius = radius * 0.65;
-    return {
-      x: centerX + textRadius * Math.cos(midAngle),
-      y: centerY + textRadius * Math.sin(midAngle),
-      rotation: (index + 0.5) * segmentAngle,
-    };
+  // Calculate text position and rotation for segment (text along radius)
+  const getTextTransform = (index: number) => {
+    const midAngle = (index + 0.5) * segmentAngle - 90;
+    const textRadius = radius * 0.6;
+    const angleRad = midAngle * (Math.PI / 180);
+    const x = centerX + textRadius * Math.cos(angleRad);
+    const y = centerY + textRadius * Math.sin(angleRad);
+    
+    // Rotate text to be readable (flip if on left side)
+    let textRotation = midAngle + 90;
+    if (midAngle > 0 && midAngle < 180) {
+      textRotation += 180;
+    }
+    
+    return { x, y, rotation: textRotation };
+  };
+
+  // Truncate long labels
+  const truncateLabel = (label: string, maxLen: number = 10) => {
+    if (label.length <= maxLen) return label;
+    return label.slice(0, maxLen - 1) + '…';
   };
 
   return (
@@ -92,33 +104,39 @@ export function FortuneWheel({ segments, onSpinEnd, isSpinning, setIsSpinning }:
       {/* Wheel */}
       <div className="relative">
         {/* Pointer */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-10">
-          <div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[20px] border-t-gold drop-shadow-lg" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 z-10">
+          <div className="w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[24px] border-t-gold drop-shadow-lg" />
         </div>
 
+        {/* Outer glow ring */}
+        <div className="absolute inset-[-8px] rounded-full bg-gradient-to-b from-gold/20 to-gold/5 blur-sm" />
+        
         {/* Outer ring */}
-        <div className="absolute inset-0 rounded-full border-8 border-gold/30 shadow-2xl" />
+        <div className="absolute inset-0 rounded-full border-[6px] border-gold/40 shadow-xl" />
 
-        <svg width="320" height="320" viewBox="0 0 320 320">
+        <svg width="300" height="300" viewBox="0 0 300 300">
           <defs>
             <filter id="wheelShadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="4" stdDeviation="8" floodOpacity="0.3" />
+              <feDropShadow dx="0" dy="2" stdDeviation="4" floodOpacity="0.2" />
+            </filter>
+            <filter id="innerShadow">
+              <feDropShadow dx="0" dy="1" stdDeviation="2" floodOpacity="0.3" />
             </filter>
           </defs>
 
           <motion.g
             ref={wheelRef}
-            style={{ originX: '160px', originY: '160px' }}
+            style={{ originX: '150px', originY: '150px' }}
             animate={{ rotate: rotation }}
             transition={{
-              duration: 4,
-              ease: [0.17, 0.67, 0.12, 0.99],
+              duration: 5,
+              ease: [0.25, 0.1, 0.25, 1], // Smooth cubic-bezier
             }}
             filter="url(#wheelShadow)"
           >
             {/* Segments */}
             {segments.map((segment, index) => {
-              const textPos = getTextPosition(index);
+              const textTransform = getTextTransform(index);
               return (
                 <g key={segment.id}>
                   <path
@@ -128,35 +146,33 @@ export function FortuneWheel({ segments, onSpinEnd, isSpinning, setIsSpinning }:
                     strokeWidth="2"
                   />
                   <text
-                    x={textPos.x}
-                    y={textPos.y}
+                    x={textTransform.x}
+                    y={textTransform.y}
                     textAnchor="middle"
                     dominantBaseline="middle"
                     fill="white"
-                    fontSize="14"
-                    fontWeight="bold"
+                    fontSize="11"
+                    fontWeight="600"
                     style={{
-                      textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+                      textShadow: '1px 1px 2px rgba(0,0,0,0.6)',
                     }}
-                    transform={`rotate(${textPos.rotation}, ${textPos.x}, ${textPos.y})`}
+                    transform={`rotate(${textTransform.rotation}, ${textTransform.x}, ${textTransform.y})`}
                   >
-                    {segment.label}
+                    {truncateLabel(segment.label)}
                   </text>
                 </g>
               );
             })}
 
             {/* Center circle */}
-            <circle cx={centerX} cy={centerY} r="30" fill="white" stroke="#e0e0e0" strokeWidth="2" />
-            <circle cx={centerX} cy={centerY} r="25" fill="linear-gradient(135deg, #f8f8f8, #e0e0e0)" />
+            <circle cx={centerX} cy={centerY} r="28" fill="white" stroke="#e5e7eb" strokeWidth="3" filter="url(#innerShadow)" />
+            <circle cx={centerX} cy={centerY} r="22" fill="#fafafa" />
             <text
               x={centerX}
               y={centerY}
               textAnchor="middle"
               dominantBaseline="middle"
-              fontSize="12"
-              fontWeight="bold"
-              fill="#333"
+              fontSize="16"
             >
               🎡
             </text>
@@ -168,7 +184,7 @@ export function FortuneWheel({ segments, onSpinEnd, isSpinning, setIsSpinning }:
       <motion.button
         onClick={spin}
         disabled={isSpinning || segments.length === 0}
-        className="mt-6 px-8 py-3 bg-gradient-to-r from-gold to-gold-dark text-white font-bold rounded-full shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-xl transition-shadow"
+        className="mt-6 px-8 py-3 bg-gradient-to-r from-gold to-gold-dark text-white font-bold rounded-full shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-xl transition-all"
         whileHover={{ scale: isSpinning ? 1 : 1.05 }}
         whileTap={{ scale: isSpinning ? 1 : 0.95 }}
       >
