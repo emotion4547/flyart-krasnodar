@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ImageUploader } from '@/components/admin/ImageUploader';
+import { MultiImageUploader, ProductImage } from '@/components/admin/MultiImageUploader';
 import { toast } from 'sonner';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
@@ -49,7 +49,7 @@ export default function ProductEdit() {
   });
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [imageUrl, setImageUrl] = useState('');
+  const [productImages, setProductImages] = useState<ProductImage[]>([]);
 
   const { data: product, isLoading: loadingProduct } = useQuery({
     queryKey: ['admin-product', id],
@@ -114,8 +114,16 @@ export default function ProductEdit() {
         setSelectedCategories(product.product_categories.map((pc: any) => pc.category_id));
       }
       if (product.product_images && product.product_images.length > 0) {
-        const main = product.product_images.find((img: any) => img.is_main);
-        setImageUrl(main?.url || product.product_images[0]?.url || '');
+        setProductImages(
+          product.product_images
+            .sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0))
+            .map((img: any) => ({
+              id: img.id,
+              url: img.url,
+              is_main: img.is_main || false,
+              sort_order: img.sort_order || 0,
+            }))
+        );
       }
     }
   }, [product]);
@@ -177,14 +185,16 @@ export default function ProductEdit() {
         await supabase.from('product_categories').insert(categoryInserts);
       }
 
-      // Update main image
-      if (imageUrl) {
-        await supabase.from('product_images').delete().eq('product_id', productId);
-        await supabase.from('product_images').insert({
+      // Update images
+      await supabase.from('product_images').delete().eq('product_id', productId);
+      if (productImages.length > 0) {
+        const imageInserts = productImages.map((img, idx) => ({
           product_id: productId,
-          url: imageUrl,
-          is_main: true,
-        });
+          url: img.url,
+          is_main: img.is_main,
+          sort_order: idx,
+        }));
+        await supabase.from('product_images').insert(imageInserts);
       }
 
       return productId;
@@ -332,11 +342,12 @@ export default function ProductEdit() {
                   />
                 </div>
 
-                <ImageUploader
-                  value={imageUrl}
-                  onChange={setImageUrl}
+                <MultiImageUploader
+                  images={productImages}
+                  onChange={setProductImages}
                   folder="products"
-                  label="Изображение товара"
+                  label="Изображения товара (до 10)"
+                  maxImages={10}
                 />
               </CardContent>
             </Card>
