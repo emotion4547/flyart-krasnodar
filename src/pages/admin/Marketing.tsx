@@ -6,9 +6,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Save, Code, FileText, Globe, Target } from 'lucide-react';
+import { Save, Code, FileText, Globe, Target, Ticket } from 'lucide-react';
 import { useSettings } from '@/hooks/useSettings';
 import AdminWheelContent from './AdminWheelContent';
+import AdminPromoCodesHub from './AdminPromoCodesHub';
 interface SeoTemplates {
   productTitle: string;
   productDescription: string;
@@ -93,18 +94,26 @@ export default function Marketing() {
       </div>
 
       <Tabs defaultValue="wheel" className="space-y-6">
-        <TabsList>
+        <TabsList className="flex-wrap h-auto gap-1">
           <TabsTrigger value="wheel" className="flex items-center gap-2">
             <Target className="h-4 w-4" />
-            Колесо Фортуны
+            Колесо
           </TabsTrigger>
-          <TabsTrigger value="templates">Шаблоны SEO</TabsTrigger>
+          <TabsTrigger value="promos" className="flex items-center gap-2">
+            <Ticket className="h-4 w-4" />
+            Промокоды
+          </TabsTrigger>
+          <TabsTrigger value="templates">SEO</TabsTrigger>
           <TabsTrigger value="robots">robots.txt</TabsTrigger>
           <TabsTrigger value="analytics">Аналитика</TabsTrigger>
         </TabsList>
 
         <TabsContent value="wheel">
           <AdminWheelContent />
+        </TabsContent>
+
+        <TabsContent value="promos">
+          <AdminPromoCodesHub />
         </TabsContent>
 
         <TabsContent value="templates" className="space-y-6">
