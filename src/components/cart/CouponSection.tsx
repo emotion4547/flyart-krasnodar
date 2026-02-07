@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 
 interface CouponSectionProps {
   orderTotal: number;
-  onDiscountChange: (discount: number, couponCode: string | null, giftProduct?: { id: string; title: string; image: string } | null) => void;
+  onDiscountChange: (discount: number, couponCode: string | null, giftProduct?: { id: string; title: string; image: string } | null, userCouponId?: string | null) => void;
 }
 
 export function CouponSection({ orderTotal, onDiscountChange }: CouponSectionProps) {
@@ -28,7 +28,8 @@ export function CouponSection({ orderTotal, onDiscountChange }: CouponSectionPro
     const result = await applyCoupon(promoCode.trim(), orderTotal, user?.id);
     if (result.success && result.appliedCoupon) {
       const discount = calculateDiscountFromCoupon(result.appliedCoupon, orderTotal);
-      onDiscountChange(discount, promoCode.trim(), null);
+      // For admin coupons, no userCouponId
+      onDiscountChange(discount, promoCode.trim(), null, null);
       setPromoCode('');
     }
   };
@@ -42,10 +43,10 @@ export function CouponSection({ orderTotal, onDiscountChange }: CouponSectionPro
           id: selectedCoupon.gift_product_id,
           title: selectedCoupon.gift_product_name || 'Подарок',
           image: selectedCoupon.gift_product_image || '',
-        });
+        }, selectedCoupon.id);
       } else if (result.appliedCoupon) {
         const discount = calculateDiscountFromCoupon(result.appliedCoupon, orderTotal);
-        onDiscountChange(discount, couponCode, null);
+        onDiscountChange(discount, couponCode, null, selectedCoupon?.id || null);
       }
     }
   };

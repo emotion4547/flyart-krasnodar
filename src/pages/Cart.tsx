@@ -18,6 +18,7 @@ const Cart = () => {
   
   const [discount, setDiscount] = useState(0);
   const [appliedCouponCode, setAppliedCouponCode] = useState<string | null>(null);
+  const [appliedUserCouponId, setAppliedUserCouponId] = useState<string | null>(null);
   const [giftProduct, setGiftProduct] = useState<{ id: string; title: string; image: string } | null>(null);
 
   // Check for available coupons notification
@@ -34,10 +35,12 @@ const Cart = () => {
   const handleDiscountChange = (
     newDiscount: number, 
     couponCode: string | null, 
-    gift?: { id: string; title: string; image: string } | null
+    gift?: { id: string; title: string; image: string } | null,
+    userCouponId?: string | null
   ) => {
     setDiscount(newDiscount);
     setAppliedCouponCode(couponCode);
+    setAppliedUserCouponId(userCouponId || null);
     if (gift) {
       setGiftProduct(gift);
       // Add gift to cart with price 0
@@ -237,7 +240,7 @@ const Cart = () => {
                   </span>
                 </div>
 
-                <Link to="/checkout" state={{ discount, appliedCouponCode }} className="block">
+                <Link to="/checkout" state={{ discount, appliedCouponCode, appliedUserCouponId }} className="block">
                   <Button variant="cta" size="lg" className="w-full">
                     Оформить заказ
                     <ArrowRight className="h-4 w-4 ml-2" />
