@@ -73,6 +73,7 @@ const Checkout = () => {
   // Get discount from cart page
   const discount = (location.state as { discount?: number })?.discount || 0;
   const appliedCouponCode = (location.state as { appliedCouponCode?: string })?.appliedCouponCode || null;
+  const appliedUserCouponId = (location.state as { appliedUserCouponId?: string })?.appliedUserCouponId || null;
   const finalTotal = Math.max(0, totalPrice - discount);
 
   const { data: paymentSettings, isLoading: paymentLoading } = useSettings<PaymentSettings>('payment', defaultPayment);
@@ -172,6 +173,23 @@ const Checkout = () => {
 
         if (itemsError) throw itemsError;
 
+        // Mark personal coupon as used (from wheel of fortune) - for online payments, mark early
+        // If payment fails, the order gets deleted and user can get a new coupon
+        if (appliedUserCouponId) {
+          try {
+            await supabase
+              .from('user_coupons')
+              .update({
+                is_used: true,
+                used_at: new Date().toISOString(),
+                order_id: order.id,
+              })
+              .eq('id', appliedUserCouponId);
+          } catch (couponErr) {
+            console.error('Error marking coupon as used:', couponErr);
+          }
+        }
+
         // Call YooKassa init edge function
         const { data: paymentData, error: paymentError } = await supabase.functions.invoke('yookassa-init', {
           body: {
@@ -189,6 +207,22 @@ const Checkout = () => {
           // Delete the order since payment failed to initialize
           await supabase.from("order_items").delete().eq("order_id", order.id);
           await supabase.from("orders").delete().eq("id", order.id);
+          
+          // Restore the coupon if payment failed
+          if (appliedUserCouponId) {
+            try {
+              await supabase
+                .from('user_coupons')
+                .update({
+                  is_used: false,
+                  used_at: null,
+                  order_id: null,
+                })
+                .eq('id', appliedUserCouponId);
+            } catch (couponErr) {
+              console.error('Error restoring coupon:', couponErr);
+            }
+          }
           
           toast({
             title: "Ошибка оплаты",
@@ -244,6 +278,22 @@ const Checkout = () => {
         .insert(orderItems);
 
       if (itemsError) throw itemsError;
+
+      // Mark personal coupon as used (from wheel of fortune)
+      if (appliedUserCouponId) {
+        try {
+          await supabase
+            .from('user_coupons')
+            .update({
+              is_used: true,
+              used_at: new Date().toISOString(),
+              order_id: order.id,
+            })
+            .eq('id', appliedUserCouponId);
+        } catch (couponErr) {
+          console.error('Error marking coupon as used:', couponErr);
+        }
+      }
 
       // Send Telegram notification for offline payments
       try {
