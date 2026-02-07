@@ -51,13 +51,15 @@ export function ProductCard({
 
   return (
     <article className="card-product group h-full flex flex-col">
-      {/* Image container */}
+      {/* Image container - fixed aspect ratio to prevent CLS */}
       <div className="relative aspect-square overflow-hidden bg-warm-cream">
         <img
           src={image}
           alt={title}
           loading="lazy"
           decoding="async"
+          width={300}
+          height={300}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         

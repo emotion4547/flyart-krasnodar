@@ -12,45 +12,60 @@ import { PendingSpinHandler } from "@/components/wheel/PendingSpinHandler";
 
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { toast } from "sonner";
+import { lazy, Suspense } from "react";
+
+// Critical pages - loaded immediately
 import Index from "./pages/Index";
-import Cart from "./pages/Cart";
-import Catalog from "./pages/Catalog";
-import Product from "./pages/Product";
-import Checkout from "./pages/Checkout";
-import OrderSuccess from "./pages/OrderSuccess";
-import Delivery from "./pages/Delivery";
-import Guarantee from "./pages/Guarantee";
-import Contacts from "./pages/Contacts";
-import Reviews from "./pages/Reviews";
-import Privacy from "./pages/Privacy";
-import Offer from "./pages/Offer";
 import NotFound from "./pages/NotFound";
-import DesignSystem from "./pages/DesignSystem";
-import Sitemap from "./pages/Sitemap";
-import Collection from "./pages/Collection";
 
-// Auth & Account pages
-import Auth from "./pages/Auth";
-import Profile from "./pages/account/Profile";
-import AccountOrders from "./pages/account/Orders";
-import AccountAddresses from "./pages/account/Addresses";
-import AccountCoupons from "./pages/account/Coupons";
-import AccountFavorites from "./pages/account/Favorites";
-import AccountSettings from "./pages/account/Settings";
+// Loading component for suspense
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="flex flex-col items-center gap-4">
+      <div className="h-12 w-12 rounded-full border-4 border-tiffany border-t-transparent animate-spin" />
+      <p className="text-muted-foreground text-sm">Загрузка...</p>
+    </div>
+  </div>
+);
 
-// Admin pages
-import AdminLogin from "./pages/admin/AdminLogin";
-import AdminLayout from "./components/admin/AdminLayout";
-import Dashboard from "./pages/admin/Dashboard";
-import ProductEdit from "./pages/admin/ProductEdit";
-import Orders from "./pages/admin/Orders";
-import Marketing from "./pages/admin/Marketing";
-import Settings from "./pages/admin/Settings";
-import CatalogHub from "./pages/admin/CatalogHub";
-import ClientsHub from "./pages/admin/ClientsHub";
-import ContentHub from "./pages/admin/ContentHub";
-import AdminWheelContent from "./pages/admin/AdminWheelContent";
-import AdminCouponsContent from "./pages/admin/AdminCouponsContent";
+// Lazy loaded pages - code splitting
+const Cart = lazy(() => import("./pages/Cart"));
+const Catalog = lazy(() => import("./pages/Catalog"));
+const Product = lazy(() => import("./pages/Product"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const OrderSuccess = lazy(() => import("./pages/OrderSuccess"));
+const Delivery = lazy(() => import("./pages/Delivery"));
+const Guarantee = lazy(() => import("./pages/Guarantee"));
+const Contacts = lazy(() => import("./pages/Contacts"));
+const Reviews = lazy(() => import("./pages/Reviews"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Offer = lazy(() => import("./pages/Offer"));
+const DesignSystem = lazy(() => import("./pages/DesignSystem"));
+const Sitemap = lazy(() => import("./pages/Sitemap"));
+const Collection = lazy(() => import("./pages/Collection"));
+
+// Auth & Account pages - lazy loaded
+const Auth = lazy(() => import("./pages/Auth"));
+const Profile = lazy(() => import("./pages/account/Profile"));
+const AccountOrders = lazy(() => import("./pages/account/Orders"));
+const AccountAddresses = lazy(() => import("./pages/account/Addresses"));
+const AccountCoupons = lazy(() => import("./pages/account/Coupons"));
+const AccountFavorites = lazy(() => import("./pages/account/Favorites"));
+const AccountSettings = lazy(() => import("./pages/account/Settings"));
+
+// Admin pages - lazy loaded
+const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
+const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
+const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
+const ProductEdit = lazy(() => import("./pages/admin/ProductEdit"));
+const Orders = lazy(() => import("./pages/admin/Orders"));
+const Marketing = lazy(() => import("./pages/admin/Marketing"));
+const Settings = lazy(() => import("./pages/admin/Settings"));
+const CatalogHub = lazy(() => import("./pages/admin/CatalogHub"));
+const ClientsHub = lazy(() => import("./pages/admin/ClientsHub"));
+const ContentHub = lazy(() => import("./pages/admin/ContentHub"));
+const AdminWheelContent = lazy(() => import("./pages/admin/AdminWheelContent"));
+const AdminCouponsContent = lazy(() => import("./pages/admin/AdminCouponsContent"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -84,53 +99,55 @@ function AppContent() {
   return (
     <>
       <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/catalog" element={<Catalog />} />
-        <Route path="/catalog/:category" element={<Catalog />} />
-        <Route path="/product/:slug" element={<Product />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/order-success/:orderNumber" element={<OrderSuccess />} />
-        <Route path="/delivery" element={<Delivery />} />
-        <Route path="/guarantee" element={<Guarantee />} />
-        <Route path="/contacts" element={<Contacts />} />
-        <Route path="/reviews" element={<Reviews />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/offer" element={<Offer />} />
-        <Route path="/sitemap" element={<Sitemap />} />
-        <Route path="/collection/:slug" element={<Collection />} />
-        <Route path="/design-system" element={<DesignSystem />} />
-        
-        {/* Auth routes */}
-        <Route path="/auth" element={<Auth />} />
-        
-        {/* Account routes */}
-        <Route path="/account" element={<Profile />} />
-        <Route path="/account/orders" element={<AccountOrders />} />
-        <Route path="/account/addresses" element={<AccountAddresses />} />
-        <Route path="/account/coupons" element={<AccountCoupons />} />
-        <Route path="/account/favorites" element={<AccountFavorites />} />
-        <Route path="/account/settings" element={<AccountSettings />} />
-        
-        {/* Admin routes */}
-        <Route path="/admin4547/login" element={<AdminLogin />} />
-        <Route path="/admin4547" element={<AdminLayout><Dashboard /></AdminLayout>} />
-        <Route path="/admin4547/catalog" element={<AdminLayout><CatalogHub /></AdminLayout>} />
-        <Route path="/admin4547/products/new" element={<AdminLayout><ProductEdit /></AdminLayout>} />
-        <Route path="/admin4547/products/:id" element={<AdminLayout><ProductEdit /></AdminLayout>} />
-        <Route path="/admin4547/catalog/:id" element={<AdminLayout><ProductEdit /></AdminLayout>} />
-        <Route path="/admin4547/orders" element={<AdminLayout><Orders /></AdminLayout>} />
-        <Route path="/admin4547/clients" element={<AdminLayout><ClientsHub /></AdminLayout>} />
-        <Route path="/admin4547/content" element={<AdminLayout><ContentHub /></AdminLayout>} />
-        <Route path="/admin4547/marketing" element={<AdminLayout><Marketing /></AdminLayout>} />
-        <Route path="/admin4547/wheel" element={<AdminLayout><AdminWheelContent /></AdminLayout>} />
-        <Route path="/admin4547/coupons" element={<AdminLayout><AdminCouponsContent /></AdminLayout>} />
-        <Route path="/admin4547/settings" element={<AdminLayout><Settings /></AdminLayout>} />
-        
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/catalog" element={<Catalog />} />
+          <Route path="/catalog/:category" element={<Catalog />} />
+          <Route path="/product/:slug" element={<Product />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order-success/:orderNumber" element={<OrderSuccess />} />
+          <Route path="/delivery" element={<Delivery />} />
+          <Route path="/guarantee" element={<Guarantee />} />
+          <Route path="/contacts" element={<Contacts />} />
+          <Route path="/reviews" element={<Reviews />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/offer" element={<Offer />} />
+          <Route path="/sitemap" element={<Sitemap />} />
+          <Route path="/collection/:slug" element={<Collection />} />
+          <Route path="/design-system" element={<DesignSystem />} />
+          
+          {/* Auth routes */}
+          <Route path="/auth" element={<Auth />} />
+          
+          {/* Account routes */}
+          <Route path="/account" element={<Profile />} />
+          <Route path="/account/orders" element={<AccountOrders />} />
+          <Route path="/account/addresses" element={<AccountAddresses />} />
+          <Route path="/account/coupons" element={<AccountCoupons />} />
+          <Route path="/account/favorites" element={<AccountFavorites />} />
+          <Route path="/account/settings" element={<AccountSettings />} />
+          
+          {/* Admin routes */}
+          <Route path="/admin4547/login" element={<AdminLogin />} />
+          <Route path="/admin4547" element={<Suspense fallback={<PageLoader />}><AdminLayout><Dashboard /></AdminLayout></Suspense>} />
+          <Route path="/admin4547/catalog" element={<Suspense fallback={<PageLoader />}><AdminLayout><CatalogHub /></AdminLayout></Suspense>} />
+          <Route path="/admin4547/products/new" element={<Suspense fallback={<PageLoader />}><AdminLayout><ProductEdit /></AdminLayout></Suspense>} />
+          <Route path="/admin4547/products/:id" element={<Suspense fallback={<PageLoader />}><AdminLayout><ProductEdit /></AdminLayout></Suspense>} />
+          <Route path="/admin4547/catalog/:id" element={<Suspense fallback={<PageLoader />}><AdminLayout><ProductEdit /></AdminLayout></Suspense>} />
+          <Route path="/admin4547/orders" element={<Suspense fallback={<PageLoader />}><AdminLayout><Orders /></AdminLayout></Suspense>} />
+          <Route path="/admin4547/clients" element={<Suspense fallback={<PageLoader />}><AdminLayout><ClientsHub /></AdminLayout></Suspense>} />
+          <Route path="/admin4547/content" element={<Suspense fallback={<PageLoader />}><AdminLayout><ContentHub /></AdminLayout></Suspense>} />
+          <Route path="/admin4547/marketing" element={<Suspense fallback={<PageLoader />}><AdminLayout><Marketing /></AdminLayout></Suspense>} />
+          <Route path="/admin4547/wheel" element={<Suspense fallback={<PageLoader />}><AdminLayout><AdminWheelContent /></AdminLayout></Suspense>} />
+          <Route path="/admin4547/coupons" element={<Suspense fallback={<PageLoader />}><AdminLayout><AdminCouponsContent /></AdminLayout></Suspense>} />
+          <Route path="/admin4547/settings" element={<Suspense fallback={<PageLoader />}><AdminLayout><Settings /></AdminLayout></Suspense>} />
+          
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
       {!isAdminRoute && (
         <>
           <FloatingContactButton />

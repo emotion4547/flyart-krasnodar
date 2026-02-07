@@ -36,7 +36,7 @@ export function HeroSection() {
 
   return (
     <section className="relative overflow-hidden min-h-[85vh] md:min-h-screen flex flex-col">
-      {/* Video background */}
+      {/* Video background - optimized for LCP */}
       <div className="absolute inset-0 z-0">
         <video
           key={videoUrl}
@@ -44,7 +44,14 @@ export function HeroSection() {
           loop
           muted
           playsInline
+          preload="auto"
           className="w-full h-full object-cover"
+          style={{ 
+            // Prevent CLS by reserving space
+            aspectRatio: '16/9',
+            minHeight: '100%',
+            minWidth: '100%',
+          }}
         >
           <source src={videoUrl} type="video/mp4" />
         </video>
