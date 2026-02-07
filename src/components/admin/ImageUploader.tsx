@@ -102,7 +102,7 @@ export function ImageUploader({
       <Label>{label}</Label>
       
       {value ? (
-        <div className="relative group">
+        <div className="relative group max-w-[200px]">
           <div className={cn('relative overflow-hidden rounded-lg border bg-muted', aspectClasses[aspectRatio])}>
             <img
               src={value}
@@ -114,30 +114,24 @@ export function ImageUploader({
             type="button"
             variant="destructive"
             size="icon"
-            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7"
             onClick={handleRemove}
           >
-            <X className="h-4 w-4" />
+            <X className="h-3 w-3" />
           </Button>
         </div>
       ) : (
         <div
-          className={cn(
-            'relative border-2 border-dashed rounded-lg flex flex-col items-center justify-center gap-2 bg-muted/50 hover:bg-muted transition-colors cursor-pointer',
-            aspectClasses[aspectRatio]
-          )}
+          className="relative border-2 border-dashed rounded-lg flex flex-col items-center justify-center gap-1 bg-muted/50 hover:bg-muted transition-colors cursor-pointer w-[200px] h-[150px]"
           onClick={() => fileInputRef.current?.click()}
         >
           {isUploading ? (
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           ) : (
             <>
-              <Upload className="h-8 w-8 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
+              <Upload className="h-6 w-6 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground text-center px-2">
                 Нажмите для загрузки
-              </span>
-              <span className="text-xs text-muted-foreground">
-                или перетащите файл
               </span>
             </>
           )}
