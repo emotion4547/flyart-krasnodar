@@ -17,7 +17,7 @@ interface WheelSegment {
   label: string;
   discount_type: 'percentage' | 'fixed';
   discount_value: number;
-  prize_type: 'discount' | 'gift' | 'nothing';
+  prize_type: 'discount' | 'gift';
   gift_product_id: string | null;
   probability: number;
   color: string;
@@ -183,14 +183,7 @@ const AdminWheelContent = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Колесо Фортуны</h1>
-          <p className="text-muted-foreground">Управление сегментами и статистика</p>
-        </div>
-      </div>
-
+    <div className="space-y-6">
       <Tabs defaultValue="segments">
         <TabsList className="mb-6">
           <TabsTrigger value="segments">Сегменты</TabsTrigger>
@@ -230,7 +223,7 @@ const AdminWheelContent = () => {
                       value={editingSegment?.prize_type || 'discount'}
                       onValueChange={(value) => setEditingSegment(prev => ({ 
                         ...prev, 
-                        prize_type: value as 'discount' | 'gift' | 'nothing',
+                        prize_type: value as 'discount' | 'gift',
                         gift_product_id: value === 'gift' ? prev?.gift_product_id : null,
                       }))}
                     >
@@ -238,9 +231,8 @@ const AdminWheelContent = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="discount">Скидка</SelectItem>
-                        <SelectItem value="gift">Подарок</SelectItem>
-                        <SelectItem value="nothing">Попробуй ещё</SelectItem>
+                        <SelectItem value="discount">Скидка (промокод)</SelectItem>
+                        <SelectItem value="gift">Подарок (товар из каталога)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -392,8 +384,6 @@ const AdminWheelContent = () => {
                           <span className="flex items-center gap-1">
                             <Gift className="h-4 w-4" /> Подарок
                           </span>
-                        ) : segment.prize_type === 'nothing' ? (
-                          'Попробуй ещё'
                         ) : (
                           <span className="flex items-center gap-1">
                             <Ticket className="h-4 w-4" /> Скидка

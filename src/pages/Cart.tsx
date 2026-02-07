@@ -1,13 +1,61 @@
+import { useState, useEffect } from 'react';
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserCoupons } from "@/hooks/useUserCoupons";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { CouponSection } from "@/components/cart/CouponSection";
+import { toast } from "sonner";
 
 const Cart = () => {
-  const { items, removeItem, updateQuantity, totalPrice, clearCart } = useCart();
+  const { items, removeItem, updateQuantity, totalPrice, clearCart, addItem } = useCart();
+  const { user } = useAuth();
+  const { coupons } = useUserCoupons();
+  
+  const [discount, setDiscount] = useState(0);
+  const [appliedCouponCode, setAppliedCouponCode] = useState<string | null>(null);
+  const [giftProduct, setGiftProduct] = useState<{ id: string; title: string; image: string } | null>(null);
+
+  // Check for available coupons notification
+  useEffect(() => {
+    const activeCoupons = coupons.filter(c => !c.is_used && new Date(c.expires_at) > new Date());
+    if (user && activeCoupons.length > 0) {
+      toast.info(`У вас есть ${activeCoupons.length} купон${activeCoupons.length > 1 ? 'а' : ''} для применения!`, {
+        id: 'available-coupons',
+        duration: 5000,
+      });
+    }
+  }, [user, coupons]);
+
+  const handleDiscountChange = (
+    newDiscount: number, 
+    couponCode: string | null, 
+    gift?: { id: string; title: string; image: string } | null
+  ) => {
+    setDiscount(newDiscount);
+    setAppliedCouponCode(couponCode);
+    if (gift) {
+      setGiftProduct(gift);
+      // Add gift to cart with price 0
+      addItem({
+        id: gift.id,
+        title: gift.title,
+        price: 0,
+        image: gift.image,
+        slug: '',
+        sku: 'GIFT',
+      }, 1);
+      toast.success('Подарок добавлен в корзину!');
+    } else {
+      setGiftProduct(null);
+    }
+  };
+
+  const finalTotal = Math.max(0, totalPrice - discount);
 
   if (items.length === 0) {
     return (
@@ -140,6 +188,12 @@ const Cart = () => {
                 <Trash2 className="h-4 w-4 mr-2" />
                 Очистить корзину
               </Button>
+
+              {/* Coupon section */}
+              <CouponSection 
+                orderTotal={totalPrice} 
+                onDiscountChange={handleDiscountChange} 
+              />
             </div>
 
             {/* Order summary */}
@@ -158,6 +212,14 @@ const Cart = () => {
                       {totalPrice.toLocaleString("ru-RU")} ₽
                     </span>
                   </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Скидка</span>
+                      <span className="text-tiffany font-medium">
+                        −{discount.toLocaleString("ru-RU")} ₽
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Доставка</span>
                     <span className="text-tiffany font-medium">Рассчитаем</span>
@@ -171,11 +233,11 @@ const Cart = () => {
                     К оплате
                   </span>
                   <span className="text-2xl font-bold text-foreground">
-                    {totalPrice.toLocaleString("ru-RU")} ₽
+                    {finalTotal.toLocaleString("ru-RU")} ₽
                   </span>
                 </div>
 
-                <Link to="/checkout" className="block">
+                <Link to="/checkout" state={{ discount, appliedCouponCode }} className="block">
                   <Button variant="cta" size="lg" className="w-full">
                     Оформить заказ
                     <ArrowRight className="h-4 w-4 ml-2" />
