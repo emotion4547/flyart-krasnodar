@@ -18,7 +18,7 @@ import { WebsiteSchema } from "@/components/schema/WebsiteSchema";
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
-      <SEO />
+      <SEO image="/og-home.jpg" />
       <LocalBusinessSchema />
       <OrganizationSchema />
       <WebsiteSchema />

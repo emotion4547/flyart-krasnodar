@@ -21,6 +21,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SEO } from "@/components/SEO";
 
+// OG image for catalog page
+const CATALOG_OG_IMAGE = "/og-catalog.jpg";
+
 const PRODUCTS_PER_PAGE = 24;
 
 const Catalog = () => {
@@ -209,6 +212,7 @@ const Catalog = () => {
         title="Каталог воздушных шаров"
         description="Каталог воздушных шаров с доставкой в Красноярске. Гелиевые шары, фольгированные фигуры, композиции на любой праздник."
         keywords="каталог шаров, воздушные шары Красноярск, гелиевые шары купить"
+        image={CATALOG_OG_IMAGE}
       />
       <Header />
       <main className="flex-1 section-padding bg-warm-cream">

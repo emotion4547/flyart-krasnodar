@@ -19,6 +19,7 @@ const Delivery = () => {
         title="Доставка и оплата"
         description="Доставка воздушных шаров по Красноярску с 09:00 до 22:00. Оплата наличными, картой или по QR-коду."
         keywords="доставка шаров Красноярск, оплата воздушных шаров"
+        image="/og-delivery.jpg"
       />
       <FAQSchema items={deliveryFAQs} />
       <Header />

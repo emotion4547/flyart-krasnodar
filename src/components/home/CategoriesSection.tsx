@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getCategoryImage } from "@/lib/imageOptimization";
 
 // Color palette for categories
 const categoryColors = [
@@ -255,10 +256,10 @@ export function CategoriesSection() {
                 className={`absolute inset-0 bg-gradient-to-br ${categoryColors[index % categoryColors.length]}`}
               />
 
-              {/* Product image - full size */}
+              {/* Product image - full size with WebP optimization */}
               {category.imageUrl && (
                 <img
-                  src={category.imageUrl}
+                  src={getCategoryImage(category.imageUrl)}
                   alt={category.name}
                   loading="lazy"
                   decoding="async"

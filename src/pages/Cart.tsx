@@ -10,6 +10,7 @@ import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { CouponSection } from "@/components/cart/CouponSection";
 import { toast } from "sonner";
+import { getCartItemImage } from "@/lib/imageOptimization";
 
 const Cart = () => {
   const { items, removeItem, updateQuantity, totalPrice, clearCart, addItem } = useCart();
@@ -113,7 +114,7 @@ const Cart = () => {
                   {/* Image */}
                   <Link to={`/product/${item.slug}`} className="flex-shrink-0">
                     <img
-                      src={item.image}
+                      src={getCartItemImage(item.image)}
                       alt={item.title}
                       loading="lazy"
                       decoding="async"

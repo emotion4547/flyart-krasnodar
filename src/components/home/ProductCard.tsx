@@ -3,6 +3,7 @@ import { ShoppingCart, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
+import { getProductCardImage } from "@/lib/imageOptimization";
 
 interface ProductCardProps {
   id: string;
@@ -54,7 +55,7 @@ export function ProductCard({
       {/* Image container - fixed aspect ratio to prevent CLS */}
       <div className="relative aspect-square overflow-hidden bg-warm-cream">
         <img
-          src={image}
+          src={getProductCardImage(image)}
           alt={title}
           loading="lazy"
           decoding="async"
