@@ -27,12 +27,17 @@ interface UserCoupon {
   expires_at: string;
 }
 
+interface AppliedCouponData {
+  discount_type: 'percentage' | 'fixed';
+  discount_value: number;
+}
+
 interface UseCouponResult {
   coupon: Coupon | null;
   userCoupon: UserCoupon | null;
   isLoading: boolean;
   error: string | null;
-  applyCoupon: (code: string, orderTotal: number, userId?: string) => Promise<{ success: boolean; isUserCoupon?: boolean }>;
+  applyCoupon: (code: string, orderTotal: number, userId?: string) => Promise<{ success: boolean; isUserCoupon?: boolean; appliedCoupon?: AppliedCouponData }>;
   removeCoupon: () => void;
   calculateDiscount: (total: number) => number;
 }
@@ -43,7 +48,7 @@ export function useCoupon(): UseCouponResult {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const applyCoupon = useCallback(async (code: string, orderTotal: number, userId?: string): Promise<{ success: boolean; isUserCoupon?: boolean }> => {
+  const applyCoupon = useCallback(async (code: string, orderTotal: number, userId?: string): Promise<{ success: boolean; isUserCoupon?: boolean; appliedCoupon?: AppliedCouponData }> => {
     setIsLoading(true);
     setError(null);
 
@@ -86,7 +91,14 @@ export function useCoupon(): UseCouponResult {
 
         setCoupon(adminCoupon as Coupon);
         setUserCoupon(null);
-        return { success: true, isUserCoupon: false };
+        return { 
+          success: true, 
+          isUserCoupon: false,
+          appliedCoupon: {
+            discount_type: adminCoupon.discount_type as 'percentage' | 'fixed',
+            discount_value: adminCoupon.discount_value
+          }
+        };
       }
 
       // 2. Если не найден в админских, ищем в персональных (если есть userId)
@@ -116,7 +128,14 @@ export function useCoupon(): UseCouponResult {
 
           setUserCoupon(personalCoupon as UserCoupon);
           setCoupon(null);
-          return { success: true, isUserCoupon: true };
+          return { 
+            success: true, 
+            isUserCoupon: true,
+            appliedCoupon: {
+              discount_type: personalCoupon.discount_type as 'percentage' | 'fixed',
+              discount_value: personalCoupon.discount_value
+            }
+          };
         }
       }
 
