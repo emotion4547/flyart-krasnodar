@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import logoMuha from "@/assets/logo-muha.png";
-import { Menu, Phone, Clock, ShoppingCart, LayoutGrid, Truck, Shield, Star, MapPin } from "lucide-react";
+import { Menu, Phone, Clock, ShoppingCart, LayoutGrid, Truck, Shield, Star, MapPin, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/hooks/useAuth";
 import { SearchDialog } from "./SearchDialog";
 import { CallbackDialog } from "@/components/CallbackDialog";
 const navigation = [
@@ -19,6 +20,7 @@ export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [callbackOpen, setCallbackOpen] = useState(false);
   const { totalItems } = useCart();
+  const { user } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -73,6 +75,16 @@ export function Header() {
             <div className="md:hidden">
               <SearchDialog />
             </div>
+
+            {/* Account icon */}
+            <Link to={user ? "/account" : "/auth"}>
+              <Button variant="ghost" size="icon" className="relative">
+                <User className="h-5 w-5" />
+                {user && (
+                  <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-tiffany" />
+                )}
+              </Button>
+            </Link>
             
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">

@@ -6,9 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Save, Code, FileText, Globe } from 'lucide-react';
+import { Save, Code, FileText, Globe, Target } from 'lucide-react';
 import { useSettings } from '@/hooks/useSettings';
-
+import AdminWheelContent from './AdminWheelContent';
 interface SeoTemplates {
   productTitle: string;
   productDescription: string;
@@ -92,12 +92,20 @@ export default function Marketing() {
         <p className="text-muted-foreground">Глобальные настройки SEO и интеграции</p>
       </div>
 
-      <Tabs defaultValue="templates" className="space-y-6">
+      <Tabs defaultValue="wheel" className="space-y-6">
         <TabsList>
+          <TabsTrigger value="wheel" className="flex items-center gap-2">
+            <Target className="h-4 w-4" />
+            Колесо Фортуны
+          </TabsTrigger>
           <TabsTrigger value="templates">Шаблоны SEO</TabsTrigger>
           <TabsTrigger value="robots">robots.txt</TabsTrigger>
           <TabsTrigger value="analytics">Аналитика</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="wheel">
+          <AdminWheelContent />
+        </TabsContent>
 
         <TabsContent value="templates" className="space-y-6">
           <Card>
