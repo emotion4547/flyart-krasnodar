@@ -119,10 +119,20 @@ export function Footer() {
       <div className="border-t border-primary-foreground/10">
         <div className="container-custom py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-primary-foreground/60">
-            <p>© 2024 FlyArt. Все права защищены.</p>
-            <p className="flex items-center gap-1">
-              Сделано с <Heart className="h-4 w-4 text-cta fill-cta" /> в Красноярске
-            </p>
+            <p>© 2026 FlyArt. Все права защищены.</p>
+            <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
+              <a 
+                href="https://t.me/emotion_marketing" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-tiffany transition-colors"
+              >
+                Сайт разработала команда Emotion Marketing
+              </a>
+              <p className="flex items-center gap-1">
+                Сделано с <Heart className="h-4 w-4 text-cta fill-cta" /> в Красноярске
+              </p>
+            </div>
           </div>
         </div>
       </div>
