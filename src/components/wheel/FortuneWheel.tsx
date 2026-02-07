@@ -101,20 +101,27 @@ export function FortuneWheel({ segments, onSpinEnd, isSpinning, setIsSpinning }:
 
   return (
     <div className="relative flex flex-col items-center">
-      {/* Wheel */}
-      <div className="relative">
-        {/* Pointer */}
+      {/* Wheel container - fixed size to prevent movement */}
+      <div className="relative w-[300px] h-[300px]">
+        {/* Pointer - positioned outside the rotating area */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 z-10">
           <div className="w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[24px] border-t-gold drop-shadow-lg" />
         </div>
 
-        {/* Outer glow ring */}
-        <div className="absolute inset-[-8px] rounded-full bg-gradient-to-b from-gold/20 to-gold/5 blur-sm" />
+        {/* Outer glow ring - static */}
+        <div className="absolute inset-[-8px] rounded-full bg-gradient-to-b from-gold/20 to-gold/5 blur-sm pointer-events-none" />
         
-        {/* Outer ring */}
-        <div className="absolute inset-0 rounded-full border-[6px] border-gold/40 shadow-xl" />
+        {/* Outer ring - static */}
+        <div className="absolute inset-0 rounded-full border-[6px] border-gold/40 shadow-xl pointer-events-none" />
 
-        <svg width="300" height="300" viewBox="0 0 300 300">
+        {/* SVG wheel - only this rotates */}
+        <svg 
+          width="300" 
+          height="300" 
+          viewBox="0 0 300 300"
+          className="block"
+          style={{ overflow: 'visible' }}
+        >
           <defs>
             <filter id="wheelShadow" x="-20%" y="-20%" width="140%" height="140%">
               <feDropShadow dx="0" dy="2" stdDeviation="4" floodOpacity="0.2" />
@@ -126,11 +133,13 @@ export function FortuneWheel({ segments, onSpinEnd, isSpinning, setIsSpinning }:
 
           <motion.g
             ref={wheelRef}
-            style={{ originX: '150px', originY: '150px' }}
+            style={{ 
+              transformOrigin: '150px 150px',
+            }}
             animate={{ rotate: rotation }}
             transition={{
               duration: 5,
-              ease: [0.25, 0.1, 0.25, 1], // Smooth cubic-bezier
+              ease: [0.33, 1, 0.68, 1], // easeOutCubic - starts fast, slows smoothly
             }}
             filter="url(#wheelShadow)"
           >

@@ -26,27 +26,36 @@ export function CouponSection({ orderTotal, onDiscountChange }: CouponSectionPro
   const handleApplyCode = async () => {
     if (!promoCode.trim()) return;
     const result = await applyCoupon(promoCode.trim(), orderTotal, user?.id);
-    if (result.success) {
-      const discount = calculateDiscount(orderTotal);
+    if (result.success && result.appliedCoupon) {
+      const discount = calculateDiscountFromCoupon(result.appliedCoupon, orderTotal);
       onDiscountChange(discount, promoCode.trim(), null);
       setPromoCode('');
     }
   };
 
   const handleSelectUserCoupon = async (couponCode: string) => {
+    const selectedCoupon = coupons.find(c => c.code === couponCode);
     const result = await applyCoupon(couponCode, orderTotal, user?.id);
     if (result.success) {
-      const selectedCoupon = coupons.find(c => c.code === couponCode);
       if (selectedCoupon?.prize_type === 'gift' && selectedCoupon.gift_product_id) {
         onDiscountChange(0, couponCode, {
           id: selectedCoupon.gift_product_id,
           title: selectedCoupon.gift_product_name || 'Подарок',
           image: selectedCoupon.gift_product_image || '',
         });
-      } else {
-        const discount = calculateDiscount(orderTotal);
+      } else if (result.appliedCoupon) {
+        const discount = calculateDiscountFromCoupon(result.appliedCoupon, orderTotal);
         onDiscountChange(discount, couponCode, null);
       }
+    }
+  };
+
+  // Helper to calculate discount from coupon data directly
+  const calculateDiscountFromCoupon = (couponData: { discount_type: string; discount_value: number }, total: number): number => {
+    if (couponData.discount_type === 'percentage') {
+      return Math.round((total * couponData.discount_value) / 100);
+    } else {
+      return Math.min(couponData.discount_value, total);
     }
   };
 
