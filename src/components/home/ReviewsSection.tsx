@@ -2,6 +2,7 @@ import { Star, Quote } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AggregateRatingSchema } from "@/components/schema/AggregateRatingSchema";
 
 interface Review {
   id: string;
@@ -28,13 +29,22 @@ export function ReviewsSection() {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
+  // Calculate average rating for schema
+  const averageRating = reviews?.length 
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length 
+    : 5;
+
   // Don't render section if no reviews
   if (!isLoading && (!reviews || reviews.length === 0)) {
     return null;
   }
 
   return (
-    <section className="section-padding bg-warm-cream">
+    <>
+      {reviews && reviews.length > 0 && (
+        <AggregateRatingSchema ratingValue={averageRating} reviewCount={reviews.length} />
+      )}
+      <section className="section-padding bg-warm-cream">
       <div className="container-custom">
         {/* Section header */}
         <div className="text-center mb-12">
@@ -121,5 +131,6 @@ export function ReviewsSection() {
         </div>
       </div>
     </section>
+    </>
   );
 }

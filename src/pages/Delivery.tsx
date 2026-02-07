@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Truck, CreditCard, MapPin, Clock, Banknote, QrCode } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { FAQSchema, deliveryFAQs } from "@/components/schema/FAQSchema";
 
 const deliveryZones = [
   { zone: "Центр города", price: "200 руб." },
@@ -19,6 +20,7 @@ const Delivery = () => {
         description="Доставка воздушных шаров по Красноярску с 09:00 до 22:00. Оплата наличными, картой или по QR-коду."
         keywords="доставка шаров Красноярск, оплата воздушных шаров"
       />
+      <FAQSchema items={deliveryFAQs} />
       <Header />
       
       <main className="flex-1">

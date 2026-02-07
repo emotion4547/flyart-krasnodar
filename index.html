@@ -14,7 +14,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="FlyArt" />
-    <link rel="apple-touch-icon" href="/pwa-192x192.png" />
+    <link rel="apple-touch-icon" href="/pwa-icon.png" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="application-name" content="FlyArt" />
     <meta name="msapplication-TileColor" content="#4DB6AC" />
@@ -32,6 +32,11 @@
     <!-- Preconnect to external resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://gsnqucupjpdlfeqpbjup.supabase.co" />
+    
+    <!-- Preload critical assets for LCP optimization -->
+    <link rel="preload" href="/videos/hero-balloons.mp4" as="video" type="video/mp4" />
+    <link rel="prefetch" href="/catalog" />
   </head>
   <body>
     <div id="root"></div>

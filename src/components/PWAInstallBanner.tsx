@@ -68,10 +68,12 @@ export function PWAInstallBanner() {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 p-4 md:hidden animate-fade-up">
       <div className="bg-gradient-to-r from-tiffany to-tiffany-dark rounded-2xl p-4 shadow-xl flex items-center gap-3">
-        <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-tiffany to-tiffany-dark flex items-center justify-center border-2 border-white/50">
-            <span className="text-white font-bold text-lg">F</span>
-          </div>
+        <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
+          <img 
+            src="/pwa-icon.png" 
+            alt="FlyArt" 
+            className="h-10 w-10 object-contain"
+          />
         </div>
 
         <div className="flex-1 min-w-0">
