@@ -6,6 +6,7 @@ import { CategoriesSection } from "@/components/home/CategoriesSection";
 import { PopularProducts } from "@/components/home/PopularProducts";
 import { VKClipsSection } from "@/components/home/VKClipsSection";
 import { ContactForm } from "@/components/home/ContactForm";
+import { PartnersSection } from "@/components/home/PartnersSection";
 import { AdvantagesSection } from "@/components/home/AdvantagesSection";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
 import { AboutSection } from "@/components/home/AboutSection";
@@ -45,6 +46,10 @@ const Index = () => {
         
         <LazySection minHeight="400px">
           <ReviewsSection />
+        </LazySection>
+        
+        <LazySection minHeight="200px">
+          <PartnersSection />
         </LazySection>
         
         <LazySection minHeight="300px">

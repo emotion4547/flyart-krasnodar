@@ -44,6 +44,7 @@ const Offer = lazy(() => import("./pages/Offer"));
 const DesignSystem = lazy(() => import("./pages/DesignSystem"));
 const Sitemap = lazy(() => import("./pages/Sitemap"));
 const Collection = lazy(() => import("./pages/Collection"));
+const Partners = lazy(() => import("./pages/Partners"));
 
 // Auth & Account pages - lazy loaded
 const Auth = lazy(() => import("./pages/Auth"));
@@ -135,6 +136,7 @@ function AppContent() {
           <Route path="/offer" element={<Offer />} />
           <Route path="/sitemap" element={<Sitemap />} />
           <Route path="/collection/:slug" element={<Collection />} />
+          <Route path="/partners" element={<Partners />} />
           <Route path="/design-system" element={<DesignSystem />} />
           
           {/* Auth routes */}

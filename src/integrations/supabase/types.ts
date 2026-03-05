@@ -537,6 +537,57 @@ export type Database = {
         }
         Relationships: []
       }
+      partners: {
+        Row: {
+          benefit_detail: string | null
+          benefit_short: string
+          created_at: string | null
+          description: string | null
+          discount_value: string | null
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          name: string
+          promo_code: string | null
+          slug: string
+          sort_order: number | null
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          benefit_detail?: string | null
+          benefit_short: string
+          created_at?: string | null
+          description?: string | null
+          discount_value?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name: string
+          promo_code?: string | null
+          slug: string
+          sort_order?: number | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          benefit_detail?: string | null
+          benefit_short?: string
+          created_at?: string | null
+          description?: string | null
+          discount_value?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string
+          promo_code?: string | null
+          slug?: string
+          sort_order?: number | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       pending_wheel_spins: {
         Row: {
           created_at: string
