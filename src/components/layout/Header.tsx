@@ -31,7 +31,7 @@ export function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="relative h-10 w-10 rounded-full bg-gradient-to-br from-tiffany to-tiffany-dark flex items-center justify-center shadow-sm">
-              <img src={logoMuha} alt="FlyArt" className="absolute h-12 w-12 object-contain -top-1" />
+              <img src={logoMuha} alt="FlyArt" className="absolute h-12 w-12 object-contain -top-1" width={48} height={48} />
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold text-foreground tracking-tight">FlyArt</span>

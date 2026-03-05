@@ -23,6 +23,7 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { compressImage } from '@/lib/imageCompression';
 
 export interface ProductImage {
   id: string;
@@ -180,12 +181,13 @@ export function MultiImageUploader({
       const newImages: ProductImage[] = [];
 
       for (const file of files) {
-        const ext = file.name.split('.').pop();
+        const compressed = await compressImage(file);
+        const ext = compressed.name.split('.').pop();
         const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
 
         const { error: uploadError } = await supabase.storage
           .from('catalog-images')
-          .upload(fileName, file, {
+          .upload(fileName, compressed, {
             cacheControl: '3600',
             upsert: false,
           });

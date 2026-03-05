@@ -71,7 +71,13 @@ export function LazySection({
   );
 
   return (
-    <div ref={ref}>
+    <div
+      ref={ref}
+      style={{
+        contentVisibility: hasLoaded ? 'visible' : 'auto',
+        containIntrinsicSize: hasLoaded ? undefined : `auto ${minHeight}`,
+      }}
+    >
       {hasLoaded ? children : (fallback || defaultFallback)}
     </div>
   );

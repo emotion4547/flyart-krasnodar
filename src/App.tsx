@@ -5,14 +5,15 @@ import { QueryClient, QueryClientProvider, QueryCache } from "@tanstack/react-qu
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/hooks/useAuth";
-import { FloatingContactButton } from "@/components/FloatingContactButton";
-import { PWAInstallBanner } from "@/components/PWAInstallBanner";
-import { FortuneWheelTrigger } from "@/components/wheel/FortuneWheelTrigger";
-import { PendingSpinHandler } from "@/components/wheel/PendingSpinHandler";
+// Deferred non-critical components - loaded after initial render
+const FloatingContactButton = lazy(() => import("@/components/FloatingContactButton").then(m => ({ default: m.FloatingContactButton })));
+const PWAInstallBanner = lazy(() => import("@/components/PWAInstallBanner").then(m => ({ default: m.PWAInstallBanner })));
+const FortuneWheelTrigger = lazy(() => import("@/components/wheel/FortuneWheelTrigger").then(m => ({ default: m.FortuneWheelTrigger })));
+const PendingSpinHandler = lazy(() => import("@/components/wheel/PendingSpinHandler").then(m => ({ default: m.PendingSpinHandler })));
 
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { toast } from "sonner";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 
 // Critical pages - loaded immediately
 import Index from "./pages/Index";
@@ -92,6 +93,24 @@ const queryClient = new QueryClient({
   }),
 });
 
+/** Defers non-critical floating widgets by 3 seconds after mount */
+function DeferredWidgets() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setShow(true), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+  if (!show) return null;
+  return (
+    <Suspense fallback={null}>
+      <FloatingContactButton />
+      <PWAInstallBanner />
+      <FortuneWheelTrigger />
+      <PendingSpinHandler />
+    </Suspense>
+  );
+}
+
 function AppContent() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
@@ -148,14 +167,7 @@ function AppContent() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
-      {!isAdminRoute && (
-        <>
-          <FloatingContactButton />
-          <PWAInstallBanner />
-          <FortuneWheelTrigger />
-          <PendingSpinHandler />
-        </>
-      )}
+      {!isAdminRoute && <DeferredWidgets />}
     </>
   );
 }
