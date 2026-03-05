@@ -74,6 +74,18 @@ const Catalog = () => {
   const { data: products, isLoading } = useQuery({
     queryKey: ["catalog-products", selectedCategory, sortBy],
     queryFn: async () => {
+      // If category selected, first get product IDs from product_categories
+      let productIds: string[] | null = null;
+      if (selectedCategory) {
+        const { data: pcData, error: pcError } = await supabase
+          .from("product_categories")
+          .select("product_id")
+          .eq("category_id", selectedCategory);
+        if (pcError) throw pcError;
+        productIds = pcData?.map(pc => pc.product_id) || [];
+        if (productIds.length === 0) return [];
+      }
+
       let query = supabase
         .from("products")
         .select(`
@@ -90,12 +102,13 @@ const Catalog = () => {
             url,
             alt_text,
             is_main
-          ),
-          product_categories (
-            category_id
           )
         `)
         .eq("is_active", true);
+
+      if (productIds) {
+        query = query.in("id", productIds);
+      }
 
       // Sort
       if (sortBy === "price_asc") {
@@ -111,17 +124,7 @@ const Catalog = () => {
       const { data, error } = await query;
       if (error) throw error;
 
-      // Filter by category on client side (simpler for MVP)
-      let filtered = data;
-      if (selectedCategory) {
-        filtered = filtered.filter((product) =>
-          product.product_categories?.some(
-            (pc) => pc.category_id === selectedCategory
-          )
-        );
-      }
-
-      return filtered;
+      return data;
     },
   });
 

@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
@@ -29,20 +30,13 @@ interface UseFavoritesResult {
 
 export function useFavorites(): UseFavoritesResult {
   const { user } = useAuth();
-  const [favorites, setFavorites] = useState<FavoriteProduct[]>([]);
-  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const fetchFavorites = useCallback(async () => {
-    if (!user) {
-      setFavorites([]);
-      setFavoriteIds(new Set());
-      setIsLoading(false);
-      return;
-    }
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['favorites', user?.id],
+    queryFn: async () => {
+      if (!user) return { favorites: [] as FavoriteProduct[], ids: new Set<string>() };
 
-    setIsLoading(true);
-    try {
       const { data, error } = await supabase
         .from('user_favorites')
         .select(`
@@ -63,34 +57,63 @@ export function useFavorites(): UseFavoritesResult {
 
       if (error) throw error;
 
-      // Получаем главные изображения для всех товаров
       const productIds = (data || []).map(f => f.product_id);
       const { data: images } = await supabase
         .from('product_images')
         .select('product_id, url')
-        .in('product_id', productIds)
+        .in('product_id', productIds.length > 0 ? productIds : ['__none__'])
         .eq('is_main', true);
 
       const imageMap = new Map(images?.map(i => [i.product_id, i.url]) || []);
 
-      const favoritesWithImages: FavoriteProduct[] = (data || []).map(f => ({
+      const favorites: FavoriteProduct[] = (data || []).map(f => ({
         ...f,
         product: f.product as FavoriteProduct['product'],
         mainImage: imageMap.get(f.product_id),
       }));
 
-      setFavorites(favoritesWithImages);
-      setFavoriteIds(new Set(productIds));
-    } catch (err) {
-      console.error('Error fetching favorites:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user]);
+      return {
+        favorites,
+        ids: new Set(productIds),
+      };
+    },
+    enabled: !!user,
+  });
 
-  useEffect(() => {
-    fetchFavorites();
-  }, [fetchFavorites]);
+  const favorites = data?.favorites ?? [];
+  const favoriteIds = data?.ids ?? new Set<string>();
+
+  const addMutation = useMutation({
+    mutationFn: async (productId: string) => {
+      if (!user) throw new Error('Not authenticated');
+      const { error } = await supabase
+        .from('user_favorites')
+        .insert({ user_id: user.id, product_id: productId });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['favorites', user?.id] });
+      toast.success('Добавлено в избранное');
+    },
+    onError: () => toast.error('Ошибка при обновлении избранного'),
+  });
+
+  const removeMutation = useMutation({
+    mutationFn: async (productId: string) => {
+      if (!user) throw new Error('Not authenticated');
+      const { error } = await supabase
+        .from('user_favorites')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('product_id', productId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['favorites', user?.id] });
+      toast.success('Удалено из избранного');
+    },
+    onError: () => toast.error('Ошибка при обновлении избранного'),
+  });
 
   const isFavorite = useCallback((productId: string): boolean => {
     return favoriteIds.has(productId);
@@ -101,49 +124,12 @@ export function useFavorites(): UseFavoritesResult {
       toast.error('Войдите, чтобы добавить в избранное');
       return;
     }
-
-    const isCurrentlyFavorite = favoriteIds.has(productId);
-
-    try {
-      if (isCurrentlyFavorite) {
-        // Удаляем из избранного
-        const { error } = await supabase
-          .from('user_favorites')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('product_id', productId);
-
-        if (error) throw error;
-
-        setFavoriteIds(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(productId);
-          return newSet;
-        });
-        setFavorites(prev => prev.filter(f => f.product_id !== productId));
-        toast.success('Удалено из избранного');
-      } else {
-        // Добавляем в избранное
-        const { error } = await supabase
-          .from('user_favorites')
-          .insert({
-            user_id: user.id,
-            product_id: productId,
-          });
-
-        if (error) throw error;
-
-        setFavoriteIds(prev => new Set([...prev, productId]));
-        toast.success('Добавлено в избранное');
-        
-        // Перезагружаем для получения полных данных
-        fetchFavorites();
-      }
-    } catch (err) {
-      console.error('Error toggling favorite:', err);
-      toast.error('Ошибка при обновлении избранного');
+    if (favoriteIds.has(productId)) {
+      await removeMutation.mutateAsync(productId);
+    } else {
+      await addMutation.mutateAsync(productId);
     }
-  }, [user, favoriteIds, fetchFavorites]);
+  }, [user, favoriteIds, addMutation, removeMutation]);
 
   return {
     favorites,
@@ -151,6 +137,6 @@ export function useFavorites(): UseFavoritesResult {
     isLoading,
     isFavorite,
     toggleFavorite,
-    refetch: fetchFavorites,
+    refetch: async () => { await refetch(); },
   };
 }

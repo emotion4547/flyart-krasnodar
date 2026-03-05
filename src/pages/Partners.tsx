@@ -3,11 +3,17 @@ import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
 import { useActivePartners } from "@/hooks/usePartners";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ExternalLink, Gift } from "lucide-react";
+import { ExternalLink, Gift, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const Partners = () => {
   const { data: partners = [], isLoading } = useActivePartners();
+
+  const copyPromoCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast.success('Промокод скопирован!');
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -79,6 +85,16 @@ const Partners = () => {
                         {partner.benefit_short}
                       </span>
                     </div>
+
+                    {partner.promo_code && (
+                      <button
+                        onClick={() => copyPromoCode(partner.promo_code!)}
+                        className="flex items-center gap-2 bg-tiffany/10 text-tiffany-dark text-sm font-mono font-bold px-4 py-2 rounded-xl hover:bg-tiffany/20 transition-colors cursor-pointer mb-3"
+                      >
+                        <Copy className="h-4 w-4" />
+                        {partner.promo_code}
+                      </button>
+                    )}
 
                     {partner.benefit_detail && (
                       <p className="text-sm text-muted-foreground mb-4 flex-1">

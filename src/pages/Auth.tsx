@@ -82,7 +82,10 @@ const Auth = () => {
     }
 
     setIsLoading(true);
-    const { error } = await signUp(registerEmail, registerPassword);
+    const { error } = await signUp(registerEmail, registerPassword, {
+      full_name: registerName,
+      phone: registerPhone || undefined,
+    });
     setIsLoading(false);
 
     if (error) {
