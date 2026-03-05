@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { CheckCircle, Phone, ArrowRight, XCircle, CreditCard, Gift, ExternalLink } from "lucide-react";
 import { useActivePartners } from "@/hooks/usePartners";
@@ -9,12 +11,16 @@ const OrderSuccess = () => {
   const { orderNumber } = useParams<{ orderNumber: string }>();
   const [searchParams] = useSearchParams();
   const paymentStatus = searchParams.get("payment");
-  const { data: partners = [] } = useActivePartners();
+  const { data: partners = [], isLoading: partnersLoading, refetch: refetchPartners } = useActivePartners();
+
+  useEffect(() => {
+    refetchPartners();
+  }, [refetchPartners]);
   
   const isPaymentSuccess = paymentStatus === "success";
   const isPaymentFailed = paymentStatus === "failed";
   const isPaid = isPaymentSuccess;
-  const showPartners = !isPaymentFailed && partners.length > 0;
+  const showPartners = !isPaymentFailed && (partnersLoading || partners.length > 0);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -111,51 +117,61 @@ const OrderSuccess = () => {
                   Спасибо за заказ! Воспользуйтесь скидками от наших партнёров:
                 </p>
                 <div className="space-y-3">
-                  {partners.map((partner) => (
-                    <div
-                      key={partner.id}
-                      className="flex items-center gap-4 bg-warm-cream rounded-xl p-4 border border-border/50"
-                    >
-                      {partner.logo_url ? (
-                        <img
-                          src={partner.logo_url}
-                          alt={partner.name}
-                          className="h-12 w-12 rounded-lg object-cover flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="h-12 w-12 rounded-lg bg-tiffany-light flex items-center justify-center flex-shrink-0">
-                          <Gift className="h-5 w-5 text-tiffany" />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-foreground text-sm">{partner.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {partner.discount_value && (
-                            <span className="text-tiffany-dark font-medium">{partner.discount_value} · </span>
-                          )}
-                          {partner.benefit_short}
-                        </p>
-                        {partner.promo_code && (
-                          <div className="mt-1.5 inline-flex items-center gap-1.5 bg-tiffany/10 text-tiffany-dark text-xs font-mono font-bold px-3 py-1 rounded-full">
-                            Промокод: {partner.promo_code}
+                  {partnersLoading
+                    ? Array.from({ length: 2 }).map((_, i) => (
+                        <div key={i} className="flex items-center gap-4 bg-warm-cream rounded-xl p-4 border border-border/50">
+                          <Skeleton className="h-12 w-12 rounded-lg" />
+                          <div className="flex-1 space-y-2">
+                            <Skeleton className="h-4 w-40" />
+                            <Skeleton className="h-3 w-56" />
                           </div>
-                        )}
-                      </div>
-                      {partner.website_url && (
-                        <a
-                          href={partner.website_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-shrink-0"
+                        </div>
+                      ))
+                    : partners.map((partner) => (
+                        <div
+                          key={partner.id}
+                          className="flex items-center gap-4 bg-warm-cream rounded-xl p-4 border border-border/50"
                         >
-                          <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-                            <ExternalLink className="h-3.5 w-3.5" />
-                            Сайт
-                          </Button>
-                        </a>
-                      )}
-                    </div>
-                  ))}
+                          {partner.logo_url ? (
+                            <img
+                              src={partner.logo_url}
+                              alt={partner.name}
+                              className="h-12 w-12 rounded-lg object-cover flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="h-12 w-12 rounded-lg bg-tiffany-light flex items-center justify-center flex-shrink-0">
+                              <Gift className="h-5 w-5 text-tiffany" />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-foreground text-sm">{partner.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {partner.discount_value && (
+                                <span className="text-tiffany-dark font-medium">{partner.discount_value} · </span>
+                              )}
+                              {partner.benefit_short}
+                            </p>
+                            {partner.promo_code && (
+                              <div className="mt-1.5 inline-flex items-center gap-1.5 bg-tiffany/10 text-tiffany-dark text-xs font-mono font-bold px-3 py-1 rounded-full">
+                                Промокод: {partner.promo_code}
+                              </div>
+                            )}
+                          </div>
+                          {partner.website_url && (
+                            <a
+                              href={partner.website_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-shrink-0"
+                            >
+                              <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                                <ExternalLink className="h-3.5 w-3.5" />
+                                Сайт
+                              </Button>
+                            </a>
+                          )}
+                        </div>
+                      ))}
                 </div>
               </div>
             )}
