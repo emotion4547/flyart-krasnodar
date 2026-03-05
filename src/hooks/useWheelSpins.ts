@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
-const COOLDOWN_DAYS = 15;
 const PENDING_SPIN_KEY = 'pending_wheel_spin';
 const SESSION_ID_KEY = 'wheel_session_id';
+const WHEEL_USED_KEY = 'flyart_wheel_used'; // permanent localStorage flag
 
 interface WheelSegment {
   id: string;
@@ -57,6 +57,16 @@ function getOrCreateSessionId(): string {
   return sessionId;
 }
 
+/** Mark this device as having used the wheel (permanent) */
+function markWheelUsed(): void {
+  localStorage.setItem(WHEEL_USED_KEY, Date.now().toString());
+}
+
+/** Check if this device has already used the wheel */
+function isWheelUsedOnDevice(): boolean {
+  return !!localStorage.getItem(WHEEL_USED_KEY);
+}
+
 export function useWheelSpins(): UseWheelSpinsResult {
   const { user } = useAuth();
   const [segments, setSegments] = useState<WheelSegment[]>([]);
@@ -88,35 +98,35 @@ export function useWheelSpins(): UseWheelSpinsResult {
     setIsLoading(true);
 
     try {
+      // First check: device-level flag (permanent, one-time only)
+      if (isWheelUsedOnDevice()) {
+        setCanSpin(false);
+        setNextSpinDate(null);
+        setIsLoading(false);
+        return;
+      }
+
       if (user) {
-        // Для авторизованных — проверяем в БД
+        // For authenticated users — also check DB for any previous spin
         const { data, error } = await supabase
           .from('user_wheel_spins')
           .select('spun_at')
           .eq('user_id', user.id)
-          .order('spun_at', { ascending: false })
           .limit(1);
 
         if (error) throw error;
 
         if (data && data.length > 0) {
-          const lastSpinDate = new Date(data[0].spun_at);
-          const nextSpin = new Date(lastSpinDate);
-          nextSpin.setDate(nextSpin.getDate() + COOLDOWN_DAYS);
-
-          if (nextSpin > new Date()) {
-            setCanSpin(false);
-            setNextSpinDate(nextSpin);
-          } else {
-            setCanSpin(true);
-            setNextSpinDate(null);
-          }
+          // User has spun before — mark device and deny
+          markWheelUsed();
+          setCanSpin(false);
+          setNextSpinDate(null);
         } else {
           setCanSpin(true);
           setNextSpinDate(null);
         }
       } else {
-        // Для неавторизованных — проверяем localStorage
+        // For unauthenticated — check localStorage pending spin
         const pendingSpin = localStorage.getItem(PENDING_SPIN_KEY);
         setCanSpin(!pendingSpin);
         setNextSpinDate(null);
@@ -153,7 +163,6 @@ export function useWheelSpins(): UseWheelSpinsResult {
         if (product) {
           giftProductName = product.title;
           
-          // Получаем главное изображение
           const { data: image } = await supabase
             .from('product_images')
             .select('url')
@@ -194,10 +203,10 @@ export function useWheelSpins(): UseWheelSpinsResult {
 
       if (spinError) throw spinError;
 
+      // Mark device permanently
+      markWheelUsed();
       setCanSpin(false);
-      const nextSpin = new Date();
-      nextSpin.setDate(nextSpin.getDate() + COOLDOWN_DAYS);
-      setNextSpinDate(nextSpin);
+      setNextSpinDate(null);
 
       return { couponCode };
     } catch (err) {
@@ -210,7 +219,6 @@ export function useWheelSpins(): UseWheelSpinsResult {
     const sessionId = getOrCreateSessionId();
 
     try {
-      // Сохраняем в localStorage
       const pendingData: PendingSpin = {
         session_id: sessionId,
         segment_id: segment.id,
@@ -221,7 +229,6 @@ export function useWheelSpins(): UseWheelSpinsResult {
       };
       localStorage.setItem(PENDING_SPIN_KEY, JSON.stringify(pendingData));
 
-      // Сохраняем в БД
       await supabase.from('pending_wheel_spins').insert({
         session_id: sessionId,
         segment_id: segment.id,
@@ -231,6 +238,8 @@ export function useWheelSpins(): UseWheelSpinsResult {
         gift_product_id: segment.gift_product_id,
       });
 
+      // Mark device permanently
+      markWheelUsed();
       setCanSpin(false);
     } catch (err) {
       console.error('Error saving pending spin:', err);
@@ -244,10 +253,8 @@ export function useWheelSpins(): UseWheelSpinsResult {
     try {
       const pending: PendingSpin = JSON.parse(pendingData);
       
-      // Удаляем из localStorage
       localStorage.removeItem(PENDING_SPIN_KEY);
 
-      // Удаляем из БД
       await supabase
         .from('pending_wheel_spins')
         .delete()

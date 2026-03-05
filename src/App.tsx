@@ -5,15 +5,15 @@ import { QueryClient, QueryClientProvider, QueryCache } from "@tanstack/react-qu
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/hooks/useAuth";
+import { ScrollToTop } from "@/components/ScrollToTop";
+import { toast } from "sonner";
+import { lazy, Suspense, useState, useEffect } from "react";
+
 // Deferred non-critical components - loaded after initial render
 const FloatingContactButton = lazy(() => import("@/components/FloatingContactButton").then(m => ({ default: m.FloatingContactButton })));
 const PWAInstallBanner = lazy(() => import("@/components/PWAInstallBanner").then(m => ({ default: m.PWAInstallBanner })));
 const FortuneWheelTrigger = lazy(() => import("@/components/wheel/FortuneWheelTrigger").then(m => ({ default: m.FortuneWheelTrigger })));
 const PendingSpinHandler = lazy(() => import("@/components/wheel/PendingSpinHandler").then(m => ({ default: m.PendingSpinHandler })));
-
-import { ScrollToTop } from "@/components/ScrollToTop";
-import { toast } from "sonner";
-import { lazy, Suspense, useState, useEffect } from "react";
 
 // Critical pages - loaded immediately
 import Index from "./pages/Index";
