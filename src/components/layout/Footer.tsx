@@ -8,6 +8,7 @@ const footerLinks = {
     { name: "Доставка и оплата", href: "/delivery" },
     { name: "Гарантия", href: "/guarantee" },
     { name: "Отзывы", href: "/reviews" },
+    { name: "Партнёры", href: "/partners" },
     { name: "Контакты", href: "/contacts" },
   ],
   legal: [

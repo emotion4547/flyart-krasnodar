@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { CouponSection } from "@/components/cart/CouponSection";
+import { PartnerBenefits } from "@/components/cart/PartnerBenefits";
 import { toast } from "sonner";
 import { getCartItemImage } from "@/lib/imageOptimization";
 
@@ -198,6 +199,9 @@ const Cart = () => {
                 orderTotal={totalPrice} 
                 onDiscountChange={handleDiscountChange} 
               />
+
+              {/* Partner benefits */}
+              <PartnerBenefits />
             </div>
 
             {/* Order summary */}
