@@ -23,10 +23,11 @@ const Cart = () => {
   const [appliedUserCouponId, setAppliedUserCouponId] = useState<string | null>(null);
   const [giftProduct, setGiftProduct] = useState<{ id: string; title: string; image: string } | null>(null);
 
-  // Check for available coupons notification
+  // Check for available coupons notification — once per session
   useEffect(() => {
     const activeCoupons = coupons.filter(c => !c.is_used && new Date(c.expires_at) > new Date());
-    if (user && activeCoupons.length > 0) {
+    if (user && activeCoupons.length > 0 && !sessionStorage.getItem('coupon_toast_shown')) {
+      sessionStorage.setItem('coupon_toast_shown', '1');
       toast.info(`У вас есть ${activeCoupons.length} купон${activeCoupons.length > 1 ? 'а' : ''} для применения!`, {
         id: 'available-coupons',
         duration: 5000,

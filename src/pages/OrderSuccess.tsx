@@ -4,18 +4,26 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { CheckCircle, Phone, ArrowRight, XCircle, CreditCard, Gift, ExternalLink } from "lucide-react";
+import { CheckCircle, Phone, ArrowRight, XCircle, CreditCard, Gift, ExternalLink, Copy } from "lucide-react";
 import { useActivePartners } from "@/hooks/usePartners";
+import { useContactInfo, getRawPhone, formatPhone } from "@/hooks/useContactInfo";
+import { toast } from "sonner";
 
 const OrderSuccess = () => {
   const { orderNumber } = useParams<{ orderNumber: string }>();
   const [searchParams] = useSearchParams();
   const paymentStatus = searchParams.get("payment");
   const { data: partners = [], isLoading: partnersLoading, refetch: refetchPartners } = useActivePartners();
+  const { contactInfo } = useContactInfo();
 
   useEffect(() => {
     refetchPartners();
   }, [refetchPartners]);
+
+  const copyPromoCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast.success('Промокод скопирован!');
+  };
   
   const isPaymentSuccess = paymentStatus === "success";
   const isPaymentFailed = paymentStatus === "failed";
@@ -152,9 +160,13 @@ const OrderSuccess = () => {
                               {partner.benefit_short}
                             </p>
                             {partner.promo_code && (
-                              <div className="mt-1.5 inline-flex items-center gap-1.5 bg-tiffany/10 text-tiffany-dark text-xs font-mono font-bold px-3 py-1 rounded-full">
+                              <button
+                                onClick={() => copyPromoCode(partner.promo_code!)}
+                                className="mt-1.5 inline-flex items-center gap-1.5 bg-tiffany/10 text-tiffany-dark text-xs font-mono font-bold px-3 py-1 rounded-full hover:bg-tiffany/20 transition-colors cursor-pointer"
+                              >
                                 Промокод: {partner.promo_code}
-                              </div>
+                                <Copy className="h-3 w-3" />
+                              </button>
                             )}
                           </div>
                           {partner.website_url && (
@@ -183,10 +195,10 @@ const OrderSuccess = () => {
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
-              <a href="tel:+79001234567">
+              <a href={`tel:${getRawPhone(contactInfo.phone)}`}>
                 <Button variant="tiffanyOutline" size="lg">
                   <Phone className="h-4 w-4 mr-2" />
-                  Позвонить нам
+                  {formatPhone(contactInfo.phone)}
                 </Button>
               </a>
             </div>
