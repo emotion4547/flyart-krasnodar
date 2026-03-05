@@ -29,7 +29,7 @@ const Partners = () => {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-64 rounded-2xl" />
+                <Skeleton key={i} className="aspect-video rounded-2xl" />
               ))}
             </div>
           ) : partners.length === 0 ? (
@@ -41,38 +41,43 @@ const Partners = () => {
               {partners.map((partner) => (
                 <article
                   key={partner.id}
-                  className="bg-card rounded-2xl border border-border/50 overflow-hidden flex flex-col"
+                  className="group bg-card rounded-2xl border border-border/50 overflow-hidden flex flex-col"
                 >
-                  {/* Logo */}
-                  {partner.logo_url && (
-                    <div className="h-40 bg-muted flex items-center justify-center p-6">
+                  {/* Banner 16:9 */}
+                  <div className="relative aspect-video w-full bg-muted">
+                    {partner.logo_url ? (
                       <img
                         src={partner.logo_url}
                         alt={partner.name}
                         loading="lazy"
                         decoding="async"
-                        className="max-h-full max-w-full object-contain"
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-tiffany/20 to-primary/20 flex items-center justify-center">
+                        <Gift className="h-12 w-12 text-tiffany" />
+                      </div>
+                    )}
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    {/* Discount badge */}
+                    {partner.discount_value && (
+                      <div className="absolute top-3 right-3 bg-tiffany text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                        {partner.discount_value}
+                      </div>
+                    )}
+                  </div>
 
-                  <div className="p-6 flex-1 flex flex-col">
+                  <div className="p-5 flex-1 flex flex-col">
                     <h2 className="text-lg font-bold text-foreground mb-2">
                       {partner.name}
                     </h2>
 
                     <div className="flex items-start gap-2 mb-3 bg-tiffany-light rounded-xl p-3">
                       <Gift className="h-5 w-5 text-tiffany flex-shrink-0 mt-0.5" />
-                      <div>
-                        {partner.discount_value && (
-                          <span className="font-bold text-tiffany-dark mr-1">
-                            {partner.discount_value}
-                          </span>
-                        )}
-                        <span className="text-sm text-foreground">
-                          {partner.benefit_short}
-                        </span>
-                      </div>
+                      <span className="text-sm text-foreground">
+                        {partner.benefit_short}
+                      </span>
                     </div>
 
                     {partner.benefit_detail && (
