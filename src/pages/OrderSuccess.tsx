@@ -14,7 +14,7 @@ const OrderSuccess = () => {
   const isPaymentSuccess = paymentStatus === "success";
   const isPaymentFailed = paymentStatus === "failed";
   const isPaid = isPaymentSuccess;
-  const activePartnersWithPromo = partners.filter(p => p.promo_code || p.website_url);
+  const showPartners = !isPaymentFailed && partners.length > 0;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -99,7 +99,7 @@ const OrderSuccess = () => {
             </div>
 
             {/* Partner bonuses */}
-            {!isPaymentFailed && activePartnersWithPromo.length > 0 && (
+            {showPartners && (
               <div className="bg-card rounded-2xl border border-tiffany/20 p-6 mb-8 text-left animate-fade-up" style={{ animationDelay: "0.3s" }}>
                 <div className="flex items-center gap-2 mb-4">
                   <Gift className="h-5 w-5 text-tiffany" />
@@ -111,7 +111,7 @@ const OrderSuccess = () => {
                   Спасибо за заказ! Воспользуйтесь скидками от наших партнёров:
                 </p>
                 <div className="space-y-3">
-                  {activePartnersWithPromo.map((partner) => (
+                  {partners.map((partner) => (
                     <div
                       key={partner.id}
                       className="flex items-center gap-4 bg-warm-cream rounded-xl p-4 border border-border/50"
