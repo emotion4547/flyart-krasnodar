@@ -30,8 +30,8 @@ export function PartnersSection() {
           Оформите заказ и получите эксклюзивные скидки от наших партнёров
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {partners.slice(0, 6).map((partner) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {partners.slice(0, 8).map((partner) => (
             <div
               key={partner.id}
               className="group relative overflow-hidden rounded-2xl border border-border/50 hover:shadow-lg transition-all duration-300"
