@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useActivePartners } from "@/hooks/usePartners";
-import { Gift, ArrowRight } from "lucide-react";
+import { Gift, ArrowRight, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function PartnersSection() {
@@ -53,6 +53,22 @@ export function PartnersSection() {
                 )}
                 {/* Gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                
+                {/* Hover button */}
+                {partner.website_url && (
+                  <a
+                    href={partner.website_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+                  >
+                    <span className="bg-white/90 backdrop-blur-sm text-foreground text-xs font-semibold px-4 py-2 rounded-full flex items-center gap-1.5 shadow-lg hover:bg-white transition-colors">
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      На сайт
+                    </span>
+                  </a>
+                )}
+
                 {/* Text on banner */}
                 <div className="absolute inset-0 p-4 flex flex-col justify-end">
                   <h3 className="font-bold text-white text-base leading-tight mb-1">
