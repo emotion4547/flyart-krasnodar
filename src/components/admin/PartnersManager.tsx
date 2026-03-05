@@ -182,7 +182,8 @@ export default function PartnersManager() {
               <Input value={form.slug} onChange={e => set('slug', e.target.value)} />
             </div>
             <div>
-              <Label>Логотип</Label>
+              <Label>Баннер (16:9)</Label>
+              <p className="text-xs text-muted-foreground mb-2">Рекомендуемый размер: 800×450 px</p>
               <ImageUploader
                 value={form.logo_url || ''}
                 onChange={(url) => set('logo_url', url)}

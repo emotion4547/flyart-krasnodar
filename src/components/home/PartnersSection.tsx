@@ -30,32 +30,40 @@ export function PartnersSection() {
           Оформите заказ и получите эксклюзивные скидки от наших партнёров
         </p>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {partners.slice(0, 8).map((partner) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {partners.slice(0, 6).map((partner) => (
             <div
               key={partner.id}
-              className="bg-card rounded-2xl border border-border/50 p-4 flex flex-col items-center text-center gap-3 hover:shadow-md transition-shadow"
+              className="group relative overflow-hidden rounded-2xl border border-border/50 hover:shadow-lg transition-all duration-300"
             >
-              {partner.logo_url ? (
-                <img
-                  src={partner.logo_url}
-                  alt={partner.name}
-                  loading="lazy"
-                  decoding="async"
-                  className="h-14 w-auto object-contain"
-                />
-              ) : (
-                <div className="h-14 w-14 rounded-full bg-tiffany-light flex items-center justify-center">
-                  <Gift className="h-6 w-6 text-tiffany" />
+              {/* Banner image 16:9 */}
+              <div className="relative aspect-video w-full bg-muted">
+                {partner.logo_url ? (
+                  <img
+                    src={partner.logo_url}
+                    alt={partner.name}
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-tiffany/20 to-primary/20 flex items-center justify-center">
+                    <Gift className="h-10 w-10 text-tiffany" />
+                  </div>
+                )}
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                {/* Text on banner */}
+                <div className="absolute inset-0 p-4 flex flex-col justify-end">
+                  <h3 className="font-bold text-white text-base leading-tight mb-1">
+                    {partner.name}
+                  </h3>
+                  <p className="text-xs text-white/80 font-medium">
+                    {partner.discount_value && `${partner.discount_value} · `}
+                    {partner.benefit_short}
+                  </p>
                 </div>
-              )}
-              <h3 className="font-semibold text-foreground text-sm leading-tight">
-                {partner.name}
-              </h3>
-              <p className="text-xs text-tiffany-dark font-medium">
-                {partner.discount_value && `${partner.discount_value} · `}
-                {partner.benefit_short}
-              </p>
+              </div>
             </div>
           ))}
         </div>
