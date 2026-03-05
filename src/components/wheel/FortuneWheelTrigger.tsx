@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { FortuneWheelDialog } from './FortuneWheelDialog';
 import { useWheelSpins } from '@/hooks/useWheelSpins';
 
-const WHEEL_SHOWN_KEY = 'wheel_dialog_shown_session';
+const WHEEL_SHOWN_KEY = 'flyart_wheel_shown'; // permanent localStorage key
 const SHOW_DELAY_MS = 30000; // 30 seconds
 
 export function FortuneWheelTrigger() {
@@ -13,12 +13,12 @@ export function FortuneWheelTrigger() {
     // Don't show if no segments or can't spin
     if (isLoading || !canSpin || segments.length === 0) return;
 
-    // Don't show again in this session
-    if (sessionStorage.getItem(WHEEL_SHOWN_KEY)) return;
+    // Don't show again if wheel was ever shown on this device
+    if (localStorage.getItem(WHEEL_SHOWN_KEY)) return;
 
     const timer = setTimeout(() => {
       setIsOpen(true);
-      sessionStorage.setItem(WHEEL_SHOWN_KEY, 'true');
+      localStorage.setItem(WHEEL_SHOWN_KEY, 'true');
     }, SHOW_DELAY_MS);
 
     return () => clearTimeout(timer);
