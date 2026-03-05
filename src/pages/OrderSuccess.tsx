@@ -2,16 +2,19 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { CheckCircle, Phone, ArrowRight, XCircle, CreditCard } from "lucide-react";
+import { CheckCircle, Phone, ArrowRight, XCircle, CreditCard, Gift, ExternalLink } from "lucide-react";
+import { useActivePartners } from "@/hooks/usePartners";
 
 const OrderSuccess = () => {
   const { orderNumber } = useParams<{ orderNumber: string }>();
   const [searchParams] = useSearchParams();
   const paymentStatus = searchParams.get("payment");
+  const { data: partners = [] } = useActivePartners();
   
   const isPaymentSuccess = paymentStatus === "success";
   const isPaymentFailed = paymentStatus === "failed";
   const isPaid = isPaymentSuccess;
+  const activePartnersWithPromo = partners.filter(p => p.promo_code || p.website_url);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -95,7 +98,69 @@ const OrderSuccess = () => {
               </ul>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style={{ animationDelay: "0.3s" }}>
+            {/* Partner bonuses */}
+            {!isPaymentFailed && activePartnersWithPromo.length > 0 && (
+              <div className="bg-card rounded-2xl border border-tiffany/20 p-6 mb-8 text-left animate-fade-up" style={{ animationDelay: "0.3s" }}>
+                <div className="flex items-center gap-2 mb-4">
+                  <Gift className="h-5 w-5 text-tiffany" />
+                  <h2 className="font-semibold text-foreground">
+                    Бонусы от наших партнёров
+                  </h2>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Спасибо за заказ! Воспользуйтесь скидками от наших партнёров:
+                </p>
+                <div className="space-y-3">
+                  {activePartnersWithPromo.map((partner) => (
+                    <div
+                      key={partner.id}
+                      className="flex items-center gap-4 bg-warm-cream rounded-xl p-4 border border-border/50"
+                    >
+                      {partner.logo_url ? (
+                        <img
+                          src={partner.logo_url}
+                          alt={partner.name}
+                          className="h-12 w-12 rounded-lg object-cover flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="h-12 w-12 rounded-lg bg-tiffany-light flex items-center justify-center flex-shrink-0">
+                          <Gift className="h-5 w-5 text-tiffany" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-foreground text-sm">{partner.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {partner.discount_value && (
+                            <span className="text-tiffany-dark font-medium">{partner.discount_value} · </span>
+                          )}
+                          {partner.benefit_short}
+                        </p>
+                        {partner.promo_code && (
+                          <div className="mt-1.5 inline-flex items-center gap-1.5 bg-tiffany/10 text-tiffany-dark text-xs font-mono font-bold px-3 py-1 rounded-full">
+                            Промокод: {partner.promo_code}
+                          </div>
+                        )}
+                      </div>
+                      {partner.website_url && (
+                        <a
+                          href={partner.website_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-shrink-0"
+                        >
+                          <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                            <ExternalLink className="h-3.5 w-3.5" />
+                            Сайт
+                          </Button>
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style={{ animationDelay: "0.35s" }}>
               <Link to="/catalog">
                 <Button variant="cta" size="lg">
                   {isPaymentFailed ? "Вернуться в каталог" : "Продолжить покупки"}
