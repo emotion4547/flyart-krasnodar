@@ -1,99 +1,52 @@
 
 
-# План: Система «Партнёры»
+# Аудит сайта FlyArt — находки и рекомендации
 
-## Общая идея
+## 1. Обнаруженные проблемы
 
-Партнёры — компании/сервисы, которые предоставляют скидки/бонусы покупателям FlyArt после оформления заказа. Управление через админку, отображение на отдельной странице `/partners`, в блоке на главной и в виде мини-карточек в корзине.
+### 1.1 Регистрация не сохраняет имя и телефон
+В `Auth.tsx` собираются `registerName` и `registerPhone`, но в `signUp` передаётся только email/password — имя и телефон теряются. Нужно передавать `full_name` и `phone` через `options.data` в `signUp`, а `handle_new_user` — записывать их в `profiles`.
 
----
+### 1.2 Каталог — фильтрация по категориям на клиенте
+В `Catalog.tsx` загружаются **все** активные товары, а фильтрация по категории делается на клиенте (строка 114-122). При росте каталога (100+ товаров) это будет тормозить и упрётся в лимит 1000 строк. Нужно фильтровать на стороне базы.
 
-## 1. База данных — таблица `partners`
+### 1.3 Hardcoded телефон на странице благодарности
+В `OrderSuccess.tsx` (строка 186) захардкожен `tel:+79001234567` вместо использования `useContactInfo`.
 
-Новая таблица:
-```sql
-CREATE TABLE public.partners (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name text NOT NULL,
-  slug text NOT NULL UNIQUE,
-  logo_url text,
-  description text,
-  benefit_short text NOT NULL,    -- краткое описание выгоды ("Скидка 10% на торты")
-  benefit_detail text,            -- подробное описание
-  website_url text,
-  promo_code text,                -- промокод партнёра (показывается после покупки)
-  discount_value text,            -- "10%", "500₽" и т.д.
-  is_active boolean DEFAULT true,
-  sort_order integer DEFAULT 0,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
+### 1.4 Промокод партнёра не копируется по клику
+На `OrderSuccess.tsx` и `Partners.tsx` промокоды отображаются, но нет кнопки копирования — пользователю неудобно.
 
-ALTER TABLE public.partners ENABLE ROW LEVEL SECURITY;
+### 1.5 Купонный тост спамит при каждом визите корзины
+В `Cart.tsx` (строка 27-34) toast с купонами показывается при каждом рендере, если есть активные купоны, даже если пользователь уже видел уведомление.
 
--- Публичный просмотр активных
-CREATE POLICY "Anyone can view active partners" ON public.partners
-  FOR SELECT USING (is_active = true);
+### 1.6 `useFavorites` не использует React Query
+Избранное реализовано через `useState` + `useEffect` вместо `useQuery`. Нет кэширования, нет автоматического refetch, нет dedupe запросов.
 
--- Админы управляют
-CREATE POLICY "Admins can manage partners" ON public.partners
-  FOR ALL USING (is_admin_or_manager(auth.uid()))
-  WITH CHECK (is_admin_or_manager(auth.uid()));
-```
+## 2. Потенциальные оптимизации
 
-## 2. Публичная страница `/partners`
+### 2.1 Дублирование кода создания заказа в Checkout
+Логика создания заказа (online vs offline) в `Checkout.tsx` дублируется на ~60 строк. Можно вынести в общую функцию.
 
-Новый файл `src/pages/Partners.tsx`:
-- Header + Footer
-- SEO-компонент
-- Сетка карточек партнёров (логотип, название, описание выгоды, ссылка на сайт)
-- Стиль аналогичен существующим страницам (rounded-2xl карточки, gold-line)
+### 2.2 Партнёры: `logo_url` vs баннер
+Поле в БД называется `logo_url`, но фактически хранит баннер 16:9. Не критично, но вводит в заблуждение.
 
-## 3. Блок партнёров на главной
+### 2.3 SEO: отсутствует `<SEO>` на OrderSuccess
+Страница благодарности не имеет мета-тегов (не критично, т.к. noindex).
 
-Новый компонент `src/components/home/PartnersSection.tsx`:
-- Горизонтальная карусель логотипов с кратким описанием выгоды
-- Кнопка «Все партнёры» → `/partners`
-- Добавляется в `Index.tsx` как LazySection
+## 3. Рекомендуемый план действий
 
-## 4. Мини-карточки в корзине
+### Критичные исправления:
+1. **Исправить регистрацию** — передавать `full_name` в `signUp` metadata и обновить триггер `handle_new_user` для записи `phone`
+2. **Исправить hardcoded телефон** на странице OrderSuccess — использовать `useContactInfo`
+3. **Ограничить тост купонов** — показывать один раз за сессию (через sessionStorage flag)
 
-В `src/pages/Cart.tsx` добавить блок **«Бонусы от партнёров»** между списком товаров и итого:
-- Компактные горизонтальные карточки (логотип + benefit_short)
-- Текст: «Оформите заказ и получите бонусы от наших партнёров»
-- Компонент `src/components/cart/PartnerBenefits.tsx`
+### Улучшения UX:
+4. **Добавить копирование промокода** по клику на страницах OrderSuccess и Partners
+5. **Серверная фильтрация каталога** — переместить фильтрацию по категории в SQL-запрос
 
-## 5. Админка — управление партнёрами
+### Технический долг:
+6. **Переписать `useFavorites`** на React Query для единообразия и кэширования
+7. **Рефакторинг Checkout** — вынести общую логику создания заказа
 
-Новый компонент `src/components/admin/PartnersManager.tsx`:
-- CRUD: создание, редактирование, удаление, переключение активности
-- Загрузка логотипа через ImageUploader
-- Drag-and-drop сортировка (как в CollectionsManager)
-- Добавить вкладку «Партнёры» в `ContentHub.tsx`
-
-## 6. Роутинг
-
-В `App.tsx`:
-- Добавить lazy-импорт `Partners` и маршрут `/partners`
-
-## 7. Навигация
-
-В Footer добавить ссылку «Партнёры» → `/partners`
-
----
-
-## Файлы
-
-| Файл | Действие |
-|---|---|
-| Migration SQL | Создать таблицу `partners` |
-| `src/pages/Partners.tsx` | Новый — публичная страница |
-| `src/components/home/PartnersSection.tsx` | Новый — блок на главной |
-| `src/components/cart/PartnerBenefits.tsx` | Новый — карточки в корзине |
-| `src/components/admin/PartnersManager.tsx` | Новый — CRUD в админке |
-| `src/pages/admin/ContentHub.tsx` | Добавить вкладку «Партнёры» |
-| `src/pages/Index.tsx` | Добавить PartnersSection |
-| `src/pages/Cart.tsx` | Добавить PartnerBenefits |
-| `src/App.tsx` | Маршрут `/partners` |
-| `src/components/layout/Footer.tsx` | Ссылка на партнёров |
+Все изменения — в клиентском коде, кроме пункта 1 (потребуется миграция для обновления триггера `handle_new_user`).
 
