@@ -45,6 +45,8 @@ export function HeroSection() {
           muted
           playsInline
           preload="auto"
+          // @ts-ignore - fetchpriority is valid HTML but not in React types yet
+          fetchpriority="high"
           className="w-full h-full object-cover"
           style={{ 
             // Prevent CLS by reserving space
