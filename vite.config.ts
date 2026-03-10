@@ -52,6 +52,8 @@ export default defineConfig(({ mode }) => ({
         skipWaiting: true,
         // Claim clients immediately
         clientsClaim: true,
+        // Never cache OAuth redirects
+        navigateFallbackDenylist: [/^\/~oauth/],
         // Precache essential assets
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         // Runtime caching strategies
