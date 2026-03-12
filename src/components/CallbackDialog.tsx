@@ -69,6 +69,16 @@ export function CallbackDialog({ open: controlledOpen, onOpenChange, showTrigger
 
       if (error) throw error;
 
+      // Telegram notification
+      try {
+        const message = `📞 <b>Заявка на обратный звонок</b>\n\n👤 Имя: ${result.data.name}\n📱 Телефон: ${result.data.phone}`;
+        await supabase.functions.invoke("send-telegram", {
+          body: { message },
+        });
+      } catch (tgErr) {
+        console.error("Telegram notification failed:", tgErr);
+      }
+
       toast.success("Заявка отправлена! Мы перезвоним вам в ближайшее время.");
       setName("");
       setPhone("");

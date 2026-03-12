@@ -46,6 +46,17 @@ export function ContactForm() {
       return;
     }
 
+    // Telegram notification
+    try {
+      const commentText = comment ? `\n💬 Комментарий: ${comment}` : "";
+      const message = `📞 <b>Заявка на обратный звонок</b>\n\n👤 Имя: ${name}\n📱 Телефон: ${phone}${commentText}`;
+      await supabase.functions.invoke("send-telegram", {
+        body: { message },
+      });
+    } catch (tgErr) {
+      console.error("Telegram notification failed:", tgErr);
+    }
+
     toast({
       title: "Заявка отправлена!",
       description: "Мы свяжемся с вами в ближайшее время",
