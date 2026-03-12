@@ -100,6 +100,68 @@ const Checkout = () => {
     ? paymentMethod 
     : availablePaymentMethods[0]?.id || 'card';
 
+  // --- Shared helpers ---
+  const createOrder = async (data: { name: string; phone: string; email: string; address: string; comment: string }, status: string) => {
+    const { data: order, error } = await supabase
+      .from("orders")
+      .insert({
+        customer_name: data.name,
+        customer_phone: data.phone,
+        customer_email: data.email || null,
+        delivery_address: data.address,
+        comment: data.comment || null,
+        subtotal: totalPrice,
+        total: finalTotal,
+        order_number: "",
+        status,
+        payment_method: effectivePaymentMethod,
+      })
+      .select()
+      .maybeSingle();
+    if (error) throw error;
+    return order!;
+  };
+
+  const createOrderItems = async (orderId: string) => {
+    const orderItems = items.map((item) => ({
+      order_id: orderId,
+      product_id: item.id,
+      product_title: item.title,
+      product_sku: item.sku,
+      quantity: item.quantity,
+      price: item.price,
+      total: item.price * item.quantity,
+    }));
+    const { error } = await supabase.from("order_items").insert(orderItems);
+    if (error) throw error;
+  };
+
+  const markCouponUsed = async (couponId: string, orderId: string) => {
+    try {
+      await supabase
+        .from('user_coupons')
+        .update({ is_used: true, used_at: new Date().toISOString(), order_id: orderId })
+        .eq('id', couponId);
+    } catch (err) {
+      console.error('Error marking coupon as used:', err);
+    }
+  };
+
+  const rollbackOrder = async (orderId: string, couponId: string | null) => {
+    await supabase.from("order_items").delete().eq("order_id", orderId);
+    await supabase.from("orders").delete().eq("id", orderId);
+    if (couponId) {
+      try {
+        await supabase
+          .from('user_coupons')
+          .update({ is_used: false, used_at: null, order_id: null })
+          .eq('id', couponId);
+      } catch (err) {
+        console.error('Error restoring coupon:', err);
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
