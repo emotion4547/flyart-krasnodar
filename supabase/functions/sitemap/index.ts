@@ -17,7 +17,7 @@ Deno.serve(async (req) => {
 
     // Get site URL from request or use default
     const url = new URL(req.url);
-    const siteUrl = url.searchParams.get("siteUrl") || "https://flyart.ru";
+    const siteUrl = url.searchParams.get("siteUrl") || "https://ко-шарик.рф";
 
     console.log("Generating sitemap for:", siteUrl);
 
