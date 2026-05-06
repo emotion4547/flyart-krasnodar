@@ -228,6 +228,21 @@ const AdminWheelContent = () => {
 
   return (
     <div className="space-y-6">
+      {/* Global toggle */}
+      <div className="flex items-center justify-between p-4 bg-card rounded-lg border">
+        <div>
+          <p className="font-medium">Колесо фортуны</p>
+          <p className="text-sm text-muted-foreground">
+            {wheelEnabled ? 'Отображается для посетителей' : 'Скрыто от посетителей'}
+          </p>
+        </div>
+        <Switch
+          checked={wheelEnabled}
+          onCheckedChange={(checked) => toggleWheelMutation.mutate(checked)}
+          disabled={toggleWheelMutation.isPending}
+        />
+      </div>
+
       <Tabs defaultValue="segments">
         <TabsList className="mb-6">
           <TabsTrigger value="segments">Сегменты</TabsTrigger>
