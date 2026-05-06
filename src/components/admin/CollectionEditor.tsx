@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { escapeILike } from '@/lib/sanitize';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -85,7 +86,8 @@ export default function CollectionEditor({ collection, onClose }: CollectionEdit
         .limit(20);
 
       if (productSearch) {
-        query = query.or(`title.ilike.%${productSearch}%,sku.ilike.%${productSearch}%`);
+        const s = escapeILike(productSearch);
+        query = query.or(`title.ilike.%${s}%,sku.ilike.%${s}%`);
       }
 
       const { data, error } = await query;

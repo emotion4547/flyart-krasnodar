@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { escapeILike } from "@/lib/sanitize";
 import {
   CommandDialog,
   CommandEmpty,
