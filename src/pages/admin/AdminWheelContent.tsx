@@ -62,7 +62,7 @@ const AdminWheelContent = () => {
         .eq('key', 'wheel_enabled')
         .maybeSingle();
       if (error) throw error;
-      return data?.value?.enabled !== false;
+      return (data?.value as any)?.enabled !== false;
     },
   });
 
