@@ -216,7 +216,7 @@ const Checkout = () => {
             orderId: order.id,
             orderNumber: order.order_number,
             amount: finalTotal,
-            description: `Заказ ${order.order_number} - FlyArt`,
+            description: `Заказ ${order.order_number} - Кошарик`,
             email: data.email || undefined,
           },
         });

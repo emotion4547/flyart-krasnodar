@@ -11,11 +11,11 @@ export function LocalBusinessSchema() {
   const schemaData = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    '@id': 'https://flyart24.ru/#business',
-    name: 'FlyArt — Воздушные шары',
-    alternateName: 'ФлайАрт',
+    '@id': 'https://ко-шарик.рф/#business',
+    name: 'Кошарик — Воздушные шары',
+    alternateName: 'Кошарик',
     description: 'Доставка воздушных шаров с гелием в Красноярске. Эксклюзивные композиции для любого праздника.',
-    url: 'https://flyart24.ru',
+    url: 'https://ко-шарик.рф',
     telephone: formatPhone(contactInfo.phone),
     email: contactInfo.email,
     address: {
@@ -46,8 +46,8 @@ export function LocalBusinessSchema() {
       closes: '22:00',
     },
     priceRange: '₽₽',
-    image: 'https://flyart24.ru/og-image.jpg',
-    logo: 'https://flyart24.ru/pwa-icon.png',
+    image: 'https://ко-шарик.рф/og-image.jpg',
+    logo: 'https://ко-шарик.рф/pwa-icon.png',
     sameAs: [
       `https://vk.com/${contactInfo.vk}`,
       `https://t.me/${contactInfo.telegram}`,

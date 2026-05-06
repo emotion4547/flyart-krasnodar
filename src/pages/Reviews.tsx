@@ -11,8 +11,8 @@ const Reviews = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <SEO 
         title="Отзывы"
-        description="Отзывы клиентов о FlyArt. Читайте мнения о качестве воздушных шаров и доставке в Красноярске."
-        keywords="отзывы FlyArt, отзывы воздушные шары Красноярск"
+        description="Отзывы клиентов о Кошарик. Читайте мнения о качестве воздушных шаров и доставке в Красноярске."
+        keywords="отзывы Кошарик, отзывы воздушные шары Красноярск"
       />
       <Header />
       
@@ -26,7 +26,7 @@ const Reviews = () => {
                 Отзывы
               </h1>
               <p className="text-lg text-muted-foreground">
-                Мнения наших клиентов о работе FlyArt
+                Мнения наших клиентов о работе Кошарик
               </p>
             </div>
           </div>
@@ -45,7 +45,7 @@ const Reviews = () => {
                     </div>
                   </div>
                   <div className="text-center md:text-left flex-1">
-                    <h2 className="text-xl font-bold text-foreground mb-2">FlyArt</h2>
+                    <h2 className="text-xl font-bold text-foreground mb-2">Кошарик</h2>
                     <p className="text-muted-foreground mb-4">Воздушные шары в Красноярске</p>
                     <div className="flex items-center justify-center md:justify-start gap-1 mb-4">
                       {[1, 2, 3, 4, 5].map((star) => (

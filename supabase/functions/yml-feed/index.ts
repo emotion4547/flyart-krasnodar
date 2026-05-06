@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const url = new URL(req.url);
-    const siteUrl = url.searchParams.get("siteUrl") || "https://flyart-krasnodar.lovable.app";
+    const siteUrl = url.searchParams.get("siteUrl") || "https://ко-шарик.рф";
 
     // Fetch categories
     const { data: categories, error: catError } = await supabase
@@ -88,8 +88,8 @@ Deno.serve(async (req) => {
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
     xml += `<yml_catalog date="${dateStr}">\n`;
     xml += `  <shop>\n`;
-    xml += `    <name>FlyArt</name>\n`;
-    xml += `    <company>FlyArt</company>\n`;
+    xml += `    <name>Кошарик</name>\n`;
+    xml += `    <company>Кошарик</company>\n`;
     xml += `    <url>${escapeXml(siteUrl)}</url>\n`;
 
     // Currencies

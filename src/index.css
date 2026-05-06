@@ -62,76 +62,76 @@
 
 @layer base {
   :root {
-    /* FlyArt Color Palette */
-    --background: 40 30% 97%;
-    --foreground: 220 15% 20%;
+    /* Кошарик Color Palette — Яркий карнавал */
+    --background: 30 100% 99%;
+    --foreground: 210 20% 18%;
 
-    --card: 40 25% 98%;
-    --card-foreground: 220 15% 20%;
+    --card: 30 50% 99%;
+    --card-foreground: 210 20% 18%;
 
-    --popover: 40 25% 98%;
-    --popover-foreground: 220 15% 20%;
+    --popover: 30 50% 99%;
+    --popover-foreground: 210 20% 18%;
 
-    /* Tiffany - Primary Brand */
-    --primary: 174 50% 45%;
+    /* Orange - Primary Brand (кот из логотипа) */
+    --primary: 36 90% 55%;
     --primary-foreground: 0 0% 100%;
 
-    /* Peach - Secondary */
-    --secondary: 15 70% 92%;
-    --secondary-foreground: 220 15% 20%;
+    /* Warm peach - Secondary */
+    --secondary: 25 100% 94%;
+    --secondary-foreground: 210 20% 18%;
 
     /* Muted */
-    --muted: 40 20% 94%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 30 30% 94%;
+    --muted-foreground: 210 12% 45%;
 
-    /* Accent - Gold/Champagne */
-    --accent: 40 60% 70%;
-    --accent-foreground: 220 15% 20%;
+    /* Accent - Blue (буква из логотипа) */
+    --accent: 207 70% 55%;
+    --accent-foreground: 0 0% 100%;
 
-    /* CTA - Coral */
-    --destructive: 15 85% 60%;
+    /* CTA - Magenta/Pink (шарик из логотипа) */
+    --destructive: 330 80% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 20% 88%;
-    --input: 40 20% 88%;
-    --ring: 174 50% 45%;
+    --border: 30 30% 88%;
+    --input: 30 30% 88%;
+    --ring: 36 90% 55%;
 
     --radius: 0.75rem;
 
     /* Custom tokens */
-    --cta: 15 85% 60%;
+    --cta: 330 80% 55%;
     --cta-foreground: 0 0% 100%;
-    --cta-hover: 15 85% 55%;
+    --cta-hover: 330 80% 48%;
     
-    --tiffany: 174 50% 45%;
-    --tiffany-light: 174 50% 92%;
-    --tiffany-dark: 174 55% 35%;
+    --tiffany: 36 90% 55%;
+    --tiffany-light: 36 90% 92%;
+    --tiffany-dark: 36 90% 42%;
     
-    --peach: 15 70% 92%;
-    --peach-dark: 15 60% 85%;
+    --peach: 25 100% 94%;
+    --peach-dark: 25 80% 85%;
     
-    --gold: 40 60% 70%;
-    --gold-light: 40 50% 85%;
+    --gold: 40 70% 55%;
+    --gold-light: 40 60% 85%;
     
-    --graphite: 220 15% 20%;
-    --graphite-light: 220 10% 45%;
+    --graphite: 210 20% 18%;
+    --graphite-light: 210 12% 45%;
     
-    --warm-white: 40 30% 97%;
-    --warm-cream: 40 25% 95%;
+    --warm-white: 30 100% 99%;
+    --warm-cream: 30 50% 96%;
 
     /* Shadows */
-    --shadow-soft: 0 4px 20px -4px hsl(220 15% 20% / 0.08);
-    --shadow-card: 0 8px 30px -8px hsl(220 15% 20% / 0.1);
-    --shadow-hover: 0 12px 40px -8px hsl(174 50% 45% / 0.15);
+    --shadow-soft: 0 4px 20px -4px hsl(210 20% 18% / 0.08);
+    --shadow-card: 0 8px 30px -8px hsl(210 20% 18% / 0.1);
+    --shadow-hover: 0 12px 40px -8px hsl(36 90% 55% / 0.2);
 
-    --sidebar-background: 40 25% 98%;
-    --sidebar-foreground: 220 15% 20%;
-    --sidebar-primary: 174 50% 45%;
+    --sidebar-background: 30 50% 99%;
+    --sidebar-foreground: 210 20% 18%;
+    --sidebar-primary: 36 90% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 40 20% 94%;
-    --sidebar-accent-foreground: 220 15% 20%;
-    --sidebar-border: 40 20% 88%;
-    --sidebar-ring: 174 50% 45%;
+    --sidebar-accent: 30 30% 94%;
+    --sidebar-accent-foreground: 210 20% 18%;
+    --sidebar-border: 30 30% 88%;
+    --sidebar-ring: 36 90% 55%;
   }
 
   .dark {

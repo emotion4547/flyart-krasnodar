@@ -21,7 +21,7 @@ export function ProductSchema({
   priceCurrency = "RUB",
   availability = "InStock",
   url,
-  brand = "FlyArt",
+  brand = "Кошарик",
 }: ProductSchemaProps) {
   const schema = {
     "@context": "https://schema.org",
@@ -42,7 +42,7 @@ export function ProductSchema({
       availability: `https://schema.org/${availability}`,
       seller: {
         "@type": "Organization",
-        name: "FlyArt",
+        name: "Кошарик",
       },
     },
   };

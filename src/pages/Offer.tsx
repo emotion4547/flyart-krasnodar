@@ -9,7 +9,7 @@ const Offer = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <SEO 
         title="Публичная оферта"
-        description="Публичная оферта интернет-магазина FlyArt. Условия договора купли-продажи."
+        description="Публичная оферта интернет-магазина Кошарик. Условия договора купли-продажи."
         noindex
       />
       <Header />

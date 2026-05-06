@@ -20,8 +20,8 @@ export function AggregateRatingSchema({
   const schemaData = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    '@id': 'https://flyart24.ru/#business',
-    name: 'FlyArt — Воздушные шары',
+    '@id': 'https://ко-шарик.рф/#business',
+    name: 'Кошарик — Воздушные шары',
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: ratingValue.toFixed(1),

@@ -28,10 +28,10 @@ interface AnalyticsCode {
 }
 
 const defaultSeoTemplates: SeoTemplates = {
-  productTitle: '{{title}} - Купить в FlyArt',
+  productTitle: '{{title}} - Купить в Кошарик',
   productDescription: '{{title}} по цене {{price}} руб. {{description}}',
-  categoryTitle: '{{name}} - Каталог FlyArt',
-  categoryDescription: 'Купить {{name}} в FlyArt. {{description}}',
+  categoryTitle: '{{name}} - Каталог Кошарик',
+  categoryDescription: 'Купить {{name}} в Кошарик. {{description}}',
 };
 
 const defaultRobotsTxt: RobotsTxt = {

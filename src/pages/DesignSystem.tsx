@@ -43,13 +43,13 @@ const DesignSystem = () => {
   return (
     <>
       <SEO
-        title="Дизайн-система | FlyArt"
-        description="Полная цветовая палитра и дизайн-система сайта FlyArt"
+        title="Дизайн-система | Кошарик"
+        description="Полная цветовая палитра и дизайн-система сайта Кошарик"
       />
       <div className="min-h-screen bg-background py-12">
         <div className="container-custom">
           <h1 className="text-4xl font-display font-bold text-foreground mb-2">
-            Дизайн-система FlyArt
+            Дизайн-система Кошарик
           </h1>
           <p className="text-muted-foreground mb-12">
             Полная цветовая палитра и токены дизайн-системы

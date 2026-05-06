@@ -22,7 +22,7 @@ const defaultMessengerLinks: MessengerLinks = {
   channels: [
     { type: 'phone', value: '+79237714004', label: 'Позвонить', enabled: true },
     { type: 'whatsapp', value: '79237714004', label: 'WhatsApp', enabled: true },
-    { type: 'telegram', value: 'FlyArtKRSK', label: 'Telegram', enabled: true },
+    { type: 'telegram', value: 'КошарикKRSK', label: 'Telegram', enabled: true },
     { type: 'vk', value: 'flyart_krasnoyarsk', label: 'ВКонтакте', enabled: true },
     { type: 'max', value: 'f9LHodD0cOIgsBJYhwYzvgXVZQEOZWcZYTilnvjWf02P4dHFbb4aELVqSGQ', label: 'MAX', enabled: true },
   ],

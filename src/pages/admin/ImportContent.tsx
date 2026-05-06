@@ -236,7 +236,7 @@ export default function ImportContent() {
       {
         'Tilda UID': '',
         'External ID': 'PROD-001',
-        'Brand': 'FlyArt',
+        'Brand': 'Кошарик',
         'SKU': 'SKU-001',
         'Category': 'Шары на день рождения; Фольгированные шары',
         'Title': 'Набор шаров "День Рождения"',
@@ -250,7 +250,7 @@ export default function ImportContent() {
         'Length': 30,
         'Width': 30,
         'Height': 50,
-        'SEO title': 'Купить набор шаров - FlyArt',
+        'SEO title': 'Купить набор шаров - Кошарик',
         'SEO descr': 'Набор шаров на день рождения с доставкой',
         'SEO keywords': 'шары, день рождения, праздник',
         'FB title': 'Набор шаров День Рождения',

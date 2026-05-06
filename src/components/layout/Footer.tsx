@@ -31,9 +31,9 @@ export function Footer() {
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-6">
               <div className="h-10 w-10 rounded-full bg-gradient-to-br from-tiffany to-tiffany-dark flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-lg">F</span>
+                <span className="text-primary-foreground font-bold text-lg">К</span>
               </div>
-              <span className="text-xl font-bold text-primary-foreground tracking-tight">FlyArt</span>
+              <span className="text-xl font-bold text-primary-foreground tracking-tight">Кошарик</span>
             </Link>
             <p className="text-primary-foreground/70 text-sm mb-6 leading-relaxed">
               Доставка воздушных шаров с гелием в Красноярске. Эксклюзивные композиции для любого праздника.
@@ -120,7 +120,7 @@ export function Footer() {
       <div className="border-t border-primary-foreground/10">
         <div className="container-custom py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-primary-foreground/60">
-            <p>© 2026 FlyArt. Все права защищены.</p>
+            <p>© 2026 Кошарик. Все права защищены.</p>
             <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
               <a 
                 href="https://t.me/emotion_marketing" 
