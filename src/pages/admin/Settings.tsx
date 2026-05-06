@@ -45,7 +45,7 @@ interface PaymentSettings {
 }
 
 const defaultGeneral: GeneralSettings = {
-  siteName: 'FlyArt',
+  siteName: 'Кошарик',
   siteDescription: 'Воздушные шары и оформление праздников',
   phone: '+7 (900) 123-45-67',
   email: 'info@flyart.ru',

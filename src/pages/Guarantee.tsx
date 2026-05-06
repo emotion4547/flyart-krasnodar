@@ -30,7 +30,7 @@ const Guarantee = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <SEO 
         title="Гарантия"
-        description="Гарантия качества воздушных шаров FlyArt. Условия возврата и замены при обнаружении брака."
+        description="Гарантия качества воздушных шаров Кошарик. Условия возврата и замены при обнаружении брака."
         keywords="гарантия воздушные шары, возврат шаров"
       />
       <Header />

@@ -18,7 +18,7 @@ const defaultContactInfo: ContactInfo = {
   address: 'г. Красноярск, ул. Александра Матросова 30ст57',
   workingHours: 'Ежедневно с 09:00 до 22:00',
   whatsapp: '79237714004',
-  telegram: 'FlyArtKRSK',
+  telegram: 'КошарикKRSK',
   vk: 'flyart_krasnoyarsk',
   max: 'f9LHodD0cOIgsBJYhwYzvgXVZQEOZWcZYTilnvjWf02P4dHFbb4aELVqSGQ',
 };

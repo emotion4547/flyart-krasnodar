@@ -10,8 +10,8 @@ const Contacts = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <SEO 
         title="Контакты"
-        description="Контакты FlyArt в Красноярске. Телефон +7 (923) 771-40-04, адрес: ул. Александра Матросова 30ст57."
-        keywords="контакты FlyArt, воздушные шары Красноярск телефон"
+        description="Контакты Кошарик в Красноярске. Телефон +7 (923) 771-40-04, адрес: ул. Александра Матросова 30ст57."
+        keywords="контакты Кошарик, воздушные шары Красноярск телефон"
       />
       <Header />
       
@@ -140,7 +140,7 @@ const Contacts = () => {
                     </a>
                   </Button>
                   <Button variant="outline" size="lg" className="flex-1 min-w-[200px]" asChild>
-                    <a href="https://t.me/FlyArtKRSK" target="_blank" rel="noopener noreferrer">
+                    <a href="https://t.me/КошарикKRSK" target="_blank" rel="noopener noreferrer">
                       <Send className="h-5 w-5 mr-2" />
                       Telegram
                     </a>
@@ -160,7 +160,7 @@ const Contacts = () => {
                   width="100%" 
                   height="100%" 
                   frameBorder="0"
-                  title="Карта расположения FlyArt"
+                  title="Карта расположения Кошарик"
                   className="w-full h-full min-h-[400px]"
                   style={{ border: 0 }}
                   allowFullScreen

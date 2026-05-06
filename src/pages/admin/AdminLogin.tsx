@@ -67,7 +67,7 @@ export default function AdminLogin() {
           <div className="mx-auto w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-2">
             <LogIn className="w-6 h-6 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl">FlyArt Admin</CardTitle>
+          <CardTitle className="text-2xl">Кошарик Admin</CardTitle>
           <CardDescription>
             {isSignUp ? 'Создайте аккаунт администратора' : 'Войдите в панель управления'}
           </CardDescription>

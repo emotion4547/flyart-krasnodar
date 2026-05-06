@@ -31,8 +31,8 @@ const Sitemap = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <SEO
         title="Карта сайта"
-        description="Карта сайта FlyArt — все страницы магазина воздушных шаров в Красноярске"
-        keywords="карта сайта, FlyArt, воздушные шары"
+        description="Карта сайта Кошарик — все страницы магазина воздушных шаров в Красноярске"
+        keywords="карта сайта, Кошарик, воздушные шары"
       />
       <Header />
 

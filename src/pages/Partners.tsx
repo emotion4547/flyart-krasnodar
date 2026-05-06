@@ -18,8 +18,8 @@ const Partners = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <SEO
-        title="Партнёры — бонусы для покупателей FlyArt"
-        description="Оформите заказ в FlyArt и получите скидки и бонусы от наших партнёров в Красноярске."
+        title="Партнёры — бонусы для покупателей Кошарик"
+        description="Оформите заказ в Кошарик и получите скидки и бонусы от наших партнёров в Красноярске."
       />
       <Header />
       <main className="flex-1 section-padding bg-warm-cream">
@@ -29,7 +29,7 @@ const Partners = () => {
           </h1>
           <div className="gold-line max-w-xs mb-4" />
           <p className="text-muted-foreground mb-10 max-w-2xl">
-            Оформите заказ в FlyArt и получите эксклюзивные бонусы от наших партнёров. Промокоды и условия вы получите после оформления заказа.
+            Оформите заказ в Кошарик и получите эксклюзивные бонусы от наших партнёров. Промокоды и условия вы получите после оформления заказа.
           </p>
 
           {isLoading ? (

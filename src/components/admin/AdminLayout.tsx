@@ -138,7 +138,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-sm">FA</span>
               </div>
-              <span className="font-semibold text-lg">FlyArt Admin</span>
+              <span className="font-semibold text-lg">Кошарик Admin</span>
             </Link>
           </SidebarHeader>
           <SidebarContent>
