@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Package, FolderTree, Upload, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+
 import ProductsContent from './ProductsContent';
 import CategoriesContent from './CategoriesContent';
 import ImportContent from './ImportContent';
