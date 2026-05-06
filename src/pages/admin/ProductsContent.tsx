@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { escapeILike } from '@/lib/sanitize';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -47,7 +48,8 @@ export default function ProductsContent() {
         .order('sort_order', { ascending: true });
 
       if (search) {
-        query = query.or(`title.ilike.%${search}%,sku.ilike.%${search}%`);
+        const s = escapeILike(search);
+        query = query.or(`title.ilike.%${s}%,sku.ilike.%${s}%`);
       }
 
       if (statusFilter !== 'all') {

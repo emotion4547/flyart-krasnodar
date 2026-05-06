@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { escapeILike } from "@/lib/sanitize";
 import {
   CommandDialog,
   CommandEmpty,
@@ -60,7 +61,7 @@ export function SearchDialog({ variant = "icon" }: SearchDialogProps) {
           product_images (url, is_main)
         `)
         .eq("is_active", true)
-        .ilike("title", `%${query}%`)
+        .ilike("title", `%${escapeILike(query)}%`)
         .limit(8);
 
       if (data) {

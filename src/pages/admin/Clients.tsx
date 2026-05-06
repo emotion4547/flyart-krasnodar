@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { escapeILike } from '@/lib/sanitize';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,7 +41,7 @@ export default function Clients() {
         .order('created_at', { ascending: false });
 
       if (search) {
-        query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%`);
+        query = query.or(`name.ilike.%${escapeILike(search)}%,phone.ilike.%${escapeILike(search)}%`);
       }
 
       if (statusFilter !== 'all') {
