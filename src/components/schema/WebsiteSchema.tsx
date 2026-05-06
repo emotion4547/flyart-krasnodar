@@ -8,19 +8,19 @@ export function WebsiteSchema() {
   const schemaData = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    '@id': 'https://flyart24.ru/#website',
-    name: 'FlyArt — Воздушные шары',
-    url: 'https://flyart24.ru',
+    '@id': 'https://ко-шарик.рф/#website',
+    name: 'Кошарик — Воздушные шары',
+    url: 'https://ко-шарик.рф',
     description: 'Доставка воздушных шаров с гелием в Красноярске',
     publisher: {
-      '@id': 'https://flyart24.ru/#organization',
+      '@id': 'https://ко-шарик.рф/#organization',
     },
     inLanguage: 'ru-RU',
     potentialAction: {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: 'https://flyart24.ru/catalog?search={search_term_string}',
+        urlTemplate: 'https://ко-шарик.рф/catalog?search={search_term_string}',
       },
       'query-input': 'required name=search_term_string',
     },

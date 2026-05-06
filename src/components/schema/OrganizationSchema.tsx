@@ -11,13 +11,13 @@ export function OrganizationSchema() {
   const schemaData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    '@id': 'https://flyart24.ru/#organization',
-    name: 'FlyArt',
-    legalName: 'ИП FlyArt',
-    url: 'https://flyart24.ru',
+    '@id': 'https://ко-шарик.рф/#organization',
+    name: 'Кошарик',
+    legalName: 'ИП Кошарик',
+    url: 'https://ко-шарик.рф',
     logo: {
       '@type': 'ImageObject',
-      url: 'https://flyart24.ru/pwa-icon.png',
+      url: 'https://ко-шарик.рф/pwa-icon.png',
       width: 512,
       height: 512,
     },
