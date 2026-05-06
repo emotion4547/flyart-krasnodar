@@ -47,7 +47,8 @@ export default function ProductsContent() {
         .order('sort_order', { ascending: true });
 
       if (search) {
-        query = query.or(`title.ilike.%${search}%,sku.ilike.%${search}%`);
+        const s = escapeILike(search);
+        query = query.or(`title.ilike.%${s}%,sku.ilike.%${s}%`);
       }
 
       if (statusFilter !== 'all') {

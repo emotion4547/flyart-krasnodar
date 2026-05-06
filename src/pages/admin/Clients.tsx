@@ -40,7 +40,7 @@ export default function Clients() {
         .order('created_at', { ascending: false });
 
       if (search) {
-        query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%`);
+        query = query.or(`name.ilike.%${escapeILike(search)}%,phone.ilike.%${escapeILike(search)}%`);
       }
 
       if (statusFilter !== 'all') {

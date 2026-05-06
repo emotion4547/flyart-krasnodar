@@ -60,7 +60,7 @@ export function SearchDialog({ variant = "icon" }: SearchDialogProps) {
           product_images (url, is_main)
         `)
         .eq("is_active", true)
-        .ilike("title", `%${query}%`)
+        .ilike("title", `%${escapeILike(query)}%`)
         .limit(8);
 
       if (data) {
