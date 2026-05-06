@@ -52,6 +52,50 @@ const AdminWheelContent = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSegment, setEditingSegment] = useState<Partial<WheelSegment> | null>(null);
 
+  // Fetch wheel enabled setting
+  const { data: wheelEnabled = true } = useQuery({
+    queryKey: ['settings', 'wheel_enabled'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'wheel_enabled')
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.value as any)?.enabled !== false;
+    },
+  });
+
+  const toggleWheelMutation = useMutation({
+    mutationFn: async (enabled: boolean) => {
+      const { data: existing } = await supabase
+        .from('settings')
+        .select('id')
+        .eq('key', 'wheel_enabled')
+        .maybeSingle();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('settings')
+          .update({ value: { enabled } })
+          .eq('key', 'wheel_enabled');
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('settings')
+          .insert({ key: 'wheel_enabled', value: { enabled } });
+        if (error) throw error;
+      }
+    },
+    onSuccess: (_, enabled) => {
+      queryClient.invalidateQueries({ queryKey: ['settings', 'wheel_enabled'] });
+      toast.success(enabled ? 'Колесо фортуны включено' : 'Колесо фортуны выключено');
+    },
+    onError: () => {
+      toast.error('Ошибка при сохранении настройки');
+    },
+  });
+
   // Fetch segments
   const { data: segments = [], isLoading: segmentsLoading } = useQuery({
     queryKey: ['admin-wheel-segments'],
@@ -184,6 +228,21 @@ const AdminWheelContent = () => {
 
   return (
     <div className="space-y-6">
+      {/* Global toggle */}
+      <div className="flex items-center justify-between p-4 bg-card rounded-lg border">
+        <div>
+          <p className="font-medium">Колесо фортуны</p>
+          <p className="text-sm text-muted-foreground">
+            {wheelEnabled ? 'Отображается для посетителей' : 'Скрыто от посетителей'}
+          </p>
+        </div>
+        <Switch
+          checked={wheelEnabled}
+          onCheckedChange={(checked) => toggleWheelMutation.mutate(checked)}
+          disabled={toggleWheelMutation.isPending}
+        />
+      </div>
+
       <Tabs defaultValue="segments">
         <TabsList className="mb-6">
           <TabsTrigger value="segments">Сегменты</TabsTrigger>
