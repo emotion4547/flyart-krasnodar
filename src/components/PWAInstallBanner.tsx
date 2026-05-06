@@ -71,13 +71,13 @@ export function PWAInstallBanner() {
         <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
           <img 
             src="/pwa-icon.png" 
-            alt="FlyArt" 
+            alt="Кошарик" 
             className="h-10 w-10 object-contain"
           />
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-white font-semibold text-sm">FlyArt</p>
+          <p className="text-white font-semibold text-sm">Кошарик</p>
           {isIOS ? (
             <p className="text-white/80 text-xs">
               Нажмите <span className="font-medium">«Поделиться»</span> → <span className="font-medium">«На экран Домой»</span>

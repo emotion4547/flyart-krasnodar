@@ -18,10 +18,10 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.jpg", "robots.txt", "pwa-icon.png"],
       manifest: {
-        name: "FlyArt — Воздушные шары",
-        short_name: "FlyArt",
+        name: "Кошарик — Воздушные шары",
+        short_name: "Кошарик",
         description: "Доставка воздушных шаров с гелием в Красноярске",
-        theme_color: "#4DB6AC",
+        theme_color: "#E8961A",
         background_color: "#ffffff",
         display: "standalone",
         orientation: "portrait",

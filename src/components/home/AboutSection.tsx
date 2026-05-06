@@ -11,7 +11,7 @@ export function AboutSection() {
             <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-card">
               <img
                 src={aboutBalloons}
-                alt="Воздушные шары FlyArt"
+                alt="Воздушные шары Кошарик"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -23,7 +23,7 @@ export function AboutSection() {
           {/* Content */}
           <div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-              FlyArt — воздушные шары с душой
+              Кошарик — воздушные шары с душой
             </h2>
             <div className="gold-line max-w-xs mb-6" />
             
