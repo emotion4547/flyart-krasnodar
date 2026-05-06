@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import logoMuha from "@/assets/logo-muha.png";
+import logoKosharik from "@/assets/logo-kosharik.png";
 import { Menu, Phone, Clock, ShoppingCart, LayoutGrid, Truck, Shield, Star, MapPin, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -30,11 +30,9 @@ export function Header() {
         <div className="flex h-16 md:h-20 items-center justify-between gap-4">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="relative h-10 w-10 rounded-full bg-gradient-to-br from-tiffany to-tiffany-dark flex items-center justify-center shadow-sm">
-              <img src={logoMuha} alt="FlyArt" className="absolute h-12 w-12 object-contain -top-1" width={48} height={48} />
-            </div>
+            <img src={logoKosharik} alt="Кошарик" className="h-12 w-auto object-contain" width={48} height={48} />
             <div className="flex flex-col">
-              <span className="text-xl font-bold text-foreground tracking-tight">FlyArt</span>
+              <span className="text-xl font-bold text-foreground tracking-tight">Кошарик</span>
               <span className="text-xs text-muted-foreground hidden sm:block">Воздушные шары</span>
             </div>
           </Link>
