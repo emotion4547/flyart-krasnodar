@@ -52,17 +52,33 @@ export default function UsersManagement() {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+
+      const { data: roles } = await supabase.from('user_roles').select('user_id, role');
+      const roleMap = new Map<string, string>();
+      (roles || []).forEach((r: any) => {
+        // Prefer highest privilege if multiple
+        const current = roleMap.get(r.user_id);
+        const rank = (x: string) => (x === 'admin' ? 3 : x === 'manager' ? 2 : 1);
+        if (!current || rank(r.role) > rank(current)) roleMap.set(r.user_id, r.role);
+      });
+      return (data || []).map((p: any) => ({ ...p, role: roleMap.get(p.id) || 'user' }));
     },
   });
 
   const updateRoleMutation = useMutation({
     mutationFn: async ({ id, role }: { id: string; role: string }) => {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ role })
-        .eq('id', id);
-      if (error) throw error;
+      // Replace user roles entries with the chosen role
+      const { error: delErr } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', id);
+      if (delErr) throw delErr;
+      if (role && role !== 'user') {
+        const { error: insErr } = await supabase
+          .from('user_roles')
+          .insert({ user_id: id, role: role as 'admin' | 'manager' });
+        if (insErr) throw insErr;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
