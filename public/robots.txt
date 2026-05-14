@@ -14,4 +14,4 @@ User-agent: *
 Allow: /
 Disallow: /admin4547/
 
-Sitemap: https://gsnqucupjpdlfeqpbjup.supabase.co/functions/v1/sitemap
+Sitemap: https://ко-шарик.рф/sitemap.xml
