@@ -45,6 +45,7 @@ const DesignSystem = lazy(() => import("./pages/DesignSystem"));
 const Sitemap = lazy(() => import("./pages/Sitemap"));
 const Collection = lazy(() => import("./pages/Collection"));
 const Partners = lazy(() => import("./pages/Partners"));
+const SeoLanding = lazy(() => import("./pages/SeoLanding"));
 
 // Auth & Account pages - lazy loaded
 const Auth = lazy(() => import("./pages/Auth"));
@@ -138,6 +139,15 @@ function AppContent() {
           <Route path="/collection/:slug" element={<Collection />} />
           <Route path="/partners" element={<Partners />} />
           <Route path="/design-system" element={<DesignSystem />} />
+
+          {/* SEO landing pages */}
+          {seoLandingList.map((cfg) => (
+            <Route
+              key={cfg.path}
+              path={cfg.path}
+              element={<SeoLanding config={cfg} />}
+            />
+          ))}
           
           {/* Auth routes */}
           <Route path="/auth" element={<Auth />} />
