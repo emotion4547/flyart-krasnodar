@@ -18,6 +18,7 @@ const PendingSpinHandler = lazy(() => import("@/components/wheel/PendingSpinHand
 // Critical pages - loaded immediately
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import { seoLandingList } from "./config/seoLandings";
 
 // Loading component for suspense
 const PageLoader = () => (
