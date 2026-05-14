@@ -14,7 +14,9 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
-      // Network-first strategy for dynamic content
+      // Self-destroying SW: unregisters any previously installed service worker
+      // and clears its caches so users always get the latest version.
+      selfDestroying: true,
       registerType: "autoUpdate",
       includeAssets: ["favicon.jpg", "robots.txt", "pwa-icon.png"],
       manifest: {
